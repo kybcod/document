@@ -25,4 +25,8 @@ public class MappingController {
         session.invalidate();
         return "redirect:/login";
     }
+
+    /****************************** 메인페이지 ******************************/
+    @GetMapping("/")
+    public String main() {return "main";}
 }
