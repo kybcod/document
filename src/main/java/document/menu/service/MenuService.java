@@ -106,6 +106,7 @@ public class MenuService {
         // 무조건 자기 자신 삭제
         menuMapper.deleteMenuById(menuDto.getMenuId());
 
+
         // 상위 메뉴가 삭제 시 하위 메뉴들도 삭제
         if ("0000".equals(menuDto.getMenuGroup())) {
             List<MenuDto> childIds = menuMapper.findChildren(menuDto.getMenuId());
@@ -113,6 +114,13 @@ public class MenuService {
                 menuMapper.deleteMenuById(childId.getMenuId());
             }
         }
+
+        // TB_PREMITDETAIL에서도 삭제
+        MenuAuthDto menuAuthDto = MenuAuthDto.builder()
+                .menuId(menuDto.getMenuId())
+                .permitId(menuDto.getPermitId())
+                .build();
+        menuAuthMapper.deletePermitDetail(menuAuthDto);
 
     }
 
