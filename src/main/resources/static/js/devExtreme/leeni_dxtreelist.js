@@ -349,13 +349,11 @@ dxtreelist.prototype.setColumns = function(columns) {
 	columns.forEach(function(column) {
 		let colConfig = { dataField: column, alignment: "center" };
 
-		if (column === "cdat" || column === "regdate"|| column === "crtDt"|| column === "creDate") {
+		if (column === "crtDt") {
 			colConfig.customizeText = function(cellInfo) {
 				const dateStr = cellInfo.value;
-				if (dateStr && dateStr.length === 8) {
-					return dateStr.substring(0, 4) + '/' +
-						dateStr.substring(4, 6) + '/' +
-						dateStr.substring(6, 8);
+				if (typeof dateStr === "string" && dateStr.includes(" ")) {
+					return dateStr.split(" ")[0];
 				}
 				return dateStr;
 			};

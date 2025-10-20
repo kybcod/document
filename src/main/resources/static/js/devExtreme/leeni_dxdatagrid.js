@@ -238,12 +238,15 @@ dxdatagrid.prototype.setColumns = function (columns, merges) {
 			colConfig.allowEditing = false;
 		}
 
-		// 🔹 permitId 컬럼만 lookup 적용
-		if (column === "permitId") {
-			colConfig.lookup = {
-				dataSource: menuLookupData,
-				valueExpr: "ID",
-				displayExpr: "Name"
+
+
+		if (column === "crtDt") {
+			colConfig.customizeText = function(cellInfo) {
+				const dateStr = cellInfo.value;
+				if (typeof dateStr === "string" && dateStr.includes(" ")) {
+					return dateStr.split(" ")[0];
+				}
+				return dateStr;
 			};
 		}
 
