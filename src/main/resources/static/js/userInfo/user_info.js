@@ -111,6 +111,19 @@ function userInfoDataGridSetting() {
         sendDataToServer("user", 'DELETE',data, deferred, userListGrid, getUserInfoList);
     });
 
+    dataGrid.setOnCellPrepared(function(e) {
+        if (e.rowType === 'data' && e.column.dataField === 'pwdFcnt') {
+            e.cellElement.css('color', 'blue');
+            e.cellElement.css('cursor', 'pointer');
+        }
+    });
+
+    dataGrid.setOnCellClick(function(e, deferred) {
+        if (e.column.dataField === 'pwdFcnt') {
+            sendDataToServer("user/updatePwdFcntZero", 'PUT',e.data, deferred, userListGrid, getUserInfoList);
+        }
+    });
+
     userListGrid = $('#userListGrid').dxDataGrid(dataGrid).dxDataGrid("instance");
 
     userListGrid.beginCustomLoading();

@@ -86,4 +86,19 @@ public class UserController {
         }
     }
 
+
+
+    @Description("실패 횟수 리셋")
+    @PutMapping("/updatePwdFcntZero")
+    public ResponseEntity<?> updatePwdFcntZero(@RequestBody UserDto userDto) {
+        try {
+             userService.updatePwdFcntZero(userDto);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+
+    }
+
+
 }

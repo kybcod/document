@@ -162,4 +162,13 @@ public class UserService {
         log.info("phone {}", phone);
         return phone.replaceAll("[^0-9]", "");
     }
+
+
+
+    /**
+     *  비밀번호 실패 횟수 리셋
+     */
+    public void updatePwdFcntZero(UserDto userDto) throws Exception {
+        userMapper.updatePwdFcnt("0", userDto.getUserId());
+    }
 }
