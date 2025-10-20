@@ -311,6 +311,11 @@ function changePassword() {
     let userPass = $('#chgPw').val();
     let userPassCheck = $('#chgPwConfirm').val();
 
+    if (!userId || userId === "") {
+        basicAlert({ icon: 'error', title: "", text: '아이디를 입력하세요.' });
+        return;
+    }
+
     if (!userPass || !userPassCheck) {
         basicAlert({ icon: 'error', title: "", text: '비밀번호를 입력하세요.' });
         return;
