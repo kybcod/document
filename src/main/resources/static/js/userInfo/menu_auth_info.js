@@ -60,17 +60,17 @@ function menuAuthMgmtDataGridSetting() {
 
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
-        sendDbmsDataToServer("menu-auth/mgmtInsert", data, deferred, menuAuthMgmtGrid, getMenuAuthMgmtList);
+        sendDataToServer("menu-auth",'POST', data, deferred, menuAuthMgmtGrid, getMenuAuthMgmtList);
     });
 
     // 수정
     dataGrid.setOnRowUpdating(function(data, deferred) {
-        sendDbmsDataToServer("menu-auth/mgmtUpdate", data, deferred, menuAuthMgmtGrid, getMenuAuthMgmtList);
+        sendDataToServer("menu-auth",'PUT', data, deferred, menuAuthMgmtGrid, getMenuAuthMgmtList);
     });
 
     // 삭제
     dataGrid.setOnRowRemoving(function(data, deferred) {
-        sendDbmsDataToServer("menu-auth/mgmtDelete", data, deferred, menuAuthMgmtGrid, getMenuAuthMgmtList);
+        sendDataToServer("menu-auth",'DELETE', data, deferred, menuAuthMgmtGrid, getMenuAuthMgmtList);
     });
 
     dataGrid.setOnRowClick(function(e){
@@ -135,7 +135,7 @@ function menuAuthInsertDataGridSetting() {
 
     // 삭제
     dataTreeList.setOnRowRemoving(function(data, deferred) {
-        sendDbmsDataToServer("menu-auth/permitDetailDelete", data, deferred, menuAuthInsertTreeList, getMenuAuthInsertList);
+        sendDataToServer("menu-auth/permitDetailDelete",'POST', data, deferred, menuAuthInsertTreeList, getMenuAuthInsertList);
     });
 
     menuAuthInsertTreeList = $('#menuAuthInsertGrid').dxTreeList(dataTreeList).dxTreeList("instance");

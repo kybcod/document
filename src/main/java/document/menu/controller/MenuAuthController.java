@@ -9,29 +9,26 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("menu-auth/")
+@RequestMapping("menu-auth")
 public class MenuAuthController {
 
     private final MenuAuthService menuAuthService;
 
     @Description("메뉴 권한 관리 리스트")
-    @PostMapping("mgmtList")
+    @PostMapping("/mgmtList")
     public ResponseEntity<?> menuMgmtList(MenuAuthDto menuAuthDto) {
         return ResponseEntity.ok(menuAuthService.getMenuMgmtList(menuAuthDto));
     }
 
     @Description("메뉴 권한 관리 수정")
-    @PostMapping("mgmtUpdate")
+    @PutMapping
     public ResponseEntity<?> updateMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto, HttpSession session) {
         try {
             UserDto userDto = (UserDto) session.getAttribute("loginUser");
@@ -44,7 +41,7 @@ public class MenuAuthController {
     }
 
     @Description("메뉴 권한 관리 등록")
-    @PostMapping("mgmtInsert")
+    @PostMapping
     public ResponseEntity<?> insertMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto, HttpSession session) {
         try {
             UserDto userDto = (UserDto) session.getAttribute("loginUser");
@@ -56,7 +53,7 @@ public class MenuAuthController {
     }
 
     @Description("메뉴 권한 관리 삭제")
-    @PostMapping("mgmtDelete")
+    @DeleteMapping
     public ResponseEntity<?> deleteMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto) {
         try {
             menuAuthService.deleteMenuAuthInfo(menuAuthDto);
@@ -68,21 +65,14 @@ public class MenuAuthController {
     }
 
 
-
-
-
-
-
-
-
     @Description("메뉴 권한 등록 리스트")
-    @PostMapping("insertList")
+    @PostMapping("/insertList")
     public ResponseEntity<?> getMenuInsertListByPermitId(@RequestBody MenuAuthDto menuAuthDto) {
         return ResponseEntity.ok(menuAuthService.getMenuInsertListByPermitId(menuAuthDto));
     }
 
     @Description("메뉴 권한 관리 삭제")
-    @PostMapping("permitDetailDelete")
+    @PostMapping("/permitDetailDelete")
     public ResponseEntity<?> deletePermitDetail(@RequestBody MenuAuthDto menuAuthDto) {
         try {
             menuAuthService.deletePermitDetail(menuAuthDto);
@@ -94,7 +84,7 @@ public class MenuAuthController {
     }
 
     @Description("권한 아이디 마다 메뉴 사용 여부 결정")
-    @PostMapping("menuUseinsert")
+    @PostMapping("/menuUseinsert")
     public ResponseEntity<?> insertMenuAuthUse(@RequestBody List<UseMenuDto> menuList, HttpSession session) {
         try {
             UserDto userDto = (UserDto) session.getAttribute("loginUser");

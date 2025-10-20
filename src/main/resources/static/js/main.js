@@ -253,10 +253,10 @@ const logout = () => {
 };
 
 // 공통 그리드 추가/함수/삭제 ajax 함수
-function sendDbmsDataToServer(url, data, deferred, gridInstance, reloadFn) {
+function sendDataToServer(url, type, data, deferred, gridInstance, reloadFn) {
     $.ajax({
         url: url,
-        type: "POST",
+        type: type,
         contentType: "application/json",
         data: JSON.stringify(data),
         success: (res) => {

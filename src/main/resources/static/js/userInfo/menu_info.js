@@ -65,17 +65,17 @@ function menuInfoTreeListSetting() {
 
     // 등록
     dataTreeList.setOnRowInserting(function(data, deferred) {
-        sendDbmsDataToServer("menu/insert", data, deferred, menuTreeList, getMenuInfoList);
+        sendDataToServer("menu",'POST', data, deferred, menuTreeList, getMenuInfoList);
     });
 
     // 수정
     dataTreeList.setOnRowUpdating(function(data, deferred) {
-        sendDbmsDataToServer("menu/update", data, deferred, menuTreeList, getMenuInfoList);
+        sendDataToServer("menu",'PUT', data, deferred, menuTreeList, getMenuInfoList);
     });
 
     // 삭제
     dataTreeList.setOnRowRemoving(function(data, deferred) {
-        sendDbmsDataToServer("menu/delete", data, deferred, menuTreeList, getMenuInfoList);
+        sendDataToServer("menu",'DELETE', data, deferred, menuTreeList, getMenuInfoList);
     });
 
     menuTreeList = $('#menuTreeList').dxTreeList(dataTreeList).dxTreeList("instance");

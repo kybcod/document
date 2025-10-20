@@ -7,34 +7,31 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("user/")
+@RequestMapping("user")
 public class UserController {
 
     private final UserService userService;
 
     @Description("사용자 관리 User 리스트")
-    @PostMapping("list")
+    @PostMapping("/list")
     public ResponseEntity<?> userList(UserDto userDto) {
         return ResponseEntity.ok(userService.getUserList(userDto));
     }
 
     @Description("사용자 관리 메뉴 권한 리스트")
-    @PostMapping("menu-role/list")
+    @PostMapping("/menu-role/list")
     public ResponseEntity<?> UserList(UserDto userDto) {
         return ResponseEntity.ok(userService.getMenuRoleList(userDto));
     }
 
     @Description("사용자 관리 User 수정")
-    @PostMapping("update")
+    @PutMapping
     public ResponseEntity<?> updateUserList(@RequestBody UserDto userDto) {
         try {
             UserDto updatedUserInfo = userService.updateUserInfo(userDto);
@@ -46,7 +43,7 @@ public class UserController {
     }
 
     @Description("사용자 관리 User 등록")
-    @PostMapping("insert")
+    @PostMapping
     public ResponseEntity<?> insertUserInfo(@RequestBody UserDto userDto) {
         try {
             UserDto insertUserDto = userService.insertUserInfo(userDto);
@@ -57,7 +54,7 @@ public class UserController {
     }
 
     @Description("사용자 관리 User 삭제")
-    @PostMapping("delete")
+    @DeleteMapping
     public ResponseEntity<?> deleteUserInfo(@RequestBody UserDto userDto) {
         try {
             userService.deleteUserInfo(userDto);
@@ -69,7 +66,7 @@ public class UserController {
     }
 
     @Description("로그인 체크")
-    @PostMapping("loginck")
+    @PostMapping("/loginck")
     public ResponseEntity<?> loginck(@RequestBody UserDto userDto, HttpSession session) throws Exception {
         UserDto loginUser = userService.login(userDto);
         session.setAttribute("loginUser", loginUser);
@@ -78,7 +75,7 @@ public class UserController {
     }
 
     @Description("암호 변경")
-    @PostMapping("changePassword")
+    @PostMapping("/changePassword")
     public ResponseEntity<?> changePassword(@RequestBody UserDto userDto){
 
         try {

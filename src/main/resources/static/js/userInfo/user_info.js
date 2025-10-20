@@ -28,7 +28,7 @@ function getUserInfoList() {
     });
 }
 
-// DBMS 그리드 세팅
+// USER 그리드 세팅
 function userInfoDataGridSetting() {
 
     let dataGrid = new dxdatagrid();
@@ -58,24 +58,29 @@ function userInfoDataGridSetting() {
 
     dataGrid.setValidationRules('permitId', 'required', '권한 아이디를 입력해주세요');
     dataGrid.setOnEditorPreparing(function(e) {
-        // 등록 모드일 때 SelectBox 설정
+        if (e.parentType !== 'dataRow') {
+            return;
+        }
+
+        // permitId 필드를 dxSelectBox로 설정
         if (e.dataField === "permitId") {
             e.editorName = "dxSelectBox";
-            e.editorOptions = {
-                dataSource: menuLookupData,
-                valueExpr: "ID",
-                displayExpr: "Name",
-                placeholder: "Select..."
+            e.editorOptions.dataSource = menuLookupData;
+            e.editorOptions.valueExpr = "ID";
+            e.editorOptions.displayExpr = "Name";
+            e.editorOptions.placeholder = "Select...";
+            e.editorOptions.onValueChanged = function (args) {
+                e.setValue(args.value);
             };
         }
 
         // 기존 행 수정 시 userId는 읽기 전용으로 설정
-        if (e.parentType === 'dataRow' && e.dataField === 'userId') {
-            e.editorOptions.readOnly = !e.row.isNewRow; // 로직 수정
+        if (e.dataField === 'userId') {
+            e.editorOptions.readOnly = !e.row.isNewRow;
         }
 
         // userPass 필드를 '비밀번호 초기화' 버튼으로 변경
-        if (e.parentType === 'dataRow' && e.dataField === 'userPass') {
+        if (e.dataField === 'userPass') {
             if (e.row.isNewRow) {
                 // 등록 시에는 userPass 필드를 숨김 (DOM 조작)
                 $(e.editorElement).closest('.dx-field-item').hide();
@@ -93,17 +98,17 @@ function userInfoDataGridSetting() {
 
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
-        sendDbmsDataToServer("user/insert", data, deferred, userListGrid, getUserInfoList);
+        sendDataToServer("user",'POST', data, deferred, userListGrid, getUserInfoList);
     });
 
     // 수정
     dataGrid.setOnRowUpdating(function(data, deferred) {
-        sendDbmsDataToServer("user/update", data, deferred, userListGrid, getUserInfoList);
+        sendDataToServer("user", 'PUT',data, deferred, userListGrid, getUserInfoList);
     });
 
     // 삭제
     dataGrid.setOnRowRemoving(function(data, deferred) {
-        sendDbmsDataToServer("user/delete", data, deferred, userListGrid, getUserInfoList);
+        sendDataToServer("user", 'DELETE',data, deferred, userListGrid, getUserInfoList);
     });
 
     userListGrid = $('#userListGrid').dxDataGrid(dataGrid).dxDataGrid("instance");
