@@ -303,6 +303,10 @@ function openPwChangeModal(userId) {
 
 function closePwChangeModal() {
     $("#pwChangeModal").hide();
+    $('#chgUserId').val("");
+    $('#chgTel').val("");
+    $('#chgPw').val("");
+    $('#chgPwConfirm').val("");
 }
 
 function changePassword() {
