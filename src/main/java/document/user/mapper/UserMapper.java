@@ -18,4 +18,5 @@ public interface UserMapper {
     int updateUserPkgInfo(UserDto userDto);
     int updatePassword(String userId, String userPass);
     UserDto login(UserDto userDto);
+    void updatePwdFcnt(String pwdFcnt, String userId);
 }

@@ -102,8 +102,12 @@ public class UserService {
 
         UserDto loginUser = userMapper.login(userDto);
         if (loginUser == null) {
+            int failCnt = Integer.valueOf(user.getPwdFcnt()) + 1;
+            userMapper.updatePwdFcnt(String.valueOf(failCnt), userDto.getUserId());
             throw new LoginException(LoginStatus.WRONG_PASSWORD);
         }
+
+        userMapper.updatePwdFcnt("0", userDto.getUserId());
 
         // 4. 정상 로그인
         return loginUser;
@@ -123,7 +127,7 @@ public class UserService {
             throw new Exception("존재하지 않는 사용자입니다.");
         }
 
-        String dbPhone = integerPhone(user.getUserTel());
+        String dbPhone = integerPhone(user.getUserTel()); // 010-1234-5678
         String inputPhone = integerPhone(userDto.getUserTel());
 
         if (!Objects.equals(dbPhone, inputPhone)) {
@@ -158,6 +162,7 @@ public class UserService {
      * 전화번호 숫자로만 비교
      */
     private String integerPhone(String phone) {
+        log.info("phone {}", phone);
         return phone.replaceAll("[^0-9]", "");
     }
 }
