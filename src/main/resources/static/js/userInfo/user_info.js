@@ -32,7 +32,7 @@ function getUserInfoList() {
 function userInfoDataGridSetting() {
 
     let dataGrid = new dxdatagrid();
-    let columns = ['userId','userName', 'userPass', 'userTel', 'userEmail', 'userFlag', 'permitId', 'pwdFcnt', 'crtId', 'crtDt', 'userPass'];
+    let columns = ['userId','userName', 'userTel', 'userEmail', 'userFlag', 'permitId', 'pwdFcnt', 'crtId', 'crtDt', 'userPass'];
     let captions = ['아이디','이름', '전화번호', '이메일', '사용구분', '권한아이디', '비번실패횟수', '등록자', '생성일','User Pass'];
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
@@ -42,7 +42,7 @@ function userInfoDataGridSetting() {
     dataGrid.setEditingTexts("사용자 관리", "이 항목을 삭제하시겠습니까?");
     dataGrid.setEditingPopup("사용자 관리", 700, 400);
     dataGrid.setEditingForm(
-        ['userId','userName', 'userPass', 'userTel', 'userEmail', 'userFlag', 'permitId', 'pwdFcnt', 'userPass'],
+        ['userId','userName', 'userTel', 'userEmail', 'userFlag', 'permitId', 'userPass'],
         2,
         2,
         "사용자 관리",

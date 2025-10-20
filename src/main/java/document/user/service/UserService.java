@@ -41,9 +41,8 @@ public class UserService {
     public UserDto updateUserInfo(UserDto userDto) throws Exception {
 
         int updateUserInfo = userMapper.updateUserInfo(userDto);
-        int updateUserPkgInfo = userMapper.updateUserPkgInfo(userDto);
 
-        if (updateUserInfo > 0 && updateUserPkgInfo > 0) {
+        if (updateUserInfo > 0) {
             return userMapper.getUserByUserId(userDto.getUserId());
         }
         return null;
@@ -61,9 +60,8 @@ public class UserService {
         }
 
         int insertUserInfo = userMapper.insertUserInfo(userDto);
-        int userPkgInfo = userMapper.insertUserPkgInfo(userDto);
 
-        if (insertUserInfo > 0 && userPkgInfo > 0) {
+        if (insertUserInfo > 0) {
             return userMapper.getUserByUserId(userDto.getUserId());
         }
         return null;
@@ -75,7 +73,6 @@ public class UserService {
      */
     public void deleteUserInfo(UserDto userDto) {
         userMapper.deleteUserInfo(userDto);
-        userMapper.deleteUserPkgInfo(userDto);
     }
 
 

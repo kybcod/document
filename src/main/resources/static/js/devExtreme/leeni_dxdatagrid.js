@@ -238,46 +238,8 @@ dxdatagrid.prototype.setColumns = function (columns, merges) {
 			colConfig.allowEditing = false;
 		}
 
-		// 🔹 dbkd 컬럼만 lookup 적용
-		if (column === "dbkd") {
-			colConfig.lookup = {
-				dataSource: dbmsLookupData,
-				valueExpr: "ID",
-				displayExpr: "Name"
-			};
-		}
-
-		// 🔹 action 컬럼만 lookup 적용
-		if (column === "action") {
-			colConfig.lookup = {
-				dataSource: [
-					{ ID: "SAVE", Name: "SAVE" },
-					{ ID: "SEND", Name: "SEND" },
-					{ ID: "CAST", Name: "CAST" },
-					{ ID: "EXEC", Name: "EXEC" },
-					{ ID: "FILE", Name: "FILE" },
-					{ ID: "SVAS", Name: "SVAS" }
-				],
-				valueExpr: "ID",
-				displayExpr: "Name"
-			};
-		}
-
-		if (column === "option") {
-			colConfig.lookup = {
-				dataSource: [
-					{ ID: "0", Name: "no load" },
-					{ ID: "1", Name: "sql load" },
-					{ ID: "2", Name: "file load" }
-				],
-				valueExpr: "ID",
-				displayExpr: "Name"
-			};
-		}
-
-
-		// 🔹 pkgId 컬럼만 lookup 적용
-		if (column === "pkgId") {
+		// 🔹 permitId 컬럼만 lookup 적용
+		if (column === "permitId") {
 			colConfig.lookup = {
 				dataSource: menuLookupData,
 				valueExpr: "ID",
@@ -285,20 +247,8 @@ dxdatagrid.prototype.setColumns = function (columns, merges) {
 			};
 		}
 
-		if (column === "cdat" || column === "regDate"|| column === "regdate"|| column === "crtDt"|| column === "creDate") {
-			colConfig.customizeText = function(cellInfo) {
-				const dateStr = cellInfo.value;
-				if (dateStr && dateStr.length === 8) {
-					return dateStr.substring(0, 4) + '/' +
-						dateStr.substring(4, 6) + '/' +
-						dateStr.substring(6, 8);
-				}
-				return dateStr;
-			};
-		}
-
 		// 🔹 'use' 컬럼에 라디오 버튼 에디터 적용
-		if (column === "use" || column === "menuUse" || column === "isUniq" || column === "enable") {
+		if (column === "use" || column === "menuUse" || column === "isUniq" || column === "enable" || column === "userFlag") {
 			colConfig.defaultValue = '1';
 			colConfig.editCellTemplate = function(cellElement, cellInfo) {
 				$('<div />').dxRadioGroup({

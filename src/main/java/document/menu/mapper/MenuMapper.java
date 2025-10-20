@@ -15,10 +15,6 @@ public interface MenuMapper {
     int insertMenuInfo(MenuDto menuDto);
     void deleteMenuById(String menuId);
     List<MenuDto> findChildren(String menuId);
-
-    List<UseMenuDto> getMenuUseList(UseMenuDto menuDto);
-    List<UseMenuDto> getNotUseMenuList(UseMenuDto menuDto);
     List<MenuDto> getMenuByMenuGroup(String menuGroup);
-
     List<UseMenuDto> getMenuWithPermitFlag(UseMenuDto menuDto);
 }

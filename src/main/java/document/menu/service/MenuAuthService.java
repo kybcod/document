@@ -138,7 +138,7 @@ public class MenuAuthService {
 
             // menuId가 DB에 없고고 realUse=1 → 추가
             if (!exist && "1".equals(menu.getRealUse())) {
-                menuAuthMapper.insertAdmPermitDetail(menuAuthDto);
+                menuAuthMapper.insertTbPermitDetail(menuAuthDto);
             }
         }
     }

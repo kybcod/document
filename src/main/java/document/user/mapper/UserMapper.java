@@ -12,10 +12,7 @@ public interface UserMapper {
     UserDto getUserByUserId(String userId);
     int updateUserInfo(UserDto userDto);
     int insertUserInfo(UserDto userDto);
-    int insertUserPkgInfo(UserDto userDto);
     void deleteUserInfo(UserDto userDto);
-    void deleteUserPkgInfo(UserDto userDto);
-    int updateUserPkgInfo(UserDto userDto);
     int updatePassword(String userId, String userPass);
     UserDto login(UserDto userDto);
     void updatePwdFcnt(String pwdFcnt, String userId);

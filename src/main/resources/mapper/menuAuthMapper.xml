@@ -28,7 +28,7 @@
             UPT_ID ,
             UPT_DT
         FROM TB_PERMIT
-        WHERE PERMIT_ID = '${permitId}'
+        WHERE PERMIT_ID = #{permitId}
     </select>
 
     <insert id="insertMenuAuthInfo" parameterType="document.menu.dto.MenuAuthDto">
@@ -42,84 +42,42 @@
             UPT_DT
         )
         VALUES (
-                   '${permitId}',
-                   '${permitName}',
-                   '${permitDesc}',
-                   '${crtId}',
-                   '${crtDt}',
-                   '${uptId}',
-                   '${uptDt}'
+                   #{permitId},
+                   #{permitName},
+                   #{permitDesc},
+                   #{crtId},
+                   #{crtDt},
+                   #{uptId},
+                   #{uptDt}
                )
     </insert>
 
     <update id="updateMenuAuthInfo" parameterType="document.menu.dto.MenuAuthDto">
         UPDATE TB_PERMIT
         SET
-            PERMIT_NAME = '${permitName}',
-            PERMIT_DESC = '${permitDesc}',
-            UPT_ID = '${uptId}',
-            UPT_DT = '${uptDt}'
+            PERMIT_NAME = #{permitName},
+            PERMIT_DESC = #{permitDesc},
+            UPT_ID = #{uptId},
+            UPT_DT = #{uptDt}
         WHERE
-            PERMIT_ID = '${permitId}'
+            PERMIT_ID = #{permitId}
     </update>
 
 
     <delete id="deleteMenuAuthInfo" parameterType="document.menu.dto.MenuAuthDto">
         DELETE FROM TB_PERMIT
-        WHERE PERMIT_ID = '${permitId}'
+        WHERE PERMIT_ID = #{permitId}
     </delete>
 
     <delete id="deletePermitDetail" parameterType="document.menu.dto.MenuAuthDto">
         DELETE FROM TB_PERMITDETAIL
-        WHERE PERMIT_ID = '${permitId}'
-        AND MENU_ID = '${menuId}'
+        WHERE PERMIT_ID = #{permitId}
+          AND MENU_ID = #{menuId}
     </delete>
-    
+
 
 
     <select id="getMenuInsertListByPermitId" resultType="document.menu.dto.MenuAuthDto">
-        SELECT
-          P.PERMIT_ID ,
-          P.PERMIT_NAME ,
-          M.MENU_ID ,
-          M.MENU_NAME ,
-          M.MENU_GROUP ,
-          PD.CRT_ID ,
-          PD.CRT_DT ,
-          PD.UPT_ID ,
-          PD.UPT_DT
-        FROM
-          TB_PERMIT P,
-          TB_MENU M,
-          TB_PERMITDETAIL PD
-        WHERE
-          P.PERMIT_ID = PD.PERMIT_ID
-          AND PD.MENU_ID = M.MENU_ID
-          AND P.PERMIT_ID = '${permitId}'
-        ORDER BY P.PERMIT_ID, M.MENU_ID DESC
-    </select>
-
-
-    <insert id="insertTBPermitDetail" parameterType="document.menu.dto.UseMenuDto">
-        INSERT INTO TB_PERMITDETAIL (
-            PERMIT_ID ,
-            MENU_ID ,
-            CRT_ID ,
-            CRT_DT ,
-            UPT_ID ,
-            UPT_DT
-        )
-        VALUES (
-                   '${permitId}',
-                   '${menuId}',
-                   '${crtId}',
-                   '${crtDt}',
-                   '${uptId}',
-                   '${uptDt}'
-               )
-    </insert>
-
-    <select id="getTBPermitDetailByPermitId" resultType="document.menu.dto.MenuAuthDto">
         SELECT
             P.PERMIT_ID ,
             P.PERMIT_NAME ,
@@ -137,8 +95,28 @@
         WHERE
             P.PERMIT_ID = PD.PERMIT_ID
           AND PD.MENU_ID = M.MENU_ID
-          AND P.PERMIT_ID = '${permitId}'
-        ORDER BY PD.CRT_DT DESC
+          AND P.PERMIT_ID = #{permitId}
+        ORDER BY P.PERMIT_ID, M.MENU_ID DESC
     </select>
+
+
+    <insert id="insertTbPermitDetail" parameterType="document.menu.dto.UseMenuDto">
+        INSERT INTO TB_PERMITDETAIL (
+            PERMIT_ID ,
+            MENU_ID ,
+            CRT_ID ,
+            CRT_DT ,
+            UPT_ID ,
+            UPT_DT
+        )
+        VALUES (
+                   #{permitId},
+                   #{menuId},
+                   #{crtId},
+                   #{crtDt},
+                   #{uptId},
+                   #{uptDt}
+               )
+    </insert>
 
 </mapper>

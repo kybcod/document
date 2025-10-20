@@ -98,7 +98,7 @@ public class MenuService {
                 .uptDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .build();
 
-        //menuAuthMapper.insertAdmPermitDetail(menuAuthDto);
+        menuAuthMapper.insertTbPermitDetail(menuAuthDto);
 
         if (insertUserInfo > 0) {
             return menuMapper.getMenuByMenuId(menuDto.getMenuId()).get(0);
