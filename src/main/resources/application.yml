@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: document
+  profiles:
+    active: local
+  thymeleaf:
+    prefix: classpath:/templates/
+    cache: false
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+
+# MyBatis 설정
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    map-underscore-to-camel-case: true
+
+server:
+  error:
+    path: /error
+    include-exception: true
+    include-stacktrace: always
+    whitelabel:
+      enabled: false
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 20
+    max-connections: 8192
+    accept-count: 100
+    connection-timeout: 10000
+
+# log common config
+logging:
+  level:
+    root: info
+    log4jdbc.log4j2: WARN
+    jdbc.sqlonly: info
+    jdbc.sqltiming: off
+    jdbc.audit: error
+    jdbc.resultset: off
+    jdbc.resultsettable: off
+    jdbc.connection: off
+  pattern:
+    console: "[%d{yyyy-MM-dd HH:mm:ss}:%-3relative]  %clr(%-5level) %clr(${PID:-}){magenta} %clr(---){faint} %clr([%15.15thread]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %msg%n"
+  file:
+    name: "./logs/document.log"
+  logback:
+    rollingpolicy:
+      fileNamePattern: "./logs/document-%d{yyyy-MM-dd}.%i.log"
+      maxHistory: 1000
+    policies:
+      time: "1d"
+    strategy:
+      max: 1000
+      fileIndex: min

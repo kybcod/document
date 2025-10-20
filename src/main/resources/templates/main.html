@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>KNOCK LAB</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- styles import -->
+    <th:block th:insert="~{include/styles :: styles}" />
+    <!-- scripts import -->
+    <th:block th:insert="~{include/scripts :: scripts}" />
+
+</head>
+<body>
+
+<div id="wrapper">
+
+    <!-- Header + 메뉴 -->
+    <div id="header" class="prevent-drag">
+        <!-- 왼쪽 그룹: 로고 + 메뉴 -->
+        <div class="left_group">
+            <h1 class="company_logo">
+                <!--<img th:src="@{/images/KNOCKLAB.png}" alt="">-->
+                문서변환서비스
+            </h1>
+
+        </div>
+
+        <!-- 오른쪽 로그아웃 -->
+        <button class="logout_btn" type="button" onclick="logout()">
+            <img th:src="@{/images/icon-logout.png}" alt="">
+            <span>로그아웃</span>
+        </button>
+    </div>
+
+    <!-- Contents 영역 -->
+    <div id="div_wrap" class="draggable">
+
+        <div class="siteMapBtn">
+            <p class="close" style="display: none;"><i class="lni lni-close"></i></p>
+            <p class="open"><i class="lni lni-menu"></i></p>
+        </div>
+
+        <div id="contents_wrap">
+            <div class="contents_drop_view" style="display: flex; height: 100%;">
+                <!-- 슬라이드메뉴 -->
+                <div id="main-sidebar">
+                    <div class="sidebar-menu"></div>
+                </div>
+
+                <!-- 메인 컨텐츠 영역 -->
+                <div class="main-content" id="main-content">
+
+                    <!-- 탭 네비게이션 (상단 탭 버튼 영역) -->
+                    <div class="tab-navigation">
+                        <div class="tab-buttons-group" id="tab-buttons"></div>
+                    </div>
+
+                    <!-- 탭 콘텐츠 (탭 내용이 Ajax로 들어오는 영역) -->
+                    <div class="tab-content" id="tab-content"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 암호 변경 모달 -->
+<div id="pwChangeModal" class="chmodal" style="display: none;">
+    <div class="chgmodal-content">
+        <span class="closeModal" onclick="closePwChangeModal()">&times;</span>
+        <h2>Change Password</h2>
+        <p>
+            <label>ID</label>
+            <input type="text" id="chgUserId">
+        </p>
+        <p>
+            <label>TEL</label>
+            <input type="text" id="chgTel" placeholder="등록된 전화번호 입력">
+            <small>※ 01x-xxxx-xxxx 형식으로 작성바랍니다.</small>
+        </p>
+        <p>
+            <label>New Password</label>
+            <input type="password" id="chgPw">
+        </p>
+        <p>
+            <label>Confirm New Password</label>
+            <input type="password" id="chgPwConfirm">
+        </p>
+        <p>
+            <small>※ 8자리 이상, 영문+숫자+특수문자 조합</small>
+        </p>
+        <button type="button" onclick="changePassword()">SAVE</button>
+    </div>
+</div>
+
+<script>
+
+    // 페이지 로드 시 첫 번째 메뉴 자동 열기
+    $(document).ready(function() {
+        $('.siteMapBtn .open').on('click', function() {
+            $('#main-sidebar').addClass('open');
+            $('.siteMapBtn').addClass('open');
+            $('.siteMapBtn .open').hide();
+            $('.siteMapBtn .close').show();
+        });
+
+        $('.siteMapBtn .close').on('click', closeSidebar);
+
+        createDynamicSidebarMenu();
+    });
+
+
+
+</script>
+
+</body>
+</html>

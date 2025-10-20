@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 브라우저가 캐시 메모리를 기록하지 않도록 한다. -->
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+
+<th:block th:fragment="scripts">
+
+	<script type="text/javascript" th:src="@{/js/external/jquery-3.4.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/external/jquery-barcode.js}"></script>
+
+	<!-- raon test cti_emulator-->
+	<script type="text/javascript" th:src="@{/js/external/raon_cti_emulator.js}"></script>
+
+	<!-- 우편번호(주소검색) -->
+	<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+	<!-- 기존 메뉴 별 해당하는 js 파일들 -->
+
+	<!-- DBMS 정보입력 관리 -->
+	<script type="text/javascript" th:src="@{/js/dbmsInfo/dbms_info_fone.js}"></script>
+	<script type="text/javascript" th:src="@{/js/dbmsInfo/dbms_info_rone.js}"></script>
+	<script type="text/javascript" th:src="@{/js/dbmsInfo/thoth_tdbms.js}"></script>
+	<script type="text/javascript" th:src="@{/js/dbmsInfo/thoth_edge.js}"></script>
+	<script type="text/javascript" th:src="@{/js/dbmsInfo/thoth_warn.js}"></script>
+	<script type="text/javascript" th:src="@{/js/dbmsInfo/fone_regi_check.js}"></script>
+	<script type="text/javascript" th:src="@{/js/dbmsInfo/fone_sour_regi.js}"></script>
+
+	<script th:src="@{/js/common/userServ.js}"></script>
+	<script type="text/javascript" th:src="@{/js/main.js}"></script>
+
+	<script type="text/javascript" th:src="@{/js/userInfo/user_info.js}"></script>
+	<script type="text/javascript" th:src="@{/js/userInfo/menu_info.js}"></script>
+	<script type="text/javascript" th:src="@{/js/userInfo/menu_auth_info.js}"></script>
+
+	<script type="text/javascript" th:src="@{/js/monitoringInfo/monitoring.js}"></script>
+
+
+	<!-- 외부 파일-->
+	<!--devExtreme 관련 소스-->
+	<!--/dx-quill.min.js 이게 항상 dx.all파일보다 위에 존재해야함 (dev공식문서에 나와있음)-->
+	<script type="text/javascript" th:src="@{/js/devExtreme/dx-quill.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/dx.all.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/dxDataGrid.rowspan.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/dxDataGrid.cellCustomizeFnc.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/exceljs.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/FileSaver.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/jspdf.umd.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/jspdf.plugin.autotable.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/pdf_font_setting.js}"></script>
+
+	<script type="text/javascript" th:src="@{/js/devExtreme/leeni_dxdatagrid.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/leeni_dxtreeview.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/leeni_dxtreelist.js}"></script>
+
+
+	<script type="text/javascript" th:src="@{/js/devExtreme/leeni_dxchart.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/leeni_dxcirculargauge.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/leeni_dxlineargauge.js}"></script>
+	<script type="text/javascript" th:src="@{/js/devExtreme/leeni_dxpiechart.js}"></script>
+
+	<!-- 죄측 메뉴에 사용되는 소스 -->
+
+	<script type="text/javascript" th:src="@{/js/external/jquery.cookie.js}"></script>
+	<script type="text/javascript" th:src="@{/js/external/jquery.treeview.js}"></script>
+
+	<!-- div lazy load에 대한 소스 -->
+	<script src="https://cdn.jsdelivr.net/npm/jquery-lazyload@1.9.7/jquery.lazyload.min.js"></script>
+
+	<!-- =================================================================== -->
+	<script type="text/javascript" th:src="@{/js/external/sp_sdk.js}"></script>
+	<script type="text/javascript" th:src="@{/js/external/sp_display.js}"></script>
+	<script type="text/javascript" th:src="@{/js/external/sp_result_code.js}"></script>
+
+	<!-- =================================================================== -->
+	<!-- Include websocket script  -->
+	<script type="text/javascript" th:src="@{/js/external/wsp_packet.js}"></script>
+	<script type="text/javascript" th:src="@{/js/external/wsw_wrapper.js}"></script>
+	<script type="text/javascript" th:src="@{/js/external/wso_observer.js}"></script>
+	<script type="text/javascript" th:src="@{/js/external/wsk_kernel.js}"></script>
+	<script type="text/javascript" th:src="@{/js/external/wsc_connector.js}"></script>
+	<script type="text/javascript" th:src="@{/js/external/wse_event.js}"></script>
+
+	<!-- =================================================================== -->
+	<!-- 외부 파일 end-->
+
+
+	<!--Editor start -->
+	<!--toastui를 아마 devExtreme으로 바꾸지 않을까...?-->
+	<script type="text/javascript" th:src="@{/js/external/jquery-ui.js}"></script>
+
+	<script type="text/javascript" th:src="@{/js/external/toastui-editor-all.min.js}"></script>
+	<!-- Color Picker -->
+	<script type="text/javascript" th:src="@{/js/external/tui-color-picker.min.js}"></script>
+	<!-- Editor's Plugin -->
+	<script type="text/javascript" th:src="@{/js/external/toastui-editor-plugin-color-syntax.min.js}"></script>
+	<!--Editor end -->
+	<!-- ************************************************************************************************************************ -->
+
+	<!-- sweetAlert2 -->
+	<script type="text/javascript" th:src="@{/js/sweetalert/sweetalert2.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/sweetalert/sweet_alert.js}"></script>
+
+
+	<!-- 우 클릭 시 contextmenu 만들기 -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
+
+
+
+</th:block>

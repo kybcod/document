@@ -1,0 +1,85 @@
+// 메뉴 리스트 받아오기
+function getMenuInfoList() {
+    $.ajax({
+        url: "menu/list",
+        type: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        success(res) {
+            menuTreeList.option("dataSource", res);
+        },
+        complete(){
+            menuTreeList.endCustomLoading();
+        }
+    });
+}
+
+// 메뉴 트리리스트 세팅
+function menuInfoTreeListSetting() {
+
+    let dataTreeList = new dxtreelist();
+    let columns = ['menuId','menuName', 'menuGroup', 'menuDesc', 'menuUse', 'menuUrl', 'crtDt'];
+    dataTreeList.setColumns(columns);
+    dataTreeList.setPaging(15);
+    dataTreeList.setId('menuId', 'menuGroup', '0000');
+    dataTreeList.setHasItemsExpr("hasItemsExpr");
+    dataTreeList.setEditing("popup", false, true, true);
+    dataTreeList.setEditingTexts("Menu Management", "이 항목을 삭제하시겠습니까?");
+    dataTreeList.setEditingPopup("Menu Management", 800, 400);
+    dataTreeList.setEditingForm(
+        ['menuId','menuName', 'menuUse', 'menuUrl', 'menuGroup', 'menuDesc'],
+        2,
+        2,
+        "Menu Management",
+    );
+    dataTreeList.setAutoPaging("#menuTreeList");
+
+    dataTreeList.setOnToolbarPreparing(function(e) {
+        e.toolbarOptions.items.unshift({
+          location: "after",
+          widget: "dxButton",
+          options: {
+            icon: "plus",
+            onClick: function() {
+              menuTreeList.addRow();
+            }
+          }
+        });
+    });
+
+    dataTreeList.setValidationRules('menuId', 'required', '메뉴명을 입력해주세요');
+    dataTreeList.setValidationRules('menuGroup', 'required', '메뉴그룹을 입력해주세요');
+    dataTreeList.onEditorPreparing = function(e) {
+        // 데이터 행이고, 읽기 전용 필드 목록에 포함되는 경우
+        if (e.parentType === "dataRow" && ["menuId"].includes(e.dataField)) {
+            e.editorOptions.readOnly = !e.row.isNewRow;
+        }
+
+        if (e.parentType === "dataRow" && e.dataField === 'menuGroup' && e.row.isNewRow) {
+            // 신규 행일 경우 초기값 강제로 빈값으로 세팅
+            e.editorOptions.value = "";
+        }
+    };
+
+    // 등록
+    dataTreeList.setOnRowInserting(function(data, deferred) {
+        sendDbmsDataToServer("menu/insert", data, deferred, menuTreeList, getMenuInfoList);
+    });
+
+    // 수정
+    dataTreeList.setOnRowUpdating(function(data, deferred) {
+        sendDbmsDataToServer("menu/update", data, deferred, menuTreeList, getMenuInfoList);
+    });
+
+    // 삭제
+    dataTreeList.setOnRowRemoving(function(data, deferred) {
+        sendDbmsDataToServer("menu/delete", data, deferred, menuTreeList, getMenuInfoList);
+    });
+
+    menuTreeList = $('#menuTreeList').dxTreeList(dataTreeList).dxTreeList("instance");
+
+    menuTreeList.beginCustomLoading();
+
+}
+
+

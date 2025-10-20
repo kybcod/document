@@ -1,0 +1,294 @@
+
+@charset "utf-8";
+
+@font-face {
+	font-family: 'NotoSansKR';
+	src: url('font/NotoSansKR-Regular.eot');
+	src: local("☺"),
+		url('../font/NotoSansKR-Regular.woff') format('woff'),
+		url('../font/NotoSansKR-Regular.otf') format('opentype'),
+}
+@font-face {
+	font-family: 'NotoSansKRBold';
+	src: url('font/NotoSansKR-Bold.eot');
+	src: local("☺"),
+		url('../font/NotoSansKR-Bold.woff') format('woff'),
+		url('../font/NotoSansKR-Bold.otf') format('opentype'),
+}
+
+@font-face {
+	font-family: 'NotoSansKRBlack';
+	src: url('font/NotoSansKR-Black.eot');
+	src: local("☺"),
+		url('../font/NotoSansKR-Black.woff') format('woff'),
+		url('../font/NotoSansKR-Black.otf') format('opentype'),
+}
+
+
+* {box-sizing: border-box;}
+
+/* Basic */
+html, body {
+	-ms-overflow-style: scrollbar;
+	overflow-x: hidden;
+	margin: 0;
+	padding: 0;
+}
+html {
+	height: 100%;
+
+}
+body {
+	min-width: 100%;
+	height: 100%;
+	background-color: #D5DFEA;
+	font-family: 'NotoSansKR';
+	font-size: 13px;
+	font-weight: 300;
+	line-height: 1em;
+	color: #333;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased !important;
+}
+
+
+
+#contents {
+	display: flex;
+	width: 100%;
+	height: calc(100% - 115px);
+	justify-content: center;
+	align-items: center;
+	font-size: 16px;
+}
+
+
+	.login_form {
+		overflow: hidden;
+		width: 450px;
+		background-color: #FFF;
+		padding-bottom: 40px;
+	}
+
+	.login_head {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 80px;
+		background-color: #154f53;
+		text-align: center;
+	}
+
+	.login_head img {
+		height: 50px;
+		vertical-align: middle;
+	}
+
+	.login_cont{
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding-top: 40px;
+		padding-bottom: 20px
+	}
+
+	.login_floor {
+		display: flex;
+		align-items: center;
+		justify-content: end;
+		width: 85%;
+		margin-top: 15px; /* 입력 필드 사이 간격 증가 */
+		margin-bottom: 15px; /* 입력 필드 사이 간격 증가 */
+	}
+
+	p {
+		margin: 5px 0 !important;
+	}
+
+	.login_tit {
+		display: inline-block;
+		width: 20%;
+		font-weight: 600;
+		line-height: 40px;
+	}
+
+	.login_input {
+		width: 79%;
+		padding: 10px 10px;
+		border: 1px solid #ced4da;
+	}
+
+	.login_btn_group {
+		display: flex;
+		justify-content: space-between;
+		width: 68%;
+		margin-top: 30px;
+		margin-left: 75px;
+	}
+
+	.login_btn {
+		flex: 1;
+		height: 45px;
+		color: #FFF;
+		background-color: #476fb4;
+		font-weight: 600;
+		border: 0;
+		border-radius: 5px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+	}
+
+	.reset_btn {
+		flex: 1;
+		height: 45px;
+		border: 1px solid #476fb4;
+		background-color: white;
+		font-weight: 600;
+		border-radius: 5px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+	}
+
+	.login_btn + .reset_btn {
+		margin-left: 10px; /* 버튼 간격 */
+	}
+
+	.login_btn img {
+		width: 14px;
+		vertical-align: middle;
+	}
+
+	.login_btn span {
+		vertical-align: middle;
+	}
+
+
+/* 모달 기본 숨김 */
+/* 전체 모달 컨테이너 */
+.chmodal {
+	display: none;
+	position: fixed;
+	z-index: 1800;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.6); /* 어두운 배경 */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 모달 컨텐츠 박스 */
+.chgmodal-content {
+	margin: 10% auto;
+	background-color: #fff;
+	padding: 30px;
+	border-radius: 12px;
+	width: 100%;
+	max-width: 450px;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+	animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	position: relative;
+}
+
+/* 모달창 닫기 버튼 */
+.closeModal {
+	position: absolute;
+	top: 15px;
+	right: 20px;
+	color: #888;
+	font-size: 30px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: color 0.3s ease;
+}
+
+/* 제목 스타일 */
+.chgmodal-content h2 {
+	text-align: center;
+	margin-top: 0;
+	margin-bottom: 25px;
+	color: #333;
+	font-size: 26px;
+	font-weight: 600;
+}
+
+/* 입력 필드 레이아웃 */
+.chgmodal-content p {
+	margin-bottom: 20px;
+	display: flex;
+	flex-direction: column;
+}
+
+/* 레이블 스타일 */
+.chgmodal-content label {
+	font-size: 15px;
+	color: #555;
+	margin-bottom: 8px;
+	font-weight: 500;
+}
+
+/* 입력 필드 */
+.chgmodal-content input[type="text"],
+.chgmodal-content input[type="password"] {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	font-size: 16px;
+	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chgmodal-content input[type="text"]:focus,
+.chgmodal-content input[type="password"]:focus {
+	border-color: #007bff;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.chgmodal-content small {
+	display: block;
+	margin-top: 5px;
+	color: #888;
+	font-size: 15px;
+	text-align: right;
+}
+
+/* 저장 버튼 */
+.chgmodal-content button {
+	width: 100%;
+	padding: 12px;
+	background-color: #476fb4;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	font-size: 18px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+	margin-top: 20px;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-50px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+
+

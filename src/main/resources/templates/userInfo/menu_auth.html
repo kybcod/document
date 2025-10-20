@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<!--  메뉴 권한 관리-->
+<script>
+    var menuAuthMgmtGrid = null;
+    var menuAuthInsertTreeList = null;
+    var menuUseTreeList = null;
+
+    $(document).ready(function () {
+        menuAuthMgmtDataGridSetting();
+        menuAuthInsertDataGridSetting();
+        getMenuAuthMgmtList();
+        menuUseDataGridSetting();
+    });
+</script>
+<body>
+<div class="Dflex H100per">
+    <div class="cont_Sform H100per">
+        <div class="search_form H100per Fcolumn Fnowrap">
+            <div class="table_wrap H413px MT05">
+                <div id="menuAuthMgmtGrid" class="table_container"></div>
+            </div>
+        </div>
+        <!-- search_form End -->
+    </div>
+    <!-- cont_Sform End -->
+
+    <div class="cont_Lform PT05">
+        <!--devExtreme grid-->
+        <div class="grid_wrap menu_hei">
+            <div class="table_wrap">
+                <div id="menuAuthInsertGrid" class="table_container"></div>
+            </div>
+        </div>
+    </div>
+    <!-- cont_Lform End -->
+
+
+
+    <!-- 메뉴 권한 등록 관리 모달 -->
+    <div id="menuUsePopupContainer"></div>
+
+
+</div>
+</body>
+</html>

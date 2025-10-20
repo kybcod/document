@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>로그인</title>
+
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <!-- CSS -->
+    <link th:href="@{/css/login.css}" rel="stylesheet">
+    <th:block th:insert="~{include/styles :: styles}" />
+
+    <!-- JS -->
+    <script type="text/javascript" th:src="@{/js/login_check.js}"></script>
+    <script type="text/javascript" th:src="@{/js/main.js}"></script>
+    <!-- sweetAlert2 -->
+    <script type="text/javascript" th:src="@{/js/sweetalert/sweetalert2.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/sweetalert/sweet_alert.js}"></script>
+
+</head>
+
+<body>
+<div id="wrapper">
+    <div id="header"></div> <!-- header End -->
+    <div id="contents">
+        <div class="login_form">
+            <div class="login_head">
+                <!--<img th:src="@{/images/KNOCKLAB.png}" alt="">-->
+                <h1>문서변환서비스</h1>
+            </div>
+            <div class="login_cont">
+                <p class="login_floor">
+                    <span class="login_tit">ID</span>
+                    <input type="text" class="login_input" name="id" id="id" >
+                </p>
+                <p class="login_floor">
+                    <span class="login_tit">PW</span>
+                    <input type="password" class="login_input" name="pw" id="pw" >
+                </p>
+
+                <div class="login_btn_group">
+                    <button type="button" class="login_btn disabled-btn" onclick="loginCheck()">
+                        <span>LOGIN</span>
+                    </button>
+                    <button type="button" class="reset_btn disabled-btn" onclick="openPwChangeModal($('#id').val())">
+                        <span>RESET PW</span>
+                    </button>
+                </div>
+            </div>
+        </div><!-- login_form End -->
+    </div> <!-- contents End -->
+
+    <!-- 암호 변경 모달 -->
+    <div id="pwChangeModal" class="chmodal" style="display: none;">
+        <div class="chgmodal-content">
+            <span class="closeModal" onclick="closePwChangeModal()">&times;</span>
+            <h2>Change Password</h2>
+            <p>
+                <label>ID</label>
+                <input type="text" id="chgUserId">
+            </p>
+            <p>
+                <label>TEL</label>
+                <input type="text" id="chgTel" placeholder="등록된 전화번호 입력">
+                <small>※ 01x-xxxx-xxxx 형식으로 작성바랍니다.</small>
+            </p>
+            <p>
+                <label>New Password</label>
+                <input type="password" id="chgPw">
+            </p>
+            <p>
+                <label>Confirm New Password</label>
+                <input type="password" id="chgPwConfirm">
+            </p>
+            <p>
+                <small>※ 8자리 이상, 영문+숫자+특수문자 조합</small>
+            </p>
+            <button type="button" onclick="changePassword()">SAVE</button>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

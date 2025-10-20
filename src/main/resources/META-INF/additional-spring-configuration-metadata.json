@@ -1,0 +1,82 @@
+{"properties": [
+  {
+    "name": "server.org-dir",
+    "type": "java.lang.String",
+    "description": "A description for 'server.org-dir'"
+  },
+  {
+    "name": "server.dir",
+    "type": "java.lang.String",
+    "description": "A description for 'server.dir'"
+  },
+  {
+    "name": "server.other-dir",
+    "type": "java.lang.String",
+    "description": "A description for 'server.other-dir'"
+  },
+  {
+    "name": "log.config.path",
+    "type": "java.lang.String",
+    "description": "A description for 'log.config.path'"
+  },
+  {
+    "name": "email.path",
+    "type": "java.lang.String",
+    "description": "A description for 'email.path'"
+  },
+  {
+    "name": "email.template.path",
+    "type": "java.lang.String",
+    "description": "A description for 'email.template.path'"
+  },
+  {
+    "name": "sms.path",
+    "type": "java.lang.String",
+    "description": "A description for 'sms.path'"
+  },
+  {
+    "name": "mo.path",
+    "type": "java.lang.String",
+    "description": "A description for 'mo.path'"
+  },
+  {
+    "name": "raondesk.my.sms",
+    "type": "java.lang.String",
+    "description": "A description for 'raondesk.my.sms'"
+  },
+  {
+    "name": "raondesk.console.log.flag",
+    "type": "java.lang.String",
+    "description": "A description for 'raondesk.console.log.flag'"
+  },
+  {
+    "name": "raondesk.cti-on.flag",
+    "type": "java.lang.String",
+    "description": "A description for 'raondesk.cti-on.flag'"
+  },
+  {
+    "name": "raondesk.call-test.flag",
+    "type": "java.lang.String",
+    "description": "A description for 'raondesk.call-test.flag'"
+  },
+  {
+    "name": "raondesk.board.emergency",
+    "type": "java.lang.String",
+    "description": "A description for 'raondesk.board.emergency'"
+  },
+  {
+    "name": "raondesk.board.day",
+    "type": "java.lang.String",
+    "description": "A description for 'raondesk.board.day'"
+  },
+  {
+    "name": "raondesk.menu.group-id",
+    "type": "java.lang.String",
+    "description": "A description for 'raondesk.menu.group-id'"
+  },
+  {
+    "name": "raondesk.menu.except",
+    "type": "java.lang.String",
+    "description": "A description for 'raondesk.menu.except'"
+  }
+]}

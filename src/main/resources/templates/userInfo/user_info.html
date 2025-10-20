@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<!--  사용자 관리 -->
+<script>
+    var userListGrid = null;
+    var menuLookupData = [];
+
+    $(document).ready(function () {
+        menuRoleSelectBox();
+        userInfoDataGridSetting();
+        getUserInfoList();
+    });
+</script>
+<body>
+<div class="grid_wrap twoSearch">
+    <div class="table_wrap">
+        <div id="userListGrid" class="table_container"></div>
+    </div>
+</div>
+</body>
+</html>

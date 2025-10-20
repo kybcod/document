@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    hikari:
+      driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      jdbc-url: jdbc:log4jdbc:mariadb://221.139.88.149:20302/test
+      username: raon
+      password: Raon31123!
+      idle-timeout: 8000
+      connection-timeout: 8000

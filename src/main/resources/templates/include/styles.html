@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 브라우저가 캐시 메모리를 기록하지 않도록 한다. -->
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+
+<th:block th:fragment="styles">
+
+	<!-- favicon 오류 삭제 -->
+	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <link th:href="@{/css/login.css}" rel="stylesheet">
+	<link th:href="@{/css/layout.css}" rel="stylesheet">
+	<link th:href="@{/css/common.css}" rel="stylesheet">
+	<link th:href="@{/css/page.css}" rel="stylesheet">
+	<link th:href="@{/css/main_menu.css}" rel="stylesheet">
+	<link th:href="@{/css/icons.css}" rel="stylesheet">
+
+	<!-- 외부 파일-->
+	<!--devExtreme 관련 소스-->
+	<link th:href="@{/css/devExtreme/dx.light.css}" rel="stylesheet">
+
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- 죄측 메뉴에 사용되는 소스 -->
+	<link th:href="@{/css/external/jquery.treeview.css}" rel="stylesheet">
+	<!-- 외부 파일 end-->
+
+	<!--Editor start -->
+	<!--toastui를 아마 devExtreme으로 바꾸지 않을까...?-->
+	<link th:href="@{/css/external/jquery-ui.css}" rel="stylesheet">
+	<!-- ************************************************************************************************************************ -->
+	<link th:href="@{/css/external/toastui-editor.min.css}" rel="stylesheet">
+	<link th:href="@{/css/external/tui-color-picker.min.css}" rel="stylesheet">
+	<link th:href="@{/css/external/toastui-editor-plugin-color-syntax.min.css}" rel="stylesheet">
+	<!-- ************************************************************************************************************************ -->
+	
+	<!-- sweetAlert2 -->
+	<link th:href="@{/css/external/sweetalert2.min.css}" rel="stylesheet">
+
+	<!-- 공지사항 -->
+	<link th:href="@{/css/external/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{/css/external/bootstrap-extended.css}" rel="stylesheet">
+	<link th:href="@{/css/external/icons.css}" rel="stylesheet">
+
+	<!-- 검색어 자동완성 -->
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+	<!-- 우 클릭 시 contextmenu 만들기 -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+</th:block>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<!--  메뉴 관리 -->
+<script>
+    var menuTreeList = null;
+
+    $(document).ready(function () {
+        menuInfoTreeListSetting();
+        getMenuInfoList();
+    });
+</script>
+<body>
+<div class="grid_wrap twoSearch">
+    <div class="table_wrap">
+        <div id="menuTreeList" class="table_container"></div>
+    </div>
+</div>
+</body>
+</html>
