@@ -75,6 +75,10 @@
           AND MENU_ID = #{menuId}
     </delete>
 
+    <delete id="deleteTbPermitDByMenuId" parameterType="document.menu.dto.MenuAuthDto">
+        DELETE FROM TB_PERMITDETAIL
+        WHERE MENU_ID = #{menuId}
+    </delete>
 
 
     <select id="getMenuInsertListByPermitId" resultType="document.menu.dto.MenuAuthDto">

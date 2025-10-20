@@ -15,4 +15,6 @@ public interface MenuAuthMapper {
     void deleteMenuAuthInfo(MenuAuthDto menuAuthDto);
     void deletePermitDetail(MenuAuthDto menuAuthDto);
     void insertTbPermitDetail(MenuAuthDto menuAuthDto);
+
+    void deleteTbPermitDByMenuId(MenuAuthDto menuAuthDto);
 }

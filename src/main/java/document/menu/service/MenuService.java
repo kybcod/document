@@ -118,9 +118,8 @@ public class MenuService {
         // TB_PREMITDETAIL에서도 삭제
         MenuAuthDto menuAuthDto = MenuAuthDto.builder()
                 .menuId(menuDto.getMenuId())
-                .permitId(menuDto.getPermitId())
                 .build();
-        menuAuthMapper.deletePermitDetail(menuAuthDto);
+        menuAuthMapper.deleteTbPermitDByMenuId(menuAuthDto);
 
     }
 
