@@ -46,9 +46,9 @@
                    #{permitName},
                    #{permitDesc},
                    #{crtId},
-                   #{crtDt},
+                   NOW(),
                    #{uptId},
-                   #{uptDt}
+                   NOW()
                )
     </insert>
 
@@ -58,7 +58,7 @@
             PERMIT_NAME = #{permitName},
             PERMIT_DESC = #{permitDesc},
             UPT_ID = #{uptId},
-            UPT_DT = #{uptDt}
+            UPT_DT = NOW()
         WHERE
             PERMIT_ID = #{permitId}
     </update>
@@ -113,9 +113,9 @@
                    #{permitId},
                    #{menuId},
                    #{crtId},
-                   #{crtDt},
+                   NOW(),
                    #{uptId},
-                   #{uptDt}
+                   NOW()
                )
     </insert>
 

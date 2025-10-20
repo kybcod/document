@@ -7,9 +7,6 @@ import document.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,7 +32,6 @@ public class MenuAuthService {
 
         MenuAuthDto updateMenuAuthDto = menuAuthDto.toBuilder()
                 .uptId(userDto.getUserId())
-                .uptDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .build();
 
         int updated = menuAuthMapper.updateMenuAuthInfo(updateMenuAuthDto);
@@ -62,9 +58,7 @@ public class MenuAuthService {
 
         MenuAuthDto insertMenuAuthDto = menuAuthDto.toBuilder()
                 .crtId(userDto.getUserId())
-                .crtDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .uptId(userDto.getUserId())
-                .uptDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .build();
 
         int inserted = menuAuthMapper.insertMenuAuthInfo(insertMenuAuthDto);
@@ -126,9 +120,7 @@ public class MenuAuthService {
                     .permitId(menu.getPermitId())
                     .menuId(menu.getMenuId())
                     .crtId(userDto.getUserId())
-                    .crtDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                     .uptId(userDto.getUserId())
-                    .uptDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                     .build();
 
             // menuId가 DB에 존재하고 realUse=0 → 삭제

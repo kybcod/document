@@ -10,13 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -53,7 +47,6 @@ public class MenuService {
 
         MenuDto updateMenuDto = menuDto.toBuilder()
                 .uptId(userDto.getUserId())
-                .uptDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .build();
 
         int updateMenuInfo = menuMapper.updateMenuInfo(updateMenuDto);
@@ -80,9 +73,7 @@ public class MenuService {
                 .menuId(menuDto.getMenuId())
                 .menuOrder(String.valueOf(newMenuOrder))
                 .crtId(userDto.getUserId())
-                .crtDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .uptId(userDto.getUserId())
-                .uptDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .build();
 
 
@@ -93,9 +84,7 @@ public class MenuService {
                 .permitId(userDto.getPermitId()) // FIXME: 관리자 일 때만?
                 .menuId(insertMenuDto.getMenuId())
                 .crtId(userDto.getUserId())
-                .crtDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .uptId(userDto.getUserId())
-                .uptDt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")))
                 .build();
 
         menuAuthMapper.insertTbPermitDetail(menuAuthDto);

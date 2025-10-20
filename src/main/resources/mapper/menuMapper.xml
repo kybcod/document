@@ -43,24 +43,6 @@
       ORDER BY MENU_ID, MENU_ORDER DESC
   </select>
 
-  <select id="getMenuUseList" resultType="document.menu.dto.UseMenuDto">
-    SELECT *
-    FROM TB_MENU
-    WHERE MENU_USE = '1'
-    ORDER BY MENU_ID, MENU_ORDER DESC
-  </select>
-
-  <select id="getNotUseMenuList" resultType="document.menu.dto.UseMenuDto" parameterType="String">
-    SELECT *
-    FROM TB_MENU
-    WHERE MENU_ID
-              NOT IN (
-                    SELECT MENU_ID
-                    FROM TB_PERMITDETAIL
-                    WHERE PERMIT_ID = #{permitId}
-            )
-  </select>
-
 
   <select id="getMenuWithPermitFlag" resultType="document.menu.dto.UseMenuDto" parameterType="String">
     SELECT
@@ -138,9 +120,9 @@
              #{menuDesc},
              #{menuUse},
              #{crtId},
-             #{crtDt},
+             NOW(),
              #{uptId},
-             #{uptDt}
+             NOW()
            )
   </insert>
 
@@ -154,7 +136,7 @@
       MENU_DESC = #{menuDesc},
       MENU_USE = #{menuUse},
       UPT_ID = #{uptId},
-      UPT_DT = #{uptDt}
+      UPT_DT = NOW()
     WHERE
       MENU_ID = #{menuId}
   </update>

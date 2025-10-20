@@ -58,6 +58,17 @@ function userInfoDataGridSetting() {
 
     dataGrid.setValidationRules('permitId', 'required', '권한 아이디를 입력해주세요');
     dataGrid.setOnEditorPreparing(function(e) {
+        // 등록 모드일 때 SelectBox 설정
+        if (e.dataField === "permitId") {
+            e.editorName = "dxSelectBox";
+            e.editorOptions = {
+                dataSource: menuLookupData,
+                valueExpr: "ID",
+                displayExpr: "Name",
+                placeholder: "Select..."
+            };
+        }
+
         // 기존 행 수정 시 userId는 읽기 전용으로 설정
         if (e.parentType === 'dataRow' && e.dataField === 'userId') {
             e.editorOptions.readOnly = !e.row.isNewRow; // 로직 수정

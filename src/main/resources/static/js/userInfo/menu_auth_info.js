@@ -44,13 +44,13 @@ function menuAuthMgmtDataGridSetting() {
     dataGrid.setCaptions(captions);
     dataGrid.setPaging(15);
     dataGrid.setEditing("popup", true, true, true);   // 추가, 수정, 삭제 모두 가능
-    dataGrid.setEditingTexts("Menu Pkg Management", "이 항목을 삭제하시겠습니까?");
-    dataGrid.setEditingPopup("Menu Pkg Management", 400, 300);
+    dataGrid.setEditingTexts("메뉴 권한 관리", "이 항목을 삭제하시겠습니까?");
+    dataGrid.setEditingPopup("메뉴 권한 관리", 400, 300);
     dataGrid.setEditingForm(
         ['permitId','permitName'],
         1,
         2,
-        "Menu Pkg Management",
+        "메뉴 권한 관리",
     );
 
 
@@ -123,12 +123,14 @@ function menuAuthInsertDataGridSetting() {
 
     let dataTreeList = new dxtreelist();
     let columns = ['permitId','permitName', 'menuName', 'menuId'];
+    let captions = ['권한아이디','권한명','메뉴명','메뉴아이디']
     dataTreeList.setColumns(columns);
+    dataTreeList.setCaptions(captions);
     dataTreeList.setId('menuId', 'menuGroup', '0000');
     dataTreeList.setHasItemsExpr("hasItemsExpr");
     dataTreeList.setEditing("popup", false, false, true);   // 추가, 수정, 삭제 모두 가능
-    dataTreeList.setEditingTexts("Menu Pkg Registration Management", "이 항목을 삭제하시겠습니까?");
-    dataTreeList.setEditingPopup("Menu Pkg Registration Management", 700, 500);
+    dataTreeList.setEditingTexts("메뉴 권한  등록 관리", "이 항목을 삭제하시겠습니까?");
+    dataTreeList.setEditingPopup("메뉴 권한  등록 관리", 700, 500);
     dataTreeList.setColumnReadOnly("permitId")
 
     // 삭제
@@ -152,6 +154,7 @@ function menuUseDataGridSetting() {
     let columns = ['menuId','menuName', 'realUse'];
     let captions = ['메뉴 아이디', '메뉴명', '사용유무']
     dataTreeList.setColumns(columns);
+    dataTreeList.setCaptions(captions);
     dataTreeList.setPaging(10);
     dataTreeList.setId('menuId', 'menuGroup', '0000');
     dataTreeList.setHasItemsExpr("hasItemsExpr");
@@ -240,7 +243,7 @@ function openMenuUsePopup(permitId) {
     $("#menuUsePopupContainer").dxPopup({
         visible: true,
         showTitle: true,
-        title: "Menu Pkg Registration Management",
+        title: "메뉴 권한  등록 관리",
         width: 1000,
         height: 700,
         contentTemplate: function(container) {
