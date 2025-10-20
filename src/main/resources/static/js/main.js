@@ -307,7 +307,7 @@ function closePwChangeModal() {
 
 function changePassword() {
     let userId = $('#chgUserId').val();
-    let hpTelNo = $('#chgTel').val();
+    let userTel = $('#chgTel').val();
     let userPass = $('#chgPw').val();
     let userPassCheck = $('#chgPwConfirm').val();
 
@@ -328,7 +328,7 @@ function changePassword() {
     $.ajax({
         url: 'user/changePassword',
         type: "POST",
-        data: JSON.stringify({ userId, hpTelNo, userPass }),
+        data: JSON.stringify({ userId, userTel, userPass }),
         contentType: 'application/json',
         success: function(res) {
             basicAlert({ icon: 'success', title: "", text: '비밀번호가 변경되었습니다. 다시 로그인해주세요.' });
