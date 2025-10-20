@@ -106,6 +106,7 @@ button {
 		flex-grow: 0;
 		height: 40px;
 		padding-left: 30px;
+		color:white;
 	}
 
 	.company_logo img {
