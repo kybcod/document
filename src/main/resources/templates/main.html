@@ -110,6 +110,10 @@
         $('.siteMapBtn .close').on('click', closeSidebar);
 
         createDynamicSidebarMenu();
+
+        $(document).on('input', '#chgTel', function() {
+            formatPhoneNumber(this);
+        });
     });
 
 

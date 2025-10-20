@@ -81,5 +81,12 @@
     </div>
 
 </div>
+<script>
+    $(document).ready(function() {
+        $(document).on('input', '#chgTel', function() {
+            formatPhoneNumber(this);
+        });
+    });
+</script>
 </body>
 </html>

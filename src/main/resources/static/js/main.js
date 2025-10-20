@@ -320,6 +320,11 @@ function changePassword() {
         return;
     }
 
+    if (!userTel || userTel === "") {
+        basicAlert({ icon: 'error', title: "", text: '전화번호를 입력하세요.' });
+        return;
+    }
+
     if (!userPass || !userPassCheck) {
         basicAlert({ icon: 'error', title: "", text: '비밀번호를 입력하세요.' });
         return;
@@ -349,4 +354,22 @@ function changePassword() {
             basicAlert({ icon: 'error', title: "", text: msg });
         }
     });
+}
+
+
+// 전화번호 입력 시 하이픈 자동 추가
+function formatPhoneNumber(input) {
+    let value = input.value.replace(/\D/g, '');
+    let result = '';
+    if (value.length < 4) {
+        result = value;
+    } else if (value.length < 8) {
+        result = value.substring(0, 3) + '-' + value.substring(3);
+    } else if (value.length < 11) {
+        result = value.substring(0, 3) + '-' + value.substring(3, 6) + '-' + value.substring(6);
+    } else {
+        result = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+    }
+
+    input.value = result;
 }

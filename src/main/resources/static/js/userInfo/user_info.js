@@ -36,6 +36,21 @@ function userInfoDataGridSetting() {
     let captions = ['아이디','이름', '전화번호', '이메일', '사용구분', '권한아이디', '비번실패횟수', '등록자', '생성일','User Pass'];
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
+    dataGrid.columns.find(c => c.dataField === 'userTel').customizeText = function(cellInfo) {
+        if (!cellInfo.value) return '';
+        let value = cellInfo.value.replace(/\D/g, '');
+        let result = '';
+        if (value.length < 4) {
+            result = value;
+        } else if (value.length < 8) {
+            result = value.substring(0, 3) + '-' + value.substring(3);
+        } else if (value.length < 11) {
+            result = value.substring(0, 3) + '-' + value.substring(3, 6) + '-' + value.substring(6);
+        } else {
+            result = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+        }
+        return result;
+    };
     dataGrid.columns.find(c => c.dataField === 'userPass').visible = false;
     dataGrid.setPaging(15);
     dataGrid.setEditing("popup", true, true, true);
@@ -71,6 +86,24 @@ function userInfoDataGridSetting() {
             e.editorOptions.placeholder = "Select...";
             e.editorOptions.onValueChanged = function (args) {
                 e.setValue(args.value);
+            };
+        }
+
+        if (e.dataField === 'userTel') {
+            e.editorOptions.onInput = function(args) {
+                let input = args.event.target;
+                let value = input.value.replace(/\D/g, '');
+                let result = '';
+                if (value.length < 4) {
+                    result = value;
+                } else if (value.length < 8) {
+                    result = value.substring(0, 3) + '-' + value.substring(3);
+                } else if (value.length < 11) {
+                    result = value.substring(0, 3) + '-' + value.substring(3, 6) + '-' + value.substring(6);
+                } else {
+                    result = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+                }
+                input.value = result;
             };
         }
 
