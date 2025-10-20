@@ -1,9 +1,9 @@
-package hello.document.user.service;
+package document.user.service;
 
-import hello.document.exception.LoginException;
-import hello.document.user.dto.LoginStatus;
-import hello.document.user.dto.UserDto;
-import hello.document.user.mapper.UserMapper;
+import document.exception.LoginException;
+import document.user.dto.LoginStatus;
+import document.user.dto.UserDto;
+import document.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 

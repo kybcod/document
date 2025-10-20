@@ -1,4 +1,4 @@
-package hello.document.exception.dto;
+package document.exception.dto;
 
 /**
  * @param code 1 성공, -1 실패

@@ -1,4 +1,4 @@
-package hello.document.controller;
+package document.controller;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;

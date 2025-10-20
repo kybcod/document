@@ -1,4 +1,4 @@
-package hello.document.user.dto;
+package document.user.dto;
 
 import lombok.*;
 

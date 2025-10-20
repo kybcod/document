@@ -1,4 +1,4 @@
-package hello.document.config;
+package document.config;
 
 import javax.sql.DataSource;
 

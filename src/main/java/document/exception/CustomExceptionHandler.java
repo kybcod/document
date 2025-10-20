@@ -1,6 +1,6 @@
-package hello.document.exception;
+package document.exception;
 
-import hello.document.exception.dto.ExceptionResponseDTO;
+import document.exception.dto.ExceptionResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

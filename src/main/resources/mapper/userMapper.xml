@@ -6,7 +6,7 @@
 <mapper namespace="user.mapper.UserMapper">
 
     <!-- 전체 사용자 목록 조회 -->
-    <select id="getUserList" resultType="hello.document.user.dto.UserDto">
+    <select id="getUserList" resultType="document.user.dto.UserDto">
         SELECT
             USER_ID,
             USER_NAME,
@@ -24,7 +24,7 @@
     </select>
 
     <!-- 사용자 ID로 조회 -->
-    <select id="getUserByUserId" resultType="hello.document.user.dto.UserDto" parameterType="String">
+    <select id="getUserByUserId" resultType="document.user.dto.UserDto" parameterType="String">
         SELECT
             USER_ID,
             USER_NAME,
@@ -42,7 +42,7 @@
     </select>
 
     <!-- 사용자 등록 -->
-    <insert id="insertUserInfo" parameterType="hello.document.user.dto.UserDto">
+    <insert id="insertUserInfo" parameterType="document.user.dto.UserDto">
         INSERT INTO TB_USER (
             USER_ID,
             USER_PASS,
@@ -70,7 +70,7 @@
     </insert>
 
     <!-- 사용자 권한 등록 -->
-    <insert id="insertUserPermit" parameterType="hello.document.user.dto.UserDto">
+    <insert id="insertUserPermit" parameterType="document.user.dto.UserDto">
         INSERT INTO TB_PERMIT (
             PERMIT_ID,
             PERMIT_NAME,
@@ -88,7 +88,7 @@
     </insert>
 
     <!-- 사용자 정보 수정 -->
-    <update id="updateUserInfo" parameterType="hello.document.user.dto.UserDto">
+    <update id="updateUserInfo" parameterType="document.user.dto.UserDto">
         UPDATE TB_USER
         SET
             USER_NAME = #{userName},
@@ -103,7 +103,7 @@
     </update>
 
     <!-- 비밀번호 수정 -->
-    <update id="updatePassword" parameterType="hello.document.user.dto.UserDto">
+    <update id="updatePassword" parameterType="document.user.dto.UserDto">
         UPDATE TB_USER
         SET
             USER_PASS = #{userPass},
@@ -120,7 +120,7 @@
     </delete>
 
     <!-- 로그인 -->
-    <select id="login" resultType="hello.document.user.dto.UserDto" parameterType="hello.document.user.dto.UserDto">
+    <select id="login" resultType="document.user.dto.UserDto" parameterType="document.user.dto.UserDto">
         SELECT
             USER_ID,
             USER_NAME,

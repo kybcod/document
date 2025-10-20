@@ -1,6 +1,6 @@
-package hello.document.exception;
+package document.exception;
 
-import hello.document.user.dto.LoginStatus;
+import document.user.dto.LoginStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

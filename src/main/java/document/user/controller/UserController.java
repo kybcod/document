@@ -1,7 +1,7 @@
-package hello.document.user.controller;
+package document.user.controller;
 
-import hello.document.user.dto.UserDto;
-import hello.document.user.service.UserService;
+import document.user.dto.UserDto;
+import document.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

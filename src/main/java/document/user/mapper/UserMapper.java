@@ -1,6 +1,6 @@
-package hello.document.user.mapper;
+package document.user.mapper;
 
-import hello.document.user.dto.UserDto;
+import document.user.dto.UserDto;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
