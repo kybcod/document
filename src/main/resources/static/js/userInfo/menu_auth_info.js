@@ -39,7 +39,9 @@ function menuAuthMgmtDataGridSetting() {
 
     let dataGrid = new dxdatagrid();
     let columns = ['permitId','permitName'];
+    let captions = ['권한아이디','권한명'];
     dataGrid.setColumns(columns);
+    dataGrid.setCaptions(captions);
     dataGrid.setPaging(15);
     dataGrid.setEditing("popup", true, true, true);   // 추가, 수정, 삭제 모두 가능
     dataGrid.setEditingTexts("Menu Pkg Management", "이 항목을 삭제하시겠습니까?");
@@ -54,7 +56,6 @@ function menuAuthMgmtDataGridSetting() {
 
     dataGrid.setValidationRules('permitId', 'required', '권한 아이디를 입력해주세요');
     dataGrid.setValidationRules('permitName', 'required', '권한명을 입력해주세요');
-
     dataGrid.setColumnReadOnly("permitId")
 
     // 등록
@@ -149,6 +150,7 @@ function menuUseDataGridSetting() {
 
     let dataTreeList = new dxtreelist();
     let columns = ['menuId','menuName', 'realUse'];
+    let captions = ['메뉴 아이디', '메뉴명', '사용유무']
     dataTreeList.setColumns(columns);
     dataTreeList.setPaging(10);
     dataTreeList.setId('menuId', 'menuGroup', '0000');

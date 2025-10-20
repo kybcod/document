@@ -19,18 +19,20 @@ function menuInfoTreeListSetting() {
 
     let dataTreeList = new dxtreelist();
     let columns = ['menuId','menuName', 'menuGroup', 'menuDesc', 'menuUse', 'menuUrl', 'crtDt'];
+    let captions = ['메뉴 아이디','메뉴명', '메뉴그룹', '메뉴설명', '사용', '메뉴경로', '생성일'];
     dataTreeList.setColumns(columns);
+    dataTreeList.setCaptions(captions);
     dataTreeList.setPaging(15);
     dataTreeList.setId('menuId', 'menuGroup', '0000');
     dataTreeList.setHasItemsExpr("hasItemsExpr");
     dataTreeList.setEditing("popup", false, true, true);
-    dataTreeList.setEditingTexts("Menu Management", "이 항목을 삭제하시겠습니까?");
-    dataTreeList.setEditingPopup("Menu Management", 800, 400);
+    dataTreeList.setEditingTexts("메뉴 관리", "이 항목을 삭제하시겠습니까?");
+    dataTreeList.setEditingPopup("메뉴 관리", 800, 400);
     dataTreeList.setEditingForm(
         ['menuId','menuName', 'menuUse', 'menuUrl', 'menuGroup', 'menuDesc'],
         2,
         2,
-        "Menu Management",
+        "메뉴 관리",
     );
     dataTreeList.setAutoPaging("#menuTreeList");
 

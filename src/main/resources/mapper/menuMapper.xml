@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="document.menu.mapper.MenuMapper">
+
+  <select id="getActiveMenuList" resultType="document.menu.dto.MenuDto">
+    SELECT
+      M.MENU_ID ,
+      M.MENU_NAME,
+      M.MENU_GROUP ,
+      M.MENU_ORDER ,
+      M.MENU_URL ,
+      M.MENU_DESC ,
+      M.MENU_USE ,
+      M.CRT_ID ,
+      M.CRT_DT ,
+      M.UPT_ID ,
+      M.UPT_DT
+    FROM TB_MENU M , TB_PERMITDETAIL PD
+    WHERE
+      M.MENU_ID = PD.MENU_ID
+      AND M.MENU_USE = '1'
+      AND PD.PERMIT_ID = '${permitId}'
+    ORDER BY M.MENU_ID, M.MENU_ORDER, M.MENU_ORDER DESC
+  </select>
+
+  <select id="getMenuList" resultType="document.menu.dto.MenuDto">
+      SELECT
+        MENU_ID ,
+        MENU_NAME ,
+        MENU_GROUP ,
+        MENU_ORDER ,
+        MENU_URL ,
+        MENU_DESC ,
+        MENU_USE ,
+        CRT_ID ,
+        CRT_DT ,
+        UPT_ID ,
+        UPT_DT
+      FROM TB_MENU
+      ORDER BY MENU_ID, MENU_ORDER DESC
+  </select>
+
+  <select id="getMenuUseList" resultType="document.menu.dto.UseMenuDto">
+    SELECT *
+    FROM TB_MENU
+    WHERE MENU_USE = '1'
+    ORDER BY MENU_ID, MENU_ORDER DESC
+  </select>
+
+  <select id="getNotUseMenuList" resultType="document.menu.dto.UseMenuDto" parameterType="String">
+    SELECT *
+    FROM TB_MENU
+    WHERE MENU_ID
+              NOT IN (
+                    SELECT MENU_ID
+                    FROM TB_PERMITDETAIL
+                    WHERE PERMIT_ID = '${permitId}'
+            )
+  </select>
+
+
+  <select id="getMenuWithPermitFlag" resultType="document.menu.dto.UseMenuDto" parameterType="String">
+    SELECT
+      M.*,
+      CASE
+        WHEN P.MENU_ID IS NOT NULL THEN 1
+        ELSE 0
+        END AS realUse
+    FROM TB_MENU M
+           LEFT JOIN TB_PERMITDETAIL P
+                     ON M.MENU_ID = P.MENU_ID
+                       AND P.PERMIT_ID = '${permitId}'
+    WHERE M.MENU_USE = '1'
+    ORDER BY M.MENU_ID, M.MENU_ORDER DESC
+  </select>
+
+
+  <select id="getMenuByMenuId" resultType="document.menu.dto.MenuDto" parameterType="String">
+    SELECT
+      MENU_ID ,
+      MENU_NAME ,
+      MENU_GROUP ,
+      MENU_ORDER ,
+      MENU_URL ,
+      MENU_DESC ,
+      MENU_USE ,
+      CRT_ID ,
+      CRT_DT ,
+      UPT_ID ,
+      UPT_DT
+    FROM TB_MENU
+    WHERE MENU_ID = '${menuId}'
+  </select>
+
+  <select id="getMenuByMenuGroup" resultType="document.menu.dto.MenuDto" parameterType="String">
+    SELECT
+      MENU_ID ,
+      MENU_NAME ,
+      MENU_GROUP ,
+      MENU_ORDER ,
+      MENU_URL ,
+      MENU_DESC ,
+      MENU_USE ,
+      CRT_ID ,
+      CRT_DT ,
+      UPT_ID ,
+      UPT_DT
+    FROM TB_MENU
+    WHERE MENU_GROUP = '${menuGroup}'
+    ORDER BY MENU_ORDER DESC
+  </select>
+
+
+  
+  <insert id="insertMenuInfo" parameterType="document.menu.dto.MenuDto">
+    INSERT INTO TB_MENU (
+      MENU_ID,
+      MENU_NAME,
+      MENU_GROUP,
+      MENU_ORDER,
+      MENU_URL,
+      MENU_DESC,
+      MENU_USE,
+      CRT_ID,
+      CRT_DT,
+      UPT_ID,
+      UPT_DT
+    )
+    VALUES (
+             '${menuId}',
+             '${menuName}',
+             '${menuGroup}',
+             '${menuOrder}',
+             '${menuUrl}',
+             '${menuDesc}',
+             '${menuUse}',
+             '${crtId}',
+             '${crtDt}',
+             '${uptId}',
+             '${uptDt}'
+           )
+  </insert>
+
+  <update id="updateMenuInfo" parameterType="document.menu.dto.MenuDto">
+    UPDATE TB_MENU
+    SET
+      MENU_NAME = '${menuName}',
+      MENU_GROUP = '${menuGroup}',
+      MENU_ORDER = '${menuOrder}',
+      MENU_URL = '${menuUrl}',
+      MENU_DESC = '${menuDesc}',
+      MENU_USE = '${menuUse}',
+      UPT_ID = '${uptId}',
+      UPT_DT = '${uptDt}'
+    WHERE
+      MENU_ID = '${menuId}'
+  </update>
+
+
+  <delete id="deleteMenuById" parameterType="string">
+    DELETE FROM TB_MENU
+    WHERE MENU_ID = '${menuId}'
+  </delete>
+
+
+  <select id="findChildren" resultType="document.menu.dto.MenuDto" parameterType="String">
+    SELECT
+      MENU_ID ,
+      MENU_NAME ,
+      MENU_GROUP ,
+      MENU_ORDER ,
+      MENU_URL ,
+      MENU_DESC ,
+      MENU_USE ,
+      CRT_ID ,
+      CRT_DT ,
+      UPT_ID ,
+      UPT_DT
+    FROM TB_MENU
+    WHERE MENU_GROUP = '${menuId}'
+  </select>
+
+</mapper>

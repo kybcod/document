@@ -32,31 +32,31 @@ function getUserInfoList() {
 function userInfoDataGridSetting() {
 
     let dataGrid = new dxdatagrid();
-    let columns = ['userId','userName', 'companyName', 'deptName', 'position', 'pkgId', 'comTel', 'hpTelNo', 'mailAddr', 'creDate', 'userPass'];
-    let captions = ['User Id','User Name', 'Company Name', 'Dept Name', 'Position', 'Pkg Id', 'Com Tel', 'Tel', 'Mail', 'DATE', 'User Pass'];
+    let columns = ['userId','userName', 'userPass', 'userTel', 'userEmail', 'userFlag', 'permitId', 'pwdFcnt', 'crtId', 'crtDt', 'userPass'];
+    let captions = ['아이디','이름', '전화번호', '이메일', '사용구분', '권한아이디', '비번실패횟수', '등록자', '생성일','User Pass'];
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
     dataGrid.columns.find(c => c.dataField === 'userPass').visible = false;
     dataGrid.setPaging(15);
     dataGrid.setEditing("popup", true, true, true);
-    dataGrid.setEditingTexts("User Management", "이 항목을 삭제하시겠습니까?");
-    dataGrid.setEditingPopup("User Management", 700, 400);
+    dataGrid.setEditingTexts("사용자 관리", "이 항목을 삭제하시겠습니까?");
+    dataGrid.setEditingPopup("사용자 관리", 700, 400);
     dataGrid.setEditingForm(
-        ['userId','userName', 'companyName', 'deptName', 'position', 'comTel', 'hpTelNo', 'mailAddr','pkgId', 'userPass'],
+        ['userId','userName', 'userPass', 'userTel', 'userEmail', 'userFlag', 'permitId', 'pwdFcnt', 'userPass'],
         2,
         2,
-        "User Management",
+        "사용자 관리",
     );
     dataGrid.setValidationRules('userId', 'required', '사용자 아이디를 입력해주세요');
-    dataGrid.setValidationRules('hpTelNo', 'required', '핸드폰을 입력해주세요');
+    dataGrid.setValidationRules('userTel', 'required', '핸드폰을 입력해주세요');
     dataGrid.setValidationRules(
-        'hpTelNo',
+        'userTel',
         'pattern',
         '휴대폰 번호 형식은 01x-xxxx-xxxx 이어야 합니다.',
         /^\d{3}-\d{4}-\d{4}$/
     );
 
-    dataGrid.setValidationRules('pkgId', 'required', '권한 아이디를 입력해주세요');
+    dataGrid.setValidationRules('permitId', 'required', '권한 아이디를 입력해주세요');
     dataGrid.setOnEditorPreparing(function(e) {
         // 기존 행 수정 시 userId는 읽기 전용으로 설정
         if (e.parentType === 'dataRow' && e.dataField === 'userId') {

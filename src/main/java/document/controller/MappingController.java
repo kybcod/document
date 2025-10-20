@@ -29,4 +29,16 @@ public class MappingController {
     /****************************** 메인페이지 ******************************/
     @GetMapping("/")
     public String main() {return "main";}
+
+
+    /****************************** 사용자 설정 ******************************/
+    @GetMapping("user_info/list")
+    public String user_info() {return "userInfo/user_info";}
+
+    @GetMapping("user_info/menu")
+    public String menu_info() {return "userInfo/menu_info";}
+
+    @GetMapping("user_info/menu_auth")
+    public String menu_auth() {return "userInfo/menu_auth";}
+
 }
