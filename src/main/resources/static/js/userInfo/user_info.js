@@ -33,7 +33,7 @@ function userInfoDataGridSetting() {
 
     let dataGrid = new dxdatagrid();
     let columns = ['userId','userName', 'userTel', 'userEmail', 'userFlag', 'permitId', 'pwdFcnt', 'crtId', 'crtDt', 'userPass'];
-    let captions = ['아이디','이름', '전화번호', '이메일', '사용구분', '권한아이디', '비번실패횟수', '등록자', '생성일','User Pass'];
+    let captions = ['아이디','이름', '전화번호', '이메일', '사용구분', '권한아이디', '비번실패횟수', '등록자', '생성일','암호'];
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
     dataGrid.columns.find(c => c.dataField === 'userTel').customizeText = function(cellInfo) {
@@ -70,8 +70,10 @@ function userInfoDataGridSetting() {
         '휴대폰 번호 형식은 01x-xxxx-xxxx 이어야 합니다.',
         /^\d{3}-\d{4}-\d{4}$/
     );
-
     dataGrid.setValidationRules('permitId', 'required', '권한 아이디를 입력해주세요');
+
+
+
     dataGrid.setOnEditorPreparing(function(e) {
         if (e.parentType !== 'dataRow') {
             return;
@@ -115,16 +117,26 @@ function userInfoDataGridSetting() {
         // userPass 필드를 '비밀번호 초기화' 버튼으로 변경
         if (e.dataField === 'userPass') {
             if (e.row.isNewRow) {
-                // 등록 시에는 userPass 필드를 숨김 (DOM 조작)
-                $(e.editorElement).closest('.dx-field-item').hide();
+                // 신규 등록 → 텍스트박스 + validator 적용
+                e.editorName = 'dxTextBox';
+                e.editorOptions.mode = 'password';
+                e.editorOptions.validationRules = [
+                    {
+                        type: 'pattern',
+                        pattern: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/,
+                        message: '비밀번호 규칙(영문+숫자+특수문자 8자리 이상)에 맞지 않습니다.',
+                        ignoreEmptyValue : true
+                    }
+                ];
             } else {
-                // 수정 시에는 '비밀번호 초기화' 버튼으로 표시
+                // 수정 → 버튼, validator 제거
                 e.editorName = 'dxButton';
-                e.editorOptions.icon = 'preferences';
                 e.editorOptions.text = '비밀번호 초기화';
+                e.editorOptions.icon = 'preferences';
                 e.editorOptions.onClick = function() {
-                    openPwChangeModal(e.row.data.userId); // 사용자 함수 호출
+                    openPwChangeModal(e.row.data.userId);
                 };
+                e.editorOptions.validationRules = []; // 버튼에는 validator 없음
             }
         }
     });

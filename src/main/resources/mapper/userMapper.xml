@@ -23,6 +23,7 @@
     <insert id="insertUserInfo" parameterType="document.user.dto.UserDto">
         INSERT INTO TB_USER (
             USER_ID,
+            USER_PASS,
             USER_NAME,
             USER_TEL,
             USER_EMAIL,
@@ -34,6 +35,7 @@
         )
         VALUES (
                    #{userId},
+                   #{userPass},
                    #{userName},
                    #{userTel},
                    #{userEmail},

@@ -59,7 +59,8 @@ public class UserService {
             throw new Exception("이미 존재하는 사용자입니다.");
         }
 
-        int insertUserInfo = userMapper.insertUserInfo(userDto);
+        int insertUserInfo = userMapper.insertUserInfo(userDto.toBuilder()
+                .userPass(sha512(userDto.getUserPass())).build());
 
         if (insertUserInfo > 0) {
             return userMapper.getUserByUserId(userDto.getUserId());
