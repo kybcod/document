@@ -41,4 +41,8 @@ public class MappingController {
     @GetMapping("user_info/menu_auth")
     public String menu_auth() {return "userInfo/menu_auth";}
 
+    /****************************** 문서 변환 ******************************/
+    @GetMapping("doc_trans/doc_insert")
+    public String doc_insert() {return "docTrans/doc_insert";}
+
 }
