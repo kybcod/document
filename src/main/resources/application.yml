@@ -9,6 +9,10 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 20
+  servlet:
+    multipart:
+      max-file-size: 50MB       # 단일 파일 최대 크기
+      max-request-size: 100MB   # 요청 전체 크기 (여러 파일 포함 시)
 
 # MyBatis 설정
 mybatis:

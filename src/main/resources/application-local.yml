@@ -8,6 +8,10 @@ spring:
       idle-timeout: 8000
       connection-timeout: 8000
 
+file:
+  upload:
+    path: ./uploads
+
 server:
   port: 8089
   servlet:

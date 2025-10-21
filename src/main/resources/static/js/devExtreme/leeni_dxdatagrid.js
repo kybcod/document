@@ -191,7 +191,7 @@ dxdatagrid.prototype.setEditingPopup = function (title, width, height) {
  * textArea를 사용하려면 배열로 넘겨주면 된다. 높이를 지정할 수 있다.
  * https://js.devexpress.com/Documentation/ApiReference/UI_Components/dxDataGrid/Configuration/editing/#form
  */
-dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, caption, requiredFields = [] ) {
+dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, caption) {
 	this.editing.form.items = [];
 	let items = {};
 	items.itemType = 'group';
@@ -209,6 +209,19 @@ dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, ca
 			editor.editorOptions = { height: dataField[i][1] };
 		} else {
 			editor.dataField = dataField[i];
+
+			// 🔽 "등록파일"은 파일 업로더 사용
+			if (dataField[i] === '등록파일') {
+				editor.editorType = 'dxFileUploader';
+				editor.colSpan = colSpan;
+				editor.editorOptions = {
+					selectButtonText: "파일 선택",
+					labelText: "",
+					multiple: false,
+					accept: "*",
+					uploadMode: "useForm" // 전송은 직접 처리
+				};
+			}
 		}
 
 		items.items.push(editor);

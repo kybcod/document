@@ -5,7 +5,7 @@
 
 <mapper namespace="document.doc.mapper.DocMapper">
 
-    <!-- 전체 사용자 목록 조회 -->
+    <!-- 문서 목록 조회 -->
     <select id="getDocList" resultType="document.doc.dto.DocDto">
         SELECT *
         FROM TB_DOCUMENT
@@ -22,18 +22,43 @@
         ORDER BY CRT_DT DESC
     </select>
 
-    <!-- 사용자 ID로 조회 -->
+    <!-- 문서 아이디로 조회 -->
     <select id="getDocrByDocId" resultType="document.doc.dto.DocDto" parameterType="String">
         SELECT *
         FROM TB_DOCUMENT
         WHERE DOC_ID = #{docId}
     </select>
 
+    <!-- 문서 삭제 -->
     <delete id="deleteDoc" parameterType="string">
         DELETE FROM TB_DOCUMENT
         WHERE DOC_ID = #{docId}
     </delete>
 
-
+    <!-- 문서 등록 -->
+    <insert id="insertDoc" parameterType="string">
+        INSERT INTO TB_DOCUMENT (
+            DOC_DT,
+            DOC_NAME,
+            ORG_FILENAME,
+            SAVE_FILENAME,
+            DOC_FILEPATH,
+            DOC_STATUS,
+            SERVER_NUM,
+            CRT_ID,
+            CRT_DT
+        )
+        VALUES (
+                   NOW(),
+                   #{docName},
+                   #{orgFilename},
+                   #{saveFilename},
+                   #{docFilepath},
+                   0,
+                   #{serverNum},
+                   #{crtId},
+                   NOW()
+               )
+    </insert>
 
 </mapper>

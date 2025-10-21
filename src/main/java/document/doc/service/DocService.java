@@ -1,20 +1,34 @@
 package document.doc.service;
 
+import document.doc.ServerInfoResolver;
 import document.doc.dto.DocDto;
 import document.doc.mapper.DocMapper;
+import document.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DocService {
 
+    @Value("${file.upload.path}")
+    private String uploadPath;
 
     private final DocMapper docMapper;
+    private final ServerInfoResolver serverInfoResolver;
 
     /**
      * 문서 리스트
@@ -25,32 +39,42 @@ public class DocService {
 
 
     /**
-     * 문서 추가
-     */
-    public DocDto insertDoc(DocDto docDto) throws Exception {
-
-        DocDto existingUserId = docMapper.getDocrByDocId(docDto.getDocId());
-
-        if (existingUserId != null) {
-            throw new Exception("이미 존재하는 문서 아이디입니다.");
-        }
-
-        int insertUserInfo = docMapper.insertDoc(docDto);
-
-        if (insertUserInfo > 0) {
-            return docMapper.getDocrByDocId(docDto.getDocId());
-        }
-        return null;
-    }
-
-
-    /**
      * 사용자 정보 삭제
      */
     public void deleteDoc(DocDto docDto) {
         docMapper.deleteDoc(docDto);
     }
 
-    
-    
+    /**
+     * 문서 등록
+     */
+    public void saveDocument(String docName, MultipartFile file, UserDto userDto) throws Exception {
+        String serverNum = serverInfoResolver.resolveCurrentServerNumber();
+
+        String orgFilename = file.getOriginalFilename();
+        String saveFilename = UUID.randomUUID() + "_" + orgFilename;
+
+        // 파일 저장 경로 생성 확인
+        Path uploadDir = Paths.get(uploadPath);
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir);
+        }
+
+        // 실제 파일 저장 경로 (uploadPath + 파일명)
+        Path filePath = uploadDir.resolve(saveFilename);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // DTO 구성
+        DocDto docDto = DocDto.builder()
+                .docName(docName)
+                .orgFilename(orgFilename)
+                .saveFilename(saveFilename)
+                .docFilepath(filePath.toString())
+                .serverNum(serverNum)
+                .crtId(userDto.getUserId())
+                .build();
+
+        docMapper.insertDoc(docDto);
+    }
+
 }

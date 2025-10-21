@@ -2,11 +2,14 @@ package document.doc.controller;
 
 import document.doc.dto.DocDto;
 import document.doc.service.DocService;
+import document.user.dto.UserDto;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -24,10 +27,13 @@ public class DocController {
 
     @Description("문서 등록")
     @PostMapping
-    public ResponseEntity<?> insertDoc(@RequestBody DocDto docDto) {
+    public ResponseEntity<?> uploadDoc(@RequestParam("docName") String docName,
+                                       @RequestParam("file") MultipartFile file,
+                                       HttpSession session) {
         try {
-            DocDto insertDocDto = docService.insertDoc(docDto);
-            return ResponseEntity.ok(insertDocDto);
+            UserDto userDto = (UserDto) session.getAttribute("loginUser");
+            docService.saveDocument(docName, file, userDto);
+            return ResponseEntity.ok("업로드 성공");
         } catch (Exception e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }

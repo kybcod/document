@@ -45,7 +45,7 @@ function docTransGridSetting() {
     dataGrid.setEditingTexts("문서 관리", "이 항목을 삭제하시겠습니까?");
     dataGrid.setEditingPopup("문서 등록", 500, 400);
     dataGrid.setEditingForm(
-        ['docName','docFile'],
+        ['docName', '등록파일'],
         1,
         2,
         "문서 관리",
@@ -53,8 +53,34 @@ function docTransGridSetting() {
 
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
-        sendDataToServer("doc",'POST', data, deferred, docTransferGrid, getUserInfoList);
+        const formData = new FormData();
+
+        // 일반 필드
+        formData.append('docName', data.docName);
+
+        // 파일 필드
+        const fileUploader = $(".dx-fileuploader input[type='file']")[0];
+        if (fileUploader && fileUploader.files.length > 0) {
+            formData.append("file", fileUploader.files[0]);
+        }
+
+        // 전송
+        $.ajax({
+            url: 'doc',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                deferred.resolve();
+                docTransferGrid.refresh();
+            },
+            error: function(err) {
+                deferred.reject("업로드 실패");
+            }
+        });
     });
+
 
     // 삭제
     dataGrid.setOnRowRemoving(function(data, deferred) {
