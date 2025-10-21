@@ -28,10 +28,22 @@ function docTransGridSetting() {
     let captions = ['등록날짜','문서명', '변환상태', '보기', '변환작업일시', '등록자ID', '원본파일명', '저장파일명', '저장경로'];
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
+    const docStatusCol = dataGrid.columns.find(c => c.dataField === 'docStatus');
+    if (docStatusCol) {
+        const docStatusMap = {
+            0: '등록',
+            1: '변환신청',
+            2: '변환완료',
+            9: '실패'
+        };
+        docStatusCol.customizeText = function(cellInfo) {
+            return docStatusMap[cellInfo.value] || cellInfo.value;
+        };
+    }
     dataGrid.setPaging(15);
     dataGrid.setEditing("popup", true, false, true);
     dataGrid.setEditingTexts("문서 관리", "이 항목을 삭제하시겠습니까?");
-    dataGrid.setEditingPopup("문서 관리", 700, 400);
+    dataGrid.setEditingPopup("문서 등록", 500, 400);
     dataGrid.setEditingForm(
         ['docName','docFile'],
         1,
