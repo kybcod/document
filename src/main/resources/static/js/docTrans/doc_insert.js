@@ -1,8 +1,3 @@
-function transStatusSelectBox(){
-
-}
-
-
 // TB_DOCUMENT 리스트
 function getDocList() {
 
@@ -34,31 +29,59 @@ function docTransGridSetting() {
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
     dataGrid.setPaging(15);
-    dataGrid.setEditing("popup", false, false, true);
+    dataGrid.setEditing("popup", true, false, true);
     dataGrid.setEditingTexts("문서 관리", "이 항목을 삭제하시겠습니까?");
+    dataGrid.setEditingPopup("문서 관리", 700, 400);
+    dataGrid.setEditingForm(
+        ['docName','docFile'],
+        1,
+        2,
+        "문서 관리",
+    );
 
 
-    /*// 등록
+    // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
         sendDataToServer("doc",'POST', data, deferred, docTransferGrid, getUserInfoList);
     });
-
-    // 수정
-    dataGrid.setOnRowUpdating(function(data, deferred) {
-        sendDataToServer("doc", 'PUT',data, deferred, docTransferGrid, getUserInfoList);
-    });*/
 
     // 삭제
     dataGrid.setOnRowRemoving(function(data, deferred) {
         sendDataToServer("doc", 'DELETE',data, deferred, docTransferGrid, getUserInfoList);
     });
 
-    dataGrid.setOnCellClick(function(e, deferred) {
-
+    dataGrid.setOnCellPrepared(function(e) {
+        if (e.rowType === 'data' && e.column.dataField === 'look') {
+            if (e.data.docStatus == 2) {
+                $('<a>')
+                    .addClass('dx-icon-search')
+                    .css('cursor', 'pointer')
+                    .attr('title', '보기')
+                    .on('click', function() {
+                        console.log('보기');
+                    })
+                    .appendTo(e.cellElement);
+            }
+        }
     });
-
     docTransferGrid = $('#docTransferGrid').dxDataGrid(dataGrid).dxDataGrid("instance");
 
     docTransferGrid.beginCustomLoading();
 
+    docTransferGrid.on("rowPrepared", function(e) {
+        if (e.rowType === "data") {
+            const $buttons = $(e.rowElement).find(".dx-command-edit");
+            if ($buttons.length) {
+                const $resetBtn = $('<div class="dx-link dx-icon-refresh" title="변환"></div>');
+                $resetBtn.on("click", function() {
+                    transfer(e.data);
+                });
+                $buttons.append($resetBtn);
+            }
+        }
+    });
+}
+
+function transfer(data){
+    console.log("변환 :", data);
 }
