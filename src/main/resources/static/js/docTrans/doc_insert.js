@@ -39,7 +39,6 @@ function docTransGridSetting() {
         "문서 관리",
     );
 
-
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
         sendDataToServer("doc",'POST', data, deferred, docTransferGrid, getUserInfoList);
@@ -69,7 +68,7 @@ function docTransGridSetting() {
     docTransferGrid.beginCustomLoading();
 
     docTransferGrid.on("rowPrepared", function(e) {
-        if (e.rowType === "data") {
+        if (e.rowType === "data" && e.data.docStatus == 9) {
             const $buttons = $(e.rowElement).find(".dx-command-edit");
             if ($buttons.length) {
                 const $resetBtn = $('<div class="dx-link dx-icon-refresh" title="변환"></div>');
