@@ -146,14 +146,23 @@ function userInfoDataGridSetting() {
 
     dataGrid.setOnCellPrepared(function(e) {
         if (e.rowType === 'data' && e.column.dataField === 'pwdFcnt') {
-            e.cellElement.css('color', 'blue');
-            e.cellElement.css('cursor', 'pointer');
-        }
-    });
 
-    dataGrid.setOnCellClick(function(e, deferred) {
-        if (e.column.dataField === 'pwdFcnt') {
-            sendDataToServer("user/updatePwdFcntZero", 'PUT',e.data, deferred, userListGrid, getUserInfoList);
+            // jQuery를 사용하여 'a' 태그 생성
+            const $link = $('<a>')
+                .text(e.data.pwdFcnt) // 셀에 표시될 텍스트 (실패 횟수)
+                .css({
+                    'cursor': 'pointer',
+                    'color': 'blue',
+                    'text-decoration': 'underline'
+                })
+                .on('click', function() {
+                    if (confirm('비밀번호 실패 횟수를 초기화하시겠습니까?')) {
+                        sendDataToServer("user/updatePwdFcntZero", 'PUT', e.data, $.Deferred(), userListGrid, getUserInfoList);
+                    }
+                });
+
+            // 셀 내용을 새로 생성한 링크로 교체
+            e.cellElement.empty().append($link);
         }
     });
 
