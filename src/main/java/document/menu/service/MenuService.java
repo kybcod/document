@@ -137,20 +137,23 @@ public class MenuService {
     private int getNewMenuOrder(MenuDto menuDto) {
 
         int newMenuOrder = 1;
-        List<MenuDto> parentMenu = menuMapper.getMenuByMenuId(menuDto.getMenuGroup());
 
+        // 부모는 0000에 따라 menuOrder + 1
         if ("0000".equals(menuDto.getMenuGroup())) {
             List<MenuDto> parentMenuList = menuMapper.getMenuByMenuGroup("0000");
             MenuDto parentMenus = parentMenuList.get(0);
             newMenuOrder = Integer.valueOf(parentMenus.getMenuOrder()) + 1;
         } else {
+            // 자식은 : 처음인 자식은 1, 그 다음 자식은 가장 마지막에 들어온 자식의 + 1
 
-            // 부모 아이디로 해당 자식 메뉴 있는지 먼저 조회
-            if (parentMenu != null && !parentMenu.isEmpty()) {
+            // 자식이 있는지 없는지 확인(메뉴 그룹으로 조회)
+            List<MenuDto> parentMenuList = menuMapper.getMenuByMenuGroup(menuDto.getMenuGroup());
+            if (parentMenuList != null && !parentMenuList.isEmpty()) {
+
                 // 부모의 가장 마지막 하위 자식 리스트를 가져와야 함
-                List<MenuDto> parentMenuList = menuMapper.getMenuByMenuGroup(menuDto.getMenuGroup());
                 MenuDto parentMenus = parentMenuList.get(0);
                 newMenuOrder = Integer.valueOf(parentMenus.getMenuOrder()) + 1;
+
             } else {
                 newMenuOrder = 1;
             }
