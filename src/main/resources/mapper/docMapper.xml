@@ -9,6 +9,16 @@
     <select id="getDocList" resultType="document.doc.dto.DocDto">
         SELECT *
         FROM TB_DOCUMENT
+        WHERE 1=1
+        <if test="docName != null and docName != ''">
+            AND  DOC_NAME = #{docName}
+        </if>
+        <if test="docStatus != null and docStatus != ''">
+            AND  DOC_STATUS = #{docStatus}
+        </if>
+        <if test="orgFilename != null and orgFilename != ''">
+            AND  ORG_FILENAME = #{orgFilename}
+        </if>
         ORDER BY CRT_DT DESC
     </select>
 

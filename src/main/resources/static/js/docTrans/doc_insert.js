@@ -5,11 +5,17 @@ function transStatusSelectBox(){
 
 // TB_DOCUMENT 리스트
 function getDocList() {
+
     $.ajax({
         url: "doc/list",
         type: "POST",
         contentType: "application/json",
         dataType: "json",
+        data: JSON.stringify({
+            docName: $("#docName").val(),
+            docStatus:  $("#docStatus").val(),
+            orgFilename: $("#orgFilename").val()
+        }),
         success(res) {
             docTransferGrid.option("dataSource", res);
         },

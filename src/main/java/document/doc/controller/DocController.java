@@ -18,7 +18,7 @@ public class DocController {
 
     @Description("문서 TB_DOC~ 리스트")
     @PostMapping("/list")
-    public ResponseEntity<?> tbDocList(DocDto docDto) {
+    public ResponseEntity<?> tbDocList(@RequestBody DocDto docDto) {
         return ResponseEntity.ok(docService.getDocList(docDto));
     }
 
