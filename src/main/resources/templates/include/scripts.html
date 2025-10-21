@@ -27,8 +27,6 @@
 	<script type="text/javascript" th:src="@{/js/docTrans/doc_insert.js}"></script>
 
 
-
-
 	<!-- 외부 파일-->
 	<!--devExtreme 관련 소스-->
 	<!--/dx-quill.min.js 이게 항상 dx.all파일보다 위에 존재해야함 (dev공식문서에 나와있음)-->
@@ -98,6 +96,18 @@
 	<!-- 우 클릭 시 contextmenu 만들기 -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
+
+
+
+	<script th:inline="javascript">
+
+		var loginUser = {
+			userId: /*[[${session.loginUser.userId}]]*/ null,
+			userName: /*[[${session.loginUser.userName}]]*/ null,
+			userEmail: /*[[${session.loginUser.userEmail}]]*/ null,
+			userTel: /*[[${session.loginUser.userTel}]]*/ null,
+		};
+	</script>
 
 
 

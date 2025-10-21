@@ -101,15 +101,7 @@
     </div>
 </div>
 
-<script th:inline="javascript">
-
-    var loginUser = {
-        userId: /*[[${session.loginUser.userId}]]*/ null,
-        userName: /*[[${session.loginUser.userName}]]*/ null,
-        userEmail: /*[[${session.loginUser.userEmail}]]*/ null,
-        userTel: /*[[${session.loginUser.userTel}]]*/ null,
-    };
-
+<script>
 
     // 페이지 로드 시 첫 번째 메뉴 자동 열기
     $(document).ready(function() {
