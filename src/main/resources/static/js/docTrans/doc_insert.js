@@ -54,8 +54,6 @@ function docTransGridSetting() {
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
         const formData = new FormData();
-
-        // 일반 필드
         formData.append('docName', data.docName);
 
         // 파일 필드
@@ -73,10 +71,11 @@ function docTransGridSetting() {
             processData: false,
             success: function(response) {
                 deferred.resolve();
-                docTransferGrid.refresh();
+                getDocList();
             },
             error: function(err) {
-                deferred.reject("업로드 실패");
+                deferred.reject();
+                basicAlert({ icon: 'error', text: err.responseJSON?.msg || err.responseText });
             }
         });
     });

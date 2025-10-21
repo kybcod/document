@@ -33,7 +33,7 @@ public class DocController {
         try {
             UserDto userDto = (UserDto) session.getAttribute("loginUser");
             docService.saveDocument(docName, file, userDto);
-            return ResponseEntity.ok("업로드 성공");
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }
