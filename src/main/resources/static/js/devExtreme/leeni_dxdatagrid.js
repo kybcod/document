@@ -240,7 +240,7 @@ dxdatagrid.prototype.setColumns = function (columns, merges) {
 
 
 
-		if (column === "crtDt") {
+		if (column === "crtDt" || column === "docDt") {
 			colConfig.customizeText = function(cellInfo) {
 				const dateStr = cellInfo.value;
 				if (typeof dateStr === "string" && dateStr.includes(" ")) {
