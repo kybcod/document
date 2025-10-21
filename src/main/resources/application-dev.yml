@@ -7,3 +7,7 @@ spring:
       password: Raon31123!
       idle-timeout: 8000
       connection-timeout: 8000
+
+file:
+  upload:
+    path: ./uploads
