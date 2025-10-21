@@ -120,6 +120,12 @@ button {
 	gap: 40px; /* 로고와 메뉴 사이 간격 */
 }
 
+
+.right_group {
+	display: flex;
+	align-items: center;
+}
+
 /* 메뉴 */
 #menu_list {
 	margin-left: 40px;

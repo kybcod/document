@@ -252,6 +252,11 @@ const logout = () => {
         .catch(error => console.error(error));
 };
 
+// 정보수정
+function updateInfo(){
+    console.log("정보수정")
+}
+
 // 공통 그리드 추가/함수/삭제 ajax 함수
 function sendDataToServer(url, type, data, deferred, gridInstance, reloadFn) {
     $.ajax({

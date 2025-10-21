@@ -28,10 +28,15 @@
         </div>
 
         <!-- 오른쪽 로그아웃 -->
-        <button class="logout_btn" type="button" onclick="logout()">
-            <img th:src="@{/images/icon-logout.png}" alt="">
-            <span>로그아웃</span>
-        </button>
+        <div class="right_group">
+            <button class="logout_btn" type="button" onclick="updateInfo()">
+                <span>정보수정</span>
+            </button>
+            <button class="logout_btn" type="button" onclick="logout()">
+                <img th:src="@{/images/icon-logout.png}" alt="">
+                <span>로그아웃</span>
+            </button>
+        </div>
     </div>
 
     <!-- Contents 영역 -->
