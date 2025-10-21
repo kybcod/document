@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -54,8 +55,11 @@ public class DocService {
         String orgFilename = file.getOriginalFilename();
         String saveFilename = UUID.randomUUID() + "_" + orgFilename;
 
-        // 파일 저장 경로 생성 확인
-        Path uploadDir = Paths.get(uploadPath);
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+
+        // 파일 저장 경로 생성 확인 (예: ./uploads/2025-10-21)
+        Path uploadDir = Paths.get(uploadPath, today);
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
