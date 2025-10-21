@@ -10,10 +10,52 @@
     });
 </script>
 <body>
-<div class="grid_wrap twoSearch">
-    <div class="table_wrap">
-        <div id="docTransferGrid" class="table_container"></div>
+<div class="one_page">
+    <div class="search_form MT05">
+        <div class="scroll_wrap">
+            <div class="search_inner_form W1300px">
+                <form name="docSearchForm" method="post" onsubmit="return false;">
+                    <table width="100%">
+                        <tr>
+                            <th class="table_tit W100px">문서명</th>
+                            <td class="table_data W150px">
+                                <input type="text" id="docName" name="docName" class="list_input">
+                            </td>
+                            <th class="table_tit W100px">변환상태</th>
+                            <td class="table_data W150px">
+                                <select id="docStatus" name="docStatus" class="list_select">
+                                    <option value="">전체</option>
+                                    <option value="0">등록</option>
+                                    <option value="1">변환신청</option>
+                                    <option value="2">변환완료</option>
+                                    <option value="9">실패</option>
+                                </select>
+                            </td>
+                            <th class="table_tit W100px">원본 파일명</th>
+                            <td class="table_data W150px">
+                                <input type="text" id="orgFilename" name="orgFilename" class="list_input">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+
+
+        <div class="btn_form">
+            <button class="common_btn" onclick="getDocList()">
+                <span>조회</span>
+            </button>
+        </div>
+
     </div>
+
+    <div class="grid_wrap">
+        <div class="table_wrap">
+            <div id="docTransferGrid" class="table_container"></div>
+        </div>
+    </div>
+
 </div>
 </body>
 </html>

@@ -1,3 +1,7 @@
+function transStatusSelectBox(){
+
+}
+
 
 // TB_DOCUMENT 리스트
 function getDocList() {
