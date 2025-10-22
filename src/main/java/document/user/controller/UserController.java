@@ -24,6 +24,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserList(userDto));
     }
 
+    @Description("해당 User 리스트")
+    @PostMapping("/userId")
+    public ResponseEntity<?> byUerIdList(@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(userService.getUserListByUserId(userDto));
+    }
+
     @Description("사용자 관리 메뉴 권한 리스트")
     @PostMapping("/menu-role/list")
     public ResponseEntity<?> UserList(UserDto userDto) {

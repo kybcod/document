@@ -21,10 +21,126 @@ const logout = () => {
         .catch(error => console.error(error));
 };
 
+const userLogout = () => {
+    confirmAlert({ icon: 'success', text: '비밀번호가 변경되었습니다. 다시 로그인해주세요.' })
+        .then(result => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'logout',
+                    type: 'GET',
+                    success: function(res) {
+                        location.href = contextPath + '/logout';
+                    },
+                    error: function(xhr) {
+                        basicAlert({ icon: 'error', text: '로그아웃에 실패했습니다.' });
+                    }
+                });
+            }
+        })
+        .catch(error => console.error(error));
+};
+
 // 정보수정
-function updateInfo(){
-    console.log("정보수정222")
+function updateInfo() {
+    $("#updateInfoPopup").dxPopup({
+        visible: true,
+        showTitle: true,
+        title: "정보수정",
+        width: 500,
+        height: 600,
+        contentTemplate: function(container) {
+            container.append(`
+                <div class="userInfo-content">
+                    <p>
+                        <label>아이디</label>
+                        <input type="text" id="userId">
+                    </p>
+                    <p>
+                        <label>이름</label>
+                        <input type="text" id="userName">
+                    </p>
+                    <p>
+                        <label>전화번호</label>
+                        <input type="text" id="userTel" placeholder="등록된 전화번호 입력">
+                        <small>※ 01x-xxxx-xxxx 형식으로 작성바랍니다.</small>
+                    </p>
+                    <p>
+                        <label>이메일</label>
+                        <input type="text" id="userEmail">
+                    </p>
+                    <p>
+                        <label>암호</label>
+                        <button id="resetPasswordBtn">비밀번호 초기화</button>
+                    </p>
+                    
+                </div>
+            `);
+
+            $.ajax({
+                url: "user/userId",
+                type: "POST",
+                contentType: "application/json",
+                dataType: "json",
+                data : JSON.stringify({userId : loginUser.userId}),
+                success(res) {
+                    $("#userId").val(res.userId);
+                    $("#userName").val(res.userName);
+                    $("#userTel").val(res.userTel);
+                    $("#userEmail").val(res.userEmail);
+                },
+            });
+
+            $("#resetPasswordBtn").on("click", function() {
+                openPwChangeModal(loginUser.userId);
+            });
+        },
+        toolbarItems: [
+            {
+                toolbar: "bottom",
+                location: "after",
+                widget: "dxButton",
+                options: {
+                    text: "Save",
+                    type: "success",
+                    width: 120,
+                    height: 40,
+                    stylingMode: "contained", // 기본 값이라 생략 가능
+                    elementAttr: {
+                        style: "font-size: 15px;" // 인라인 스타일 직접 지정
+                    },
+                    onClick: function() {
+                        const data = {
+                            userId: $("#userId").val(),
+                            userName: $("#userName").val(),
+                            userTel: $("#userTel").val(),
+                            userEmail: $("#userEmail").val()
+                        };
+                        sendDataToServer("user", "PUT", data);
+                        $("#updateInfoPopup").dxPopup("hide");
+                    }
+                }
+            },
+            {
+                toolbar: "bottom",
+                location: "after",
+                widget: "dxButton",
+                options: {
+                    text: "Cancel",
+                    width: 120,
+                    height: 40,
+                    stylingMode: "contained",
+                    elementAttr: {
+                        style: "font-size: 15px;"
+                    },
+                    onClick: function() {
+                        $("#updateInfoPopup").dxPopup("hide");
+                    }
+                }
+            }
+        ],
+    });
 }
+
 
 // 공통 그리드 추가/함수/삭제 ajax 함수
 function sendDataToServer(url, type, data, deferred, gridInstance, reloadFn) {
@@ -34,13 +150,19 @@ function sendDataToServer(url, type, data, deferred, gridInstance, reloadFn) {
         contentType: "application/json",
         data: JSON.stringify(data),
         success: (res) => {
-            gridInstance.option("editing.popup.visible", false);
+
+            if(gridInstance){
+                gridInstance.option("editing.popup.visible", false);
+            }
 
             if (deferred) {
                 deferred.resolve();
             }
 
-            reloadFn();
+            if(reloadFn){
+                reloadFn();
+            }
+
         },
         error: (err) => {
             if (deferred) {
@@ -50,7 +172,9 @@ function sendDataToServer(url, type, data, deferred, gridInstance, reloadFn) {
             basicAlert({ icon: 'error', text: err.responseJSON?.msg || err.responseText });
         },
         complete(){
-            gridInstance.endCustomLoading();
+            if(gridInstance){
+                gridInstance.endCustomLoading();
+            }
         }
     });
 }
@@ -119,9 +243,13 @@ function changePassword() {
         data: JSON.stringify({ userId, userTel, userPass }),
         contentType: 'application/json',
         success: function(res) {
-            basicAlert({ icon: 'success', title: "", text: '비밀번호가 변경되었습니다. 다시 로그인해주세요.' });
+            basicAlert({ icon: 'success', title: "", text: '비밀번호가 변경되었습니다.' });
             closePwChangeModal();
             $("#pw").val("");
+
+            if (loginUser.userId === userId) {
+                userLogout();
+            }
         },
         error: function(xhr) {
             const msg = xhr.responseJSON?.msg || xhr.responseText || '오류가 발생했습니다. 새로고침 후 다시 시도해주세요.';

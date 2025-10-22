@@ -29,6 +29,13 @@ public class UserService {
     }
 
     /**
+     * 해당 USERID 리스트
+     */
+    public UserDto getUserListByUserId(UserDto userDto) {
+        return userMapper.getUserByUserId(userDto.getUserId());
+    }
+
+    /**
      * 권한 아이디 리스트"
      */
     public List<UserDto> getMenuRoleList(UserDto userDto) {

@@ -101,6 +101,8 @@
     </div>
 </div>
 
+<div id="updateInfoPopup"></div>
+
 <script>
 
     // 페이지 로드 시 첫 번째 메뉴 자동 열기
@@ -116,7 +118,7 @@
 
         createDynamicSidebarMenu();
 
-        $(document).on('input', '#chgTel', function() {
+        $(document).on('input', '#chgTel, #userTel', function() {
             formatPhoneNumber(this);
         });
     });

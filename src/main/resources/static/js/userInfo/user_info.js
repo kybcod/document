@@ -159,9 +159,8 @@ function userInfoDataGridSetting() {
     dataGrid.setOnCellPrepared(function(e) {
         if (e.rowType === 'data' && e.column.dataField === 'pwdFcnt') {
 
-            // jQuery를 사용하여 'a' 태그 생성
             const $link = $('<a>')
-                .text(e.data.pwdFcnt) // 셀에 표시될 텍스트 (실패 횟수)
+                .text(e.data.pwdFcnt)
                 .css({
                     'cursor': 'pointer',
                     'color': 'blue',
@@ -173,7 +172,6 @@ function userInfoDataGridSetting() {
                     }
                 });
 
-            // 셀 내용을 새로 생성한 링크로 교체
             e.cellElement.empty().append($link);
         }
     });

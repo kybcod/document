@@ -3052,3 +3052,77 @@ form[name="problemBankEditForm"] label{
 .restart-button:hover {
 	background-color: #ddd;
 }
+
+
+/* 모달 컨텐츠 박스 */
+.userInfo-content {
+	border-radius: 12px;
+	width: 100%;
+	animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	position: relative;
+}
+
+/* 제목 스타일 */
+.userInfo-content h2 {
+	text-align: center;
+	margin-top: 0;
+	margin-bottom: 25px;
+	color: #333;
+	font-size: 26px;
+	font-weight: 600;
+}
+
+/* 입력 필드 레이아웃 */
+.userInfo-content p {
+	margin-bottom: 20px;
+	display: flex;
+	flex-direction: column;
+}
+
+/* 레이블 스타일 */
+.userInfo-content label {
+	font-size: 15px;
+	color: #555;
+	margin-bottom: 10px;
+	font-weight: 500;
+}
+
+/* 입력 필드 */
+.userInfo-content input[type="text"],
+.userInfo-content input[type="password"] {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	font-size: 16px;
+	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.userInfo-content input[type="text"]:focus,
+.userInfo-content input[type="password"]:focus {
+	border-color: #007bff;
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.userInfo-content small {
+	display: block;
+	margin-top: 5px;
+	color: #888;
+	font-size: 15px;
+	text-align: right;
+}
+
+/* 저장 버튼 */
+.userInfo-content button {
+	width: 100%;
+	padding: 12px;
+	background-color: #476fb4;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}

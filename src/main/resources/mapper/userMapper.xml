@@ -69,16 +69,27 @@
     <update id="updateUserInfo" parameterType="document.user.dto.UserDto">
         UPDATE TB_USER
         SET
-            USER_NAME = #{userName},
-            USER_TEL = #{userTel},
-            USER_EMAIL = #{userEmail},
-            PERMIT_ID = #{permitId},
-            USE_FLAG = #{userFlag},
+            <if test="userName != null and userName != ''">
+                USER_NAME = #{userName},
+            </if>
+            <if test="userTel != null and userTel != ''">
+                USER_TEL = #{userTel},
+            </if>
+            <if test="userEmail != null and userEmail != ''">
+                USER_EMAIL = #{userEmail},
+            </if>
+            <if test="permitId != null and permitId != ''">
+                PERMIT_ID = #{permitId},
+            </if>
+            <if test="userFlag != null and userFlag != ''">
+                USE_FLAG = #{userFlag},
+            </if>
             UPT_ID = #{userId},
             UPT_DT = NOW()
         WHERE
-            USER_ID = #{userId}
+        USER_ID = #{userId}
     </update>
+
 
     <!-- 비밀번호 수정 -->
     <update id="updatePassword" parameterType="document.user.dto.UserDto">
