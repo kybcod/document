@@ -1,0 +1,46 @@
+# log common config
+logging:
+  pattern:
+    console: "[%d{yyyy-MM-dd HH:mm:ss}:%-3relative]  %clr(%-5level) %clr(${PID:-}){magenta} %clr(---){faint} %clr([%15.15thread]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %msg%n"
+  file:
+    name: "./logs/document.log"
+  logback:
+    rollingpolicy:
+      fileNamePattern: "./logs/document-%d{yyyy-MM-dd}.%i.log"
+      maxHistory: 1000
+    policies:
+      time: "1d"
+    strategy:
+      max: 1000
+      fileIndex: min
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+logging:
+  level:
+    root: info
+    jdbc.sqlonly: info
+    jdbc.sqltiming: off
+    jdbc.audit: error
+    jdbc.resultset: off
+    jdbc.resultsettable: off
+    jdbc.connection: off
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+logging:
+  level:
+    root: info
+    jdbc.sqlonly: off
+    jdbc.sqltiming: off
+    jdbc.audit: error
+    jdbc.resultset: off
+    jdbc.resultsettable: off
+    jdbc.connection: off
