@@ -12,6 +12,9 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 20
+      max-lifetime: 1800000       # 30분
+      keepalive-time: 300000      # 5분마다 유휴 커넥션 깨우기
+      validation-timeout: 5000    # 5초 내에 커넥션 확인 안 되면 실패
   servlet:
     multipart:
       max-file-size: 50MB       # 단일 파일 최대 크기
