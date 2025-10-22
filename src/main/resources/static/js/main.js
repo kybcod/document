@@ -104,11 +104,18 @@ function updateInfo() {
                     type: "success",
                     width: 120,
                     height: 40,
-                    stylingMode: "contained", // 기본 값이라 생략 가능
+                    stylingMode: "contained",
                     elementAttr: {
-                        style: "font-size: 15px;" // 인라인 스타일 직접 지정
+                        style: "font-size: 15px;"
                     },
                     onClick: function() {
+                        const emailPattern = /^$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+                        if (!emailPattern.test($("#userEmail").val())) {
+                            basicAlert({ icon: 'error', text: '이메일 형식이 올바르지 않습니다. 예: user@example.com' });
+                            return;
+                        }
+
                         const data = {
                             userId: $("#userId").val(),
                             userName: $("#userName").val(),

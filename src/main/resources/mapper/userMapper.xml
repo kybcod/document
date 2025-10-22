@@ -69,13 +69,13 @@
     <update id="updateUserInfo" parameterType="document.user.dto.UserDto">
         UPDATE TB_USER
         SET
-            <if test="userName != null and userName != ''">
+            <if test="userName != null">
                 USER_NAME = #{userName},
             </if>
             <if test="userTel != null and userTel != ''">
                 USER_TEL = #{userTel},
             </if>
-            <if test="userEmail != null and userEmail != ''">
+            <if test="userEmail != null">
                 USER_EMAIL = #{userEmail},
             </if>
             <if test="permitId != null and permitId != ''">

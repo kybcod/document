@@ -71,6 +71,12 @@ function userInfoDataGridSetting() {
         /^\d{3}-\d{4}-\d{4}$/
     );
     dataGrid.setValidationRules('permitId', 'required', '권한 아이디를 입력해주세요');
+    dataGrid.setValidationRules(
+        'userEmail',
+        'pattern',
+        '이메일 형식이 올바르지 않습니다. 예: user@example.com',
+        /^$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    );
 
 
 
