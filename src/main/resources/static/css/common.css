@@ -500,6 +500,7 @@ input[type="date"]::-webkit-inner-spin-button {
 
 .one_page .search_inner_form {
 	min-width: 500px;
+	margin-right: 30px;
 }
 
 .one_page .search_inner_form .table_tit {
@@ -837,7 +838,8 @@ ul.checktree span.count {
 
 .scroll_wrap {
 	overflow: auto;
-	margin-right: auto;
+	margin-right: 30px;
+	display: flex;
 }
 
 .scroll_wrap::-webkit-scrollbar {

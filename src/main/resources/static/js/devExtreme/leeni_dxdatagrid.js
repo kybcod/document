@@ -210,7 +210,6 @@ dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, ca
 		} else {
 			editor.dataField = dataField[i];
 
-			// 🔽 "등록파일"은 파일 업로더 사용
 			if (dataField[i] === '등록파일') {
 				editor.editorType = 'dxFileUploader';
 				editor.colSpan = colSpan;
@@ -219,7 +218,14 @@ dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, ca
 					labelText: "",
 					multiple: false,
 					accept: "*",
-					uploadMode: "useForm" // 전송은 직접 처리
+					uploadMode: "useForm",
+					// 💡 아이콘 추가를 위한 onContentReady 핸들러
+					onContentReady: function(e) {
+						const selectButton = e.element.find('.dx-fileuploader-button');
+						if (selectButton.length) {
+							selectButton.dxButton('option', 'icon', 'floppy');
+						}
+					}
 				};
 			}
 		}

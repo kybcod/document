@@ -68,6 +68,8 @@ body {
 		width: 450px;
 		background-color: #FFF;
 		padding-bottom: 40px;
+		box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+		border-radius: 10px;
 	}
 
 	.login_head {
@@ -76,7 +78,7 @@ body {
 		align-items: center;
 		width: 100%;
 		height: 80px;
-		background-color: #154f53;
+		background-color: #2C3E50;
 		text-align: center;
 	}
 

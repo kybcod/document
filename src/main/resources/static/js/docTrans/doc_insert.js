@@ -43,7 +43,7 @@ function docTransGridSetting() {
     dataGrid.setPaging(15);
     dataGrid.setEditing("popup", true, false, true);
     dataGrid.setEditingTexts("문서 관리", "이 항목을 삭제하시겠습니까?");
-    dataGrid.setEditingPopup("문서 등록", 500, 400);
+    dataGrid.setEditingPopup("문서 등록", 400, 350);
     dataGrid.setEditingForm(
         ['docName', '등록파일'],
         1,
