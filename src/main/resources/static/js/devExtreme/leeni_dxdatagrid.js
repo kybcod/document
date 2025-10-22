@@ -55,6 +55,7 @@ function dxdatagrid() {
 			"height": "26px",
 			"line-height": "26px"
 		});
+		e.cellElement.attr('title', e.value);
 	};
 
 	this.paging = {
