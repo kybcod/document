@@ -52,8 +52,9 @@ public class DocService {
     public void saveDocument(String docName, MultipartFile file, UserDto userDto) throws Exception {
         String serverNum = serverInfoResolver.resolveCurrentServerNumber();
 
-        String orgFilename = file.getOriginalFilename();
-        String saveFilename = UUID.randomUUID() + "_" + orgFilename;
+        String orgFilename = file.getOriginalFilename(); // 예: "myDocument.pdf"
+        String extension = orgFilename.substring(orgFilename.lastIndexOf(".")); // 확장자 추출
+        String saveFilename = UUID.randomUUID().toString() +extension;
 
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 

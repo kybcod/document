@@ -59,18 +59,7 @@ function docTransGridSetting() {
         // 파일 필드
         const fileUploader = $(".dx-fileuploader input[type='file']")[0];
         if (fileUploader && fileUploader.files.length > 0) {
-            const file = fileUploader.files[0];
-            const fileName = file.name;
-
-            // 한글 포함 여부 검사 (정규식: 유니코드 한글 범위)
-            const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(fileName);
-            if (hasKorean) {
-                deferred.reject();
-                basicAlert({ icon: 'error', text: '파일명에 한글을 포함할 수 없습니다. 영문/숫자/기호만 사용해주세요.' });
-                return;
-            }
-
-            formData.append("file", file);
+            formData.append("file", fileUploader.files[0]);
         }
 
         // 전송
@@ -94,7 +83,7 @@ function docTransGridSetting() {
 
     // 삭제
     dataGrid.setOnRowRemoving(function(data, deferred) {
-        sendDataToServer("doc", 'DELETE',data, deferred, docTransferGrid, getUserInfoList);
+        sendDataToServer("doc", 'DELETE',data, deferred, docTransferGrid, getDocList);
     });
 
     dataGrid.setOnCellPrepared(function(e) {
