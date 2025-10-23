@@ -58,9 +58,14 @@ public class DocService {
 
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
+        // uploadPath 디렉토리가 없으면 생성
+        Path baseDir = Paths.get(uploadPath);
+        if (!Files.exists(baseDir)) {
+            Files.createDirectories(baseDir);
+        }
 
-        // 파일 저장 경로 생성 확인 (예: ./uploads/2025-10-21)
-        Path uploadDir = Paths.get(uploadPath, today);
+        // 2날짜별 디렉토리 생성
+        Path uploadDir = baseDir.resolve(today);
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
