@@ -11,3 +11,8 @@ spring:
 file:
   upload:
     path: ./uploads
+
+
+scheduler:
+  cron: "*/30 * * * * *" # 30초마다 실행
+  enable : true

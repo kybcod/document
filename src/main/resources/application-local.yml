@@ -16,3 +16,8 @@ server:
   port: 8089
   servlet:
     context-path: /document
+
+
+scheduler:
+  cron: "*/30 * * * * *" # 30초마다 실행
+  enable : true
