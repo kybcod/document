@@ -51,6 +51,7 @@ function docTransGridSetting() {
         "문서 관리",
     );
 
+
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
         const formData = new FormData();
@@ -58,9 +59,16 @@ function docTransGridSetting() {
 
         // 파일 필드
         const fileUploader = $(".dx-fileuploader input[type='file']")[0];
-        if (fileUploader && fileUploader.files.length > 0) {
-            formData.append("file", fileUploader.files[0]);
+
+        // 파일 선택 여부 체크
+        if (!fileUploader || fileUploader.files.length === 0) {
+            basicAlert({ icon: 'error', text: '파일을 선택해주세요.' });
+            deferred.reject(); // 업로드 취소
+            return;
         }
+
+        formData.append("file", fileUploader.files[0]);
+
 
         // 전송
         $.ajax({
