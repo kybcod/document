@@ -10,8 +10,12 @@ spring:
 
 file:
   upload:
-    path: ./uploads
+    path: /usr/local/images
 
+server:
+  port: 8089
+  servlet:
+    context-path: /document
 
 scheduler:
   cron: "*/30 * * * * *" # 30초마다 실행
