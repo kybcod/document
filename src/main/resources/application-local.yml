@@ -20,4 +20,4 @@ server:
 
 scheduler:
   cron: "*/30 * * * * *" # 30초마다 실행
-  enable : true
+  enable : false
