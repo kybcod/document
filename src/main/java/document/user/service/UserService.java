@@ -156,6 +156,10 @@ public class UserService {
     * SHA-512 해시
     */
     private static String sha512(String password) throws NoSuchAlgorithmException {
+
+        if (password == null || password.trim().isEmpty()) {
+            return "";
+        }
         MessageDigest md = MessageDigest.getInstance("SHA-512");
         md.update(password.getBytes());
         return String.format("%0128x", new BigInteger(1, md.digest()));

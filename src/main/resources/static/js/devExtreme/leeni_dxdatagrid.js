@@ -238,7 +238,13 @@ dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, ca
 };
 
 
+dxdatagrid.prototype.setOnInitNewRow = function(callback) {
+	this.onInitNewRow = callback;
+};
 
+dxdatagrid.prototype.setOnEditingStart = function(callback) {
+	this.onEditingStart = callback;
+};
 
 /**
  * datagrid의 컬럼을 지정

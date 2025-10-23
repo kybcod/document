@@ -52,6 +52,7 @@ function userInfoDataGridSetting() {
         return result;
     };
     dataGrid.columns.find(c => c.dataField === 'userPass').visible = false;
+
     dataGrid.setPaging(15);
     dataGrid.setEditing("popup", true, true, true);
     dataGrid.setEditingTexts("사용자 관리", "이 항목을 삭제하시겠습니까?");
@@ -62,6 +63,93 @@ function userInfoDataGridSetting() {
         2,
         "사용자 관리",
     );
+// setEditingForm 호출 후에 추가
+
+// 신규 등록 시
+    dataGrid.setOnInitNewRow(function(e) {
+        const formItems = e.component.option('editing.form.items');
+        if (formItems && formItems[0] && formItems[0].items) {
+            const userPassItem = formItems[0].items.find(item => item.dataField === 'userPass');
+            if (userPassItem) {
+                userPassItem.visible = true;
+            }
+        }
+
+        // 등록 시에는 기본 버튼만 사용
+        e.component.option('editing.popup.toolbarItems', [
+            {
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'after',
+                options: {
+                    text: 'Save',
+                    onClick: function() {
+                        e.component.saveEditData();
+                    }
+                }
+            },
+            {
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'after',
+                options: {
+                    text: 'Cancel',
+                    onClick: function() {
+                        e.component.cancelEditData();
+                    }
+                }
+            }
+        ]);
+    });
+
+// 수정 시
+    dataGrid.setOnEditingStart(function(e) {
+        const formItems = e.component.option('editing.form.items');
+        if (formItems && formItems[0] && formItems[0].items) {
+            const userPassItem = formItems[0].items.find(item => item.dataField === 'userPass');
+            if (userPassItem) {
+                userPassItem.visible = false;
+            }
+        }
+
+        // 수정 시에는 암호 초기화 버튼 추가
+        e.component.option('editing.popup.toolbarItems', [
+            {
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'after',
+                options: {
+                    text: '암호 초기화',
+                    type: 'default',
+                    onClick: function() {
+                        openPwChangeModal(e.data.userId);
+                    }
+                }
+            },
+            {
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'after',
+                options: {
+                    text: 'Save',
+                    onClick: function() {
+                        e.component.saveEditData();
+                    }
+                }
+            },
+            {
+                widget: 'dxButton',
+                toolbar: 'bottom',
+                location: 'after',
+                options: {
+                    text: 'Cancel',
+                    onClick: function() {
+                        e.component.cancelEditData();
+                    }
+                }
+            }
+        ]);
+    });
     dataGrid.setValidationRules('userId', 'required', '사용자 아이디를 입력해주세요');
     dataGrid.setValidationRules('userTel', 'required', '핸드폰을 입력해주세요');
     dataGrid.setValidationRules(
@@ -77,8 +165,12 @@ function userInfoDataGridSetting() {
         '이메일 형식이 올바르지 않습니다. 예: user@example.com',
         /^$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     );
-
-
+    dataGrid.setValidationRules(
+        'userPass',
+        'pattern',
+        '비밀번호는 비어있거나, 영문+숫자+특수문자 8자리 이상이어야 합니다.',
+        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/
+    );
 
     dataGrid.setOnEditorPreparing(function(e) {
         if (e.parentType !== 'dataRow') {
@@ -98,7 +190,7 @@ function userInfoDataGridSetting() {
         }
 
         if (e.dataField === 'userTel') {
-            e.editorOptions.onInput = function(args) {
+            e.editorOptions.onInput = function (args) {
                 let input = args.event.target;
                 let value = input.value.replace(/\D/g, '');
                 let result = '';
@@ -120,32 +212,14 @@ function userInfoDataGridSetting() {
             e.editorOptions.readOnly = !e.row.isNewRow;
         }
 
-        // userPass 필드를 '비밀번호 초기화' 버튼으로 변경
         if (e.dataField === 'userPass') {
             if (e.row.isNewRow) {
-                // 신규 등록 → 텍스트박스 + validator 적용
                 e.editorName = 'dxTextBox';
                 e.editorOptions.mode = 'password';
-                e.editorOptions.validationRules = [
-                    {
-                        type: 'pattern',
-                        pattern: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/,
-                        message: '비밀번호 규칙(영문+숫자+특수문자 8자리 이상)에 맞지 않습니다.',
-                        ignoreEmptyValue : true
-                    }
-                ];
-            } else {
-                // 수정 → 버튼, validator 제거
-                e.editorName = 'dxButton';
-                e.editorOptions.text = '비밀번호 초기화';
-                e.editorOptions.icon = 'preferences';
-                e.editorOptions.onClick = function() {
-                    openPwChangeModal(e.row.data.userId);
-                };
-                e.editorOptions.validationRules = []; // 버튼에는 validator 없음
             }
         }
     });
+
 
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
@@ -183,6 +257,7 @@ function userInfoDataGridSetting() {
     });
 
     userListGrid = $('#userListGrid').dxDataGrid(dataGrid).dxDataGrid("instance");
+
 
     userListGrid.beginCustomLoading();
 
