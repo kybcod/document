@@ -10,7 +10,7 @@ spring:
 
 file:
   upload:
-    path: /usr/local/images
+    path: /usr/local/doc
 
 server:
   port: 8089
