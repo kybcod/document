@@ -247,9 +247,7 @@ function userInfoDataGridSetting() {
                     'text-decoration': 'underline'
                 })
                 .on('click', function() {
-                    if (confirm('비밀번호 실패 횟수를 초기화하시겠습니까?')) {
-                        sendDataToServer("user/updatePwdFcntZero", 'PUT', e.data, $.Deferred(), userListGrid, getUserInfoList);
-                    }
+                    pwFcntRest(e.data, $.Deferred());
                 });
 
             e.cellElement.empty().append($link);
@@ -262,3 +260,14 @@ function userInfoDataGridSetting() {
     userListGrid.beginCustomLoading();
 
 }
+
+
+const pwFcntRest = (data, deferred) => {
+    confirmAlert({ icon: 'warning', text: '비밀번호 실패 횟수를 초기화하시겠습니까?' })
+        .then(result => {
+            if (result.isConfirmed) {
+                sendDataToServer("user/updatePwdFcntZero", 'PUT', data, deferred, userListGrid, getUserInfoList);
+            }
+        })
+        .catch(error => console.error(error));
+};
