@@ -9,7 +9,9 @@ function getDocList() {
         data: JSON.stringify({
             docName: $("#docName").val().trim(),
             docStatus:  $("#docStatus").val().trim(),
-            orgFilename: $("#orgFilename").val().trim()
+            orgFilename: $("#orgFilename").val().trim(),
+            startDate : $("#docInsertFrom").val().trim(),
+            endDate : $("#docInsertTo").val().trim(),
         }),
         success(res) {
             docTransferGrid.option("dataSource", res);

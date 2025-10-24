@@ -282,3 +282,70 @@ function formatPhoneNumber(input) {
 
     input.value = result;
 }
+
+
+
+//날짜를 문자열로
+function dateToString(type) {
+
+    /* 시작기간 : 현재날짜
+     * 종료기간 : 오늘날짜
+     */
+
+    let Nowdate = new Date();
+    // 30일 전의 날짜 계산
+    let Agodate = new Date(Nowdate.getTime() - (30 * 24 * 60 * 60 * 1000));
+
+    //현재 달
+    let NowMonth = ((Nowdate.getMonth() + 1) >= 10 ? (Nowdate.getMonth() + 1) : '0' + (Nowdate.getMonth() + 1));
+    //현재 일
+    let NowDay = (Nowdate.getDate() >= 10 ? Nowdate.getDate() : '0' + Nowdate.getDate());
+    // 한달 전 달
+    let AgoMonth = ((Agodate.getMonth() + 1) >= 10 ? (Agodate.getMonth() + 1) : '0' + (Agodate.getMonth() + 1));
+    // 일주일전 일
+    //	let AgoDay = (Agodate.getDate() >= 10 ? Agodate.getDate() : '0' + Agodate.getDate());
+
+    if (type === 'start') {
+        // 한달 전 날짜
+        let day = Agodate.getDate();
+
+        let formattedDay = (day < 10) ? '0' + day : day;
+
+        Stringdate = Agodate.getFullYear() + '-' + AgoMonth + '-' + formattedDay;
+    } else if (type === 'end') {
+        //현재 날짜
+        Stringdate = Nowdate.getFullYear() + '-' + NowMonth + '-' + NowDay;
+    } else if (type = 'endMonth') {
+        let d = new Date();
+        let sel_month = 1; // 월을 조절하시면 됩니다. -1이면 전달을 +1이면 다음달을..
+        d.setMonth(d.getMonth() + sel_month);
+
+        let year = d.getFullYear();
+        let month = ('0' + (d.getMonth() + 1)).slice(-2);
+        let day = ('0' + d.getDate()).slice(-2);
+        Stringdate = year + '-' + month + '-' + day;
+
+        //		logDisplay(1,"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA:"+Stringdate);
+
+    }
+    //현재 날짜 기준 다음 날짜 선택 x
+    let now_utc = Date.now();
+    let timeOff = new Date().getTimezoneOffset() * 60000;
+    let today = new Date(now_utc - timeOff);
+    let oneMonthAgo = new Date(today);
+
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
+    //	let oneMonthAgoISO = oneMonthAgo.toISOString().split("T")[0];
+    let todayISO = today.toISOString().split("T")[0];
+
+    // let todayCheck = document.getElementsByClassName("date_input");
+    //콜백관리의 회수와 콜백이력은 최대 날짜 제한을 푼다
+    let todayCheck = $(".date_input").not("#end_reservation_date, #callback_mgmt_endDate");
+    if (todayCheck.length > 0) {
+        for (let i = 0; i < todayCheck.length; i++) {
+            todayCheck[i].setAttribute("max", todayISO);
+        }
+    }
+    return Stringdate;
+}

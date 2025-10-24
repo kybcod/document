@@ -19,6 +19,9 @@
         <if test="orgFilename != null and orgFilename != ''">
             AND  ORG_FILENAME = #{orgFilename}
         </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != '' ">
+            AND  CRT_DT BETWEEN #{startDate} AND #{endDate}
+        </if>
         ORDER BY CRT_DT DESC
     </select>
 
