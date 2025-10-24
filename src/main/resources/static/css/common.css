@@ -837,9 +837,13 @@ ul.checktree span.count {
 }
 
 .scroll_wrap {
-	overflow: auto;
+	overflow-x: auto;
 	margin-right: 30px;
-	display: flex;
+}
+.flex_content_wrap {
+	display: flex; /* 자식(폼과 버튼)을 나란히 배치 */
+	flex-wrap: nowrap;
+	min-width: 1500px; /* 콘텐츠 너비(1300px + 버튼 영역)보다 크게 지정 */
 }
 
 .scroll_wrap::-webkit-scrollbar {
