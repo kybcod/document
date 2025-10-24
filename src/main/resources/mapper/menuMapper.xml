@@ -18,7 +18,7 @@
       M.CRT_DT ,
       M.UPT_ID ,
       M.UPT_DT
-    FROM TB_MENU M , TB_PERMITDETAIL PD
+    FROM tb_menu M , tb_permitdetail PD
     WHERE
       M.MENU_ID = PD.MENU_ID
       AND M.MENU_USE = '1'
@@ -39,7 +39,7 @@
         CRT_DT ,
         UPT_ID ,
         UPT_DT
-      FROM TB_MENU
+      FROM tb_menu
       ORDER BY MENU_ID, MENU_ORDER DESC
   </select>
 
@@ -51,8 +51,8 @@
         WHEN P.MENU_ID IS NOT NULL THEN 1
         ELSE 0
         END AS realUse
-    FROM TB_MENU M
-           LEFT JOIN TB_PERMITDETAIL P
+    FROM tb_menu M
+           LEFT JOIN tb_permitdetail P
                      ON M.MENU_ID = P.MENU_ID
                        AND P.PERMIT_ID = #{permitId}
     WHERE M.MENU_USE = '1'
@@ -73,7 +73,7 @@
       CRT_DT ,
       UPT_ID ,
       UPT_DT
-    FROM TB_MENU
+    FROM tb_menu
     WHERE MENU_ID = #{menuId}
   </select>
 
@@ -90,7 +90,7 @@
       CRT_DT ,
       UPT_ID ,
       UPT_DT
-    FROM TB_MENU
+    FROM tb_menu
     WHERE MENU_GROUP = #{menuGroup}
     ORDER BY MENU_ORDER DESC
   </select>
@@ -98,7 +98,7 @@
 
   
   <insert id="insertMenuInfo" parameterType="document.menu.dto.MenuDto">
-    INSERT INTO TB_MENU (
+    INSERT INTO tb_menu (
       MENU_ID,
       MENU_NAME,
       MENU_GROUP,
@@ -127,7 +127,7 @@
   </insert>
 
   <update id="updateMenuInfo" parameterType="document.menu.dto.MenuDto">
-    UPDATE TB_MENU
+    UPDATE tb_menu
     SET
       MENU_NAME = #{menuName},
       MENU_GROUP = #{menuGroup},
@@ -143,7 +143,7 @@
 
 
   <delete id="deleteMenuById" parameterType="string">
-    DELETE FROM TB_MENU
+    DELETE FROM tb_menu
     WHERE MENU_ID = #{menuId}
   </delete>
 
@@ -161,7 +161,7 @@
       CRT_DT ,
       UPT_ID ,
       UPT_DT
-    FROM TB_MENU
+    FROM tb_menu
     WHERE MENU_GROUP = #{menuId}
   </select>
 

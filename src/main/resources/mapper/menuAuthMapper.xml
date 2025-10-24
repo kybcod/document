@@ -14,7 +14,7 @@
             CRT_DT ,
             UPT_ID ,
             UPT_DT
-        FROM TB_PERMIT
+        FROM tb_permit
         ORDER BY PERMIT_ID
     </select>
 
@@ -27,12 +27,12 @@
             CRT_DT ,
             UPT_ID ,
             UPT_DT
-        FROM TB_PERMIT
+        FROM tb_permit
         WHERE PERMIT_ID = #{permitId}
     </select>
 
     <insert id="insertMenuAuthInfo" parameterType="document.menu.dto.MenuAuthDto">
-        INSERT INTO TB_PERMIT (
+        INSERT INTO tb_permit (
             PERMIT_ID ,
             PERMIT_NAME ,
             PERMIT_DESC ,
@@ -53,7 +53,7 @@
     </insert>
 
     <update id="updateMenuAuthInfo" parameterType="document.menu.dto.MenuAuthDto">
-        UPDATE TB_PERMIT
+        UPDATE tb_permit
         SET
             PERMIT_NAME = #{permitName},
             PERMIT_DESC = #{permitDesc},
@@ -65,18 +65,18 @@
 
 
     <delete id="deleteMenuAuthInfo" parameterType="document.menu.dto.MenuAuthDto">
-        DELETE FROM TB_PERMIT
+        DELETE FROM tb_permit
         WHERE PERMIT_ID = #{permitId}
     </delete>
 
     <delete id="deletePermitDetail" parameterType="document.menu.dto.MenuAuthDto">
-        DELETE FROM TB_PERMITDETAIL
+        DELETE FROM tb_permitdetail
         WHERE PERMIT_ID = #{permitId}
           AND MENU_ID = #{menuId}
     </delete>
 
     <delete id="deleteTbPermitDByMenuId" parameterType="document.menu.dto.MenuAuthDto">
-        DELETE FROM TB_PERMITDETAIL
+        DELETE FROM tb_permitdetail
         WHERE MENU_ID = #{menuId}
     </delete>
 
@@ -93,9 +93,9 @@
             PD.UPT_ID ,
             PD.UPT_DT
         FROM
-            TB_PERMIT P,
-            TB_MENU M,
-            TB_PERMITDETAIL PD
+            tb_permit P,
+            tb_menu M,
+            tb_permitdetail PD
         WHERE
             P.PERMIT_ID = PD.PERMIT_ID
           AND PD.MENU_ID = M.MENU_ID
@@ -105,7 +105,7 @@
 
 
     <insert id="insertTbPermitDetail" parameterType="document.menu.dto.UseMenuDto">
-        INSERT INTO TB_PERMITDETAIL (
+        INSERT INTO tb_permitdetail (
             PERMIT_ID ,
             MENU_ID ,
             CRT_ID ,

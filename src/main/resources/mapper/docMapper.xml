@@ -8,7 +8,7 @@
     <!-- 문서 목록 조회 -->
     <select id="getDocList" resultType="document.doc.dto.DocDto">
         SELECT *
-        FROM TB_DOCUMENT
+        FROM tb_document
         WHERE 1=1
         <if test="docName != null and docName != ''">
             AND  DOC_NAME = #{docName}
@@ -25,19 +25,19 @@
     <!-- 문서 아이디로 조회 -->
     <select id="getDocrByDocId" resultType="document.doc.dto.DocDto" parameterType="String">
         SELECT *
-        FROM TB_DOCUMENT
+        FROM tb_document
         WHERE DOC_ID = #{docId}
     </select>
 
     <!-- 문서 삭제 -->
     <delete id="deleteDoc" parameterType="string">
-        DELETE FROM TB_DOCUMENT
+        DELETE FROM tb_document
         WHERE DOC_ID = #{docId}
     </delete>
 
     <!-- 문서 등록 -->
     <insert id="insertDoc" parameterType="string">
-        INSERT INTO TB_DOCUMENT (
+        INSERT INTO tb_document (
             DOC_DT,
             DOC_NAME,
             ORG_FILENAME,
