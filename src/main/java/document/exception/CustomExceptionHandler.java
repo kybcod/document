@@ -45,7 +45,7 @@ public class CustomExceptionHandler {
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<String> handleMaxSizeException(MaxUploadSizeExceededException e) {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
-                .body("업로드 가능한 파일 크기를 초과했습니다. (최대 50MB)");
+                .body("업로드 가능한 파일 크기를 초과했습니다. (최대 20MB)");
     }
 
 }
