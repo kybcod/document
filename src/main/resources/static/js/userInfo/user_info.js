@@ -102,7 +102,7 @@ function userInfoDataGridSetting() {
         ]);
     });
 
-// 수정 시
+    // 수정 시
     dataGrid.setOnEditingStart(function(e) {
         const formItems = e.component.option('editing.form.items');
         if (formItems && formItems[0] && formItems[0].items) {
@@ -237,6 +237,11 @@ function userInfoDataGridSetting() {
     });
 
     dataGrid.setOnCellPrepared(function(e) {
+        if (e.rowType === 'data' && e.column.command === 'edit') {
+            if (e.data.permitId == 1000 ) {
+                e.cellElement.find('.dx-link-delete').hide();
+            }
+        }
         if (e.rowType === 'data' && e.column.dataField === 'pwdFcnt') {
 
             const $link = $('<a>')
@@ -255,6 +260,30 @@ function userInfoDataGridSetting() {
     });
 
     userListGrid = $('#userListGrid').dxDataGrid(dataGrid).dxDataGrid("instance");
+
+    // 기본 삭제 핸들러를 제거하고 DevExtreme 네이티브 비동기 방식으로 새로 정의합니다.
+    userListGrid.off('rowRemoving'); 
+    userListGrid.on('rowRemoving', function(e) {
+        e.cancel = new Promise(function(resolve, reject) {
+            $.ajax({
+                url: "user",
+                type: 'DELETE',
+                contentType: "application/json",
+                data: JSON.stringify(e.data),
+            }).done(function() {
+                resolve();
+            }).fail(function(err) {
+                basicAlert({ icon: 'error', text: err.responseJSON?.msg || err.responseText });
+                reject(); // 오류 발생 시 UI 변경을 취소합니다.
+            });
+        });
+    });
+    
+    // 성공적으로 삭제된 후에만 목록을 다시 로드합니다.
+    userListGrid.off('rowRemoved'); // just in case
+    userListGrid.on('rowRemoved', function () {
+        getUserInfoList();
+    });
 
 
     userListGrid.beginCustomLoading();

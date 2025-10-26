@@ -6,6 +6,7 @@ import document.user.dto.UserDto;
 import document.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -79,7 +80,12 @@ public class UserService {
     /**
      * 사용자 정보 삭제
      */
-    public void deleteUserInfo(UserDto userDto) {
+    public void deleteUserInfo(UserDto userDto) throws Exception {
+
+        if ("1000".equals(userDto.getPermitId())) {
+            throw new Exception("관리자 계정은 삭제할 수 없습니다.");
+        }
+
         userMapper.deleteUserInfo(userDto);
     }
 
