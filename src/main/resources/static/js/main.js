@@ -2,8 +2,8 @@ let contextPath = window.location.pathname.substring(0, window.location.pathname
 
 
 // 로그아웃
-const logout = () => {
-    confirmAlert({ icon: 'success', text: '로그아웃 하시겠습니까?' })
+const logout = (text) => {
+    confirmAlert({ icon: 'success', text: text })
         .then(result => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -21,24 +21,6 @@ const logout = () => {
         .catch(error => console.error(error));
 };
 
-const userLogout = () => {
-    confirmAlert({ icon: 'success', text: '비밀번호가 변경되었습니다. 다시 로그인해주세요.' })
-        .then(result => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: 'logout',
-                    type: 'GET',
-                    success: function(res) {
-                        location.href = contextPath + '/logout';
-                    },
-                    error: function(xhr) {
-                        basicAlert({ icon: 'error', text: '로그아웃에 실패했습니다.' });
-                    }
-                });
-            }
-        })
-        .catch(error => console.error(error));
-};
 
 // 정보수정
 function updateInfo() {
@@ -255,7 +237,7 @@ function changePassword() {
             $("#pw").val("");
 
             if (loginUser.userId === userId) {
-                userLogout();
+                logout('비밀번호가 변경되었습니다. 다시 로그인해주세요.');
             }
         },
         error: function(xhr) {
