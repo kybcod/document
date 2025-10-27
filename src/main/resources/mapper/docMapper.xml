@@ -11,13 +11,13 @@
         FROM tb_document
         WHERE 1=1
         <if test="docName != null and docName != ''">
-            AND  DOC_NAME = #{docName}
+            AND DOC_NAME LIKE CONCAT('%', #{docName}, '%')
         </if>
         <if test="docStatus != null and docStatus != ''">
             AND  DOC_STATUS = #{docStatus}
         </if>
         <if test="orgFilename != null and orgFilename != ''">
-            AND  ORG_FILENAME = #{orgFilename}
+            AND ORG_FILENAME LIKE CONCAT('%', #{orgFilename}, '%')
         </if>
         <if test="startDate != null and startDate != '' and endDate != null and endDate != '' ">
             AND  CRT_DT BETWEEN #{startDate} AND #{endDate}
