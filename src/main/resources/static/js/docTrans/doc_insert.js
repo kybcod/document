@@ -104,7 +104,7 @@ function docTransGridSetting() {
                     .css('cursor', 'pointer')
                     .attr('title', '보기')
                     .on('click', function() {
-                        console.log('보기');
+                        readFile(e.data);
                     })
                     .appendTo(e.cellElement);
             }
@@ -129,5 +129,21 @@ function docTransGridSetting() {
 }
 
 function transfer(data){
-    console.log("변환 :", data);
+
+    $.ajax({
+        url: "doc/transfer",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({data}),
+        success(res) {
+            basicAlert({ icon: 'success', text: res });
+        },
+        error: function(err) {
+            basicAlert({ icon: 'error', text: err.responseJSON?.msg || err.responseText });
+        }
+    });
+}
+
+function readFile(data){
+
 }

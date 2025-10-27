@@ -87,4 +87,11 @@ public class DocService {
         docMapper.insertDoc(docDto);
     }
 
+    public void apiTransfer(DocDto docDto) {
+        log.info("apiTransfer");
+
+        // api 타고 변환 중일 떄는 1
+        // 실패하면 docStatus 9
+        // 성공하면 docStatus 2
+    }
 }

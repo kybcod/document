@@ -51,4 +51,17 @@ public class DocController {
 
     }
 
+
+    @Description("문서 변환")
+    @PostMapping("/transfer")
+    public ResponseEntity<?> transferDoc(@RequestBody DocDto docDto) {
+        try {
+            docService.apiTransfer(docDto);
+            return ResponseEntity.ok("변환 성공");
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+
+    }
+
 }
