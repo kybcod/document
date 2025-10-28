@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,7 +42,13 @@ public class DocService {
     /**
      * 사용자 정보 삭제
      */
-    public void deleteDoc(DocDto docDto) {
+    public void deleteDoc(DocDto docDto) throws IOException {
+
+        Path filePath = Paths.get(docDto.getDocFilepath());
+        if (Files.exists(filePath)) {
+            Files.delete(filePath);
+        }
+
         docMapper.deleteDoc(docDto);
     }
 
