@@ -211,6 +211,14 @@ dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, ca
 		} else {
 			editor.dataField = dataField[i];
 
+			if (dataField[i] === 'ocryn') {
+				editor.editorType = 'dxCheckBox';
+				editor.editorOptions = {
+					text: "ORC",
+				};
+				editor.defaultValue = false;
+			}
+
 			if (dataField[i] === '등록파일') {
 				editor.editorType = 'dxFileUploader';
 				editor.colSpan = colSpan;

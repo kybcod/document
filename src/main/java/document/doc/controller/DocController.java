@@ -27,12 +27,11 @@ public class DocController {
 
     @Description("문서 등록")
     @PostMapping
-    public ResponseEntity<?> uploadDoc(@RequestParam("docName") String docName,
-                                       @RequestParam("file") MultipartFile file,
+    public ResponseEntity<?> uploadDoc(@ModelAttribute DocDto docDto,
                                        HttpSession session) {
         try {
             UserDto userDto = (UserDto) session.getAttribute("loginUser");
-            docService.saveDocument(docName, file, userDto);
+            docService.saveDocument(docDto,userDto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(404).body(e.getMessage());

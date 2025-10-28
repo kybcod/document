@@ -5,8 +5,12 @@
     var docTransferGrid = null;
 
     $(document).ready(function () {
+        $('#docInsertFrom').val(dateToString('start'));
+        $('#docInsertTo').val(dateToString('end'));
+
         docTransGridSetting();
         getDocList();
+
     });
 </script>
 <body>
@@ -66,12 +70,3 @@
 </div>
 </body>
 </html>
-
-<script>
-    $(document).ready( function() {
-
-        $('#docInsertFrom').val(dateToString('start'));
-        $('#docInsertTo').val(dateToString('end'));
-
-    });
-</script>

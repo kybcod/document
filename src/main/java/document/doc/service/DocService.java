@@ -15,7 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
@@ -49,10 +48,10 @@ public class DocService {
     /**
      * 문서 등록
      */
-    public void saveDocument(String docName, MultipartFile file, UserDto userDto) throws Exception {
+    public void saveDocument(DocDto docDto, UserDto userDto) throws Exception {
         String serverNum = serverInfoResolver.resolveCurrentServerNumber();
 
-        String orgFilename = file.getOriginalFilename(); // 예: "myDocument.pdf"
+        String orgFilename = docDto.getFile().getOriginalFilename(); // 예: "myDocument.pdf"
         String extension = orgFilename.substring(orgFilename.lastIndexOf(".")); // 확장자 추출
         String saveFilename = UUID.randomUUID().toString() +extension;
 
@@ -72,19 +71,21 @@ public class DocService {
 
         // 실제 파일 저장 경로 (uploadPath + 파일명)
         Path filePath = uploadDir.resolve(saveFilename);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(docDto.getFile().getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         // DTO 구성
-        DocDto docDto = DocDto.builder()
-                .docName(docName)
+        DocDto insertDocDto = DocDto.builder()
+                .docName(docDto.getDocName())
                 .orgFilename(orgFilename)
                 .saveFilename(saveFilename)
                 .docFilepath(filePath.toString())
                 .serverNum(serverNum)
+                .ocryn(docDto.getOcryn())
                 .crtId(userDto.getUserId())
                 .build();
 
-        docMapper.insertDoc(docDto);
+
+        docMapper.insertDoc(insertDocDto);
     }
 
     public void apiTransfer(DocDto docDto) {

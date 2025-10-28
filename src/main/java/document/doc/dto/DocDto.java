@@ -1,8 +1,9 @@
 package document.doc.dto;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
-@Getter
+@Getter @Setter
 @Builder(toBuilder = true)
 @ToString
 @NoArgsConstructor
@@ -17,6 +18,7 @@ public class DocDto {
     private String docFilepath; // 저장경로
     private String docStatus; // 문서 상태
     private String serverNum; //서버번호
+    private String ocryn; //orc로 변환
     private String crtId;
     private String crtDt;
     private String transFile; //변환파일
@@ -24,6 +26,8 @@ public class DocDto {
 
     private String startDate; //시작날짜
     private String endDate; //종료날짜
+
+    private MultipartFile file; //파일
 
 
 }

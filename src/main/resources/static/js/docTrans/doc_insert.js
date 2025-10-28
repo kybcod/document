@@ -1,6 +1,9 @@
 // TB_DOCUMENT 리스트
 function getDocList() {
 
+    const startDate = $('#docInsertFrom').val().trim() || dateToString('start');
+    const endDate = $('#docInsertTo').val().trim() || dateToString('end');
+
     $.ajax({
         url: "doc/list",
         type: "POST",
@@ -10,8 +13,8 @@ function getDocList() {
             docName: $("#docName").val().trim(),
             docStatus:  $("#docStatus").val().trim(),
             orgFilename: $("#orgFilename").val().trim(),
-            startDate : $("#docInsertFrom").val().trim(),
-            endDate : $("#docInsertTo").val().trim(),
+            startDate : startDate + " 00:00:00",
+            endDate : endDate + " 23:59:59"
         }),
         success(res) {
             docTransferGrid.option("dataSource", res);
@@ -26,10 +29,11 @@ function getDocList() {
 function docTransGridSetting() {
 
     let dataGrid = new dxdatagrid();
-    let columns = ['docDt','docName', 'docStatus', 'look', 'transDt', 'crtId', 'orgFilename', 'saveFilename', 'docFilepath'];
-    let captions = ['등록날짜','문서명', '변환상태', '보기', '변환작업일시', '등록자ID', '원본파일명', '저장파일명', '저장경로'];
+    let columns = ['docDt','docName', 'docStatus', 'look', 'transDt', 'crtId', 'orgFilename', 'saveFilename', 'docFilepath', 'ocryn'];
+    let captions = ['등록날짜','문서명', '변환상태', '보기', '변환작업일시', '등록자ID', '원본파일명', '저장파일명', '저장경로','OCR여부'];
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
+    dataGrid.columns.find(c => c.dataField === 'ocryn').visible = false;
     const docStatusCol = dataGrid.columns.find(c => c.dataField === 'docStatus');
     if (docStatusCol) {
         const docStatusMap = {
@@ -47,17 +51,21 @@ function docTransGridSetting() {
     dataGrid.setEditingTexts("문서 관리", "이 항목을 삭제하시겠습니까?");
     dataGrid.setEditingPopup("문서 등록", 400, 410);
     dataGrid.setEditingForm(
-        ['docName', '등록파일'],
+        ['docName', '등록파일', 'ocryn'],
         1,
         2,
-        "문서 관리",
+        "문서 등록",
     );
 
+    dataGrid.setOnInitNewRow(function(e) {
+        e.data.ocryn = 0;
+    });
 
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
         const formData = new FormData();
         formData.append('docName', data.docName);
+        formData.append('ocryn', data.ocryn ? 1 : 0);
 
         // 파일 필드
         const fileUploader = $(".dx-fileuploader input[type='file']")[0];

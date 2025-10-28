@@ -48,6 +48,7 @@
             DOC_FILEPATH,
             DOC_STATUS,
             SERVER_NUM,
+            OCRYN,
             CRT_ID,
             CRT_DT
         )
@@ -59,6 +60,7 @@
                    #{docFilepath},
                    0,
                    #{serverNum},
+                   #{ocryn},
                    #{crtId},
                    NOW()
                )
