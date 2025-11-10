@@ -41,3 +41,17 @@ server:
     accept-count: 100
     connection-timeout: 10000
 
+
+api:
+  url:
+    docx: http://210.113.0.140:8123
+    docxHost: docuverse_docx
+    docxPort: 8123
+    ocr: http://210.113.0.140:8080
+    ocrHost: test
+    ocrPort: 8080
+
+servers:
+  server1: 172.20.10.5
+  server2: 172.20.10.10
+  type: local
