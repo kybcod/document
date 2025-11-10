@@ -3,6 +3,7 @@ package document.doc.service;
 import document.config.TransDocApiProperties;
 import document.config.TransServerProperties;
 import document.doc.dto.ApiDocxResponse;
+import document.doc.dto.ApiHwpResponse;
 import document.doc.dto.DocDto;
 import document.doc.mapper.DocMapper;
 import document.user.dto.UserDto;
@@ -134,23 +135,18 @@ public class DocService {
     public void apiTransfer(DocDto docDto) throws Exception {
         String save_filename = docDto.getSaveFilename();
 
-        if (save_filename.toLowerCase().endsWith(".doc")) {
-            log.info("doc 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".docx")) {
-            log.info("docx 파일입니다.");
+        if (save_filename.toLowerCase().endsWith(".doc") || save_filename.toLowerCase().endsWith(".docx")) {
+            log.info("doc , docx 파일입니다.");
             transDocx( apiProps.getDocx(),  docDto);
-        }else if (save_filename.toLowerCase().endsWith(".txt")) {
-            log.info("텍스트 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".xlx")) {
-            log.info("엑셀xlx 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".xlsx")) {
-            log.info("엑셀xlsx 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".ppt")) {
-            log.info("파워포인트ppt 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".pptx")) {
-            log.info("파워포인트pptx 파일입니다.");
         }else if (save_filename.toLowerCase().endsWith(".hwp")) {
             log.info("hwp 파일입니다.");
+            transHwp( apiProps.getHwp(), docDto);
+        }else if (save_filename.toLowerCase().endsWith(".xlx") || save_filename.toLowerCase().endsWith(".")) {
+            log.info("엑셀 xlx,xlsx 파일입니다.");
+        }else if (save_filename.toLowerCase().endsWith(".ppt") || save_filename.toLowerCase().endsWith(".pptx")) {
+            log.info("파워포인트 ppt, pptx 파일입니다.");
+        }else if (save_filename.toLowerCase().endsWith(".txt")) {
+            log.info("텍스트 파일입니다.");
         }else if (save_filename.toLowerCase().endsWith(".gif") || save_filename.toLowerCase().endsWith(".jpeg") || save_filename.toLowerCase().endsWith(".jpg")
                 || save_filename.toLowerCase().endsWith(".png") || save_filename.toLowerCase().endsWith("bmp")) {
             log.info("이미지 파일입니다.");
@@ -219,16 +215,6 @@ public class DocService {
 
             String mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
 
-            log.info("mergedHtml : {}", mergedHtml);
-
-
-
-            log.info("buildDTO : {}",
-                    docDto.toBuilder()
-                            .docStatus("2")
-                            .transHtml(mergedHtml)
-                            .build());
-
             docMapper.updateTrans(docDto.toBuilder()
                             .docStatus("2")
                             .transHtml(mergedHtml)
@@ -250,6 +236,75 @@ public class DocService {
             }
 
             throw new Exception(errMsg);
+        }
+
+    }
+
+
+
+    //HWP 문서변환 요청
+    public void transHwp(String apiUrlHwp, DocDto docDto) throws Exception {
+        String hwpHost = apiProps.getHwpHost();
+        String hwpPort = apiProps.getHwpPort();
+
+        String ip = null;
+        if(!serverType.equals("local")) {
+            try {
+                ip = InetAddress.getByName(hwpHost).getHostAddress();
+                apiUrlHwp = "http://" + ip + ":" + hwpPort;
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                throw new RuntimeException("HWP 변환 서버 IP 확인 중 오류가 발생했습니다: " + e.getMessage());
+            }
+        }
+
+        // 버퍼 크기 늘리기 (기본: 256KB)
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024)) // 50MB
+                .build();
+
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofMinutes(2))  // 서버 응답 대기 시간
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000); // 연결 타임아웃
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl(apiUrlHwp.trim())
+                .exchangeStrategies(strategies)
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+
+        FileSystemResource file2 = new FileSystemResource(docDto.getDocFilepath());
+        // API 호출
+        ApiHwpResponse response = webClient.post()
+                .uri("/convert")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file2))
+                .retrieve()
+                .bodyToMono(ApiHwpResponse.class)
+                .doOnError(e -> e.printStackTrace())
+//                    .bodyToMono(String.class) //그냥  String 으로 받을때
+                .block();
+
+        // 응답 확인 및 DB 저장
+        if (response != null && "success".equalsIgnoreCase(response.status)) {
+            log.info("변환 성공 → DB 저장 중...");
+
+            String mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus("2")
+                    .transHtml(mergedHtml)
+                    .build());
+
+            log.info("DB 저장 완료!");
+        } else {
+            log.info("변환 실패");
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus("9")
+                    .build());
+
+            throw new Exception("문서 변환 중 오류가 발생했습니다.");
         }
 
     }

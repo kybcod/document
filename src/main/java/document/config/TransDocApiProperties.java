@@ -16,4 +16,7 @@ public class TransDocApiProperties {
 	private String docxPort;
 	private String ocrHost;
 	private String ocrPort;
+	private String hwp;
+	private String hwpHost;
+	private String hwpPort;
 }
