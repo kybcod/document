@@ -214,7 +214,7 @@ dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, ca
 			if (dataField[i] === 'ocryn') {
 				editor.editorType = 'dxCheckBox';
 				editor.editorOptions = {
-					text: "ORC",
+					text: "OCR",
 				};
 				editor.defaultValue = false;
 			}
