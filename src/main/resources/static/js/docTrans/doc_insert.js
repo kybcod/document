@@ -29,11 +29,12 @@ function getDocList() {
 function docTransGridSetting() {
 
     let dataGrid = new dxdatagrid();
-    let columns = ['docDt','docName', 'docStatus', 'look', 'transDt', 'crtId', 'orgFilename', 'saveFilename', 'docFilepath', 'ocryn'];
-    let captions = ['등록날짜','문서명', '변환상태', '보기', '변환작업일시', '등록자ID', '원본파일명', '저장파일명', '저장경로','OCR여부'];
+    let columns = ['docDt','docName', 'docStatus', 'look', 'transDt', 'crtId', 'orgFilename', 'saveFilename', 'docFilepath', 'ocryn', 'transHtml'];
+    let captions = ['등록날짜','문서명', '변환상태', '보기', '변환작업일시', '등록자ID', '원본파일명', '저장파일명', '저장경로','OCR여부','변환HTML'];
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
     dataGrid.columns.find(c => c.dataField === 'ocryn').visible = false;
+    dataGrid.columns.find(c => c.dataField === 'transHtml').visible = false;
     const docStatusCol = dataGrid.columns.find(c => c.dataField === 'docStatus');
     if (docStatusCol) {
         const docStatusMap = {
@@ -112,7 +113,7 @@ function docTransGridSetting() {
                     .css('cursor', 'pointer')
                     .attr('title', '보기')
                     .on('click', function() {
-                        readFile(e.data);
+                        readFile(e.data.transHtml);
                     })
                     .appendTo(e.cellElement);
             }
@@ -152,6 +153,45 @@ function transfer(data){
     });
 }
 
-function readFile(data){
+function readFile(data) {
+    // 팝업이 이미 있다면 초기화
+    if ($("#previewPopup").data("dxPopup")) {
+        $("#previewPopup").dxPopup("dispose");
+        $("#previewPopup").empty();
+    }
 
+    // iframe 요소를 생성
+    const iframe = document.createElement('iframe');
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "none";
+
+    // 팝업 생성
+    $("#previewPopup").dxPopup({
+        title: "문서 미리보기",
+        width: "100%",
+        height: "100%",
+        showCloseButton: true,
+        hideOnOutsideClick: true,
+        dragEnabled: true,
+        resizeEnabled: true,
+        showTitle: true,
+        contentTemplate: function() {
+            // contentTemplate 안에 iframe 삽입
+            const container = $("<div>").css({
+                width: "100%",
+                height: "100%",
+                overflow: "hidden"
+            });
+            container.append(iframe);
+            return container;
+        },
+        onShown: function() {
+            // 팝업이 열린 후 HTML 내용 삽입
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(data);
+            iframeDoc.close();
+        }
+    }).dxPopup("instance").show();
 }

@@ -23,6 +23,7 @@ public class DocDto {
     private String crtDt;
     private String transFile; //변환파일
     private String transDt; //변환파일작업일시
+    private String transHtml; //변환파일html
 
     private String startDate; //시작날짜
     private String endDate; //종료날짜
