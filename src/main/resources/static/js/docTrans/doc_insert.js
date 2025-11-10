@@ -174,17 +174,11 @@ function transfer(data){
 }
 
 function readFile(htmlString) {
-    const popupId = "previewPopup";
-    let $popupContainer = $("#" + popupId);
-
-    if ($popupContainer.length === 0) {
-        $popupContainer = $("<div>").attr("id", popupId).appendTo("body");
-    }
-
-    $popupContainer.dxPopup({
+    $("#previewPopup").dxPopup({
+        visible: true,
         title: "미리보기",
-        width: "100%",
-        height: "100%",
+        width: "90%",
+        height: "90%",
         showCloseButton: true,
         dragEnabled: true,
         resizeEnabled: true,
@@ -199,5 +193,5 @@ function readFile(htmlString) {
         onHidden: function(e) {
             e.component.dispose();
         }
-    }).dxPopup("instance").show();
+    });
 }
