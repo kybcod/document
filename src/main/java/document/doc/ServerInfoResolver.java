@@ -25,6 +25,8 @@ public class ServerInfoResolver {
     public String resolveCurrentServerNumber() {
         try {
             String currentIp = InetAddress.getLocalHost().getHostAddress();
+
+            @SuppressWarnings("unchecked")
             Map<String, String> servers = (Map<String, String>) serverConfig.get("servers");
 
             String server2Ip = servers.get("server2");
