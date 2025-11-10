@@ -143,13 +143,15 @@ function transfer(data){
         url: "doc/transfer",
         type: "POST",
         contentType: "application/json",
-        data: JSON.stringify({data}),
+        data: JSON.stringify(data),
         success(res) {
             basicAlert({ icon: 'success', text: res });
+            getDocList();
         },
-        error: function(err) {
-            basicAlert({ icon: 'error', text: err.responseJSON?.msg || err.responseText });
+        error: function(xhr, status, err) {
+            basicAlert({ icon: 'error', text: xhr.responseJSON?.msg || xhr.responseText || err });
         }
+
     });
 }
 

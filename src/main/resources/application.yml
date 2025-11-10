@@ -54,4 +54,3 @@ api:
 servers:
   server1: 172.20.10.5
   server2: 172.20.10.10
-  type: local

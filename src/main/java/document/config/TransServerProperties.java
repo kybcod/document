@@ -11,5 +11,4 @@ import org.springframework.stereotype.Component;
 public class TransServerProperties {
 	private String  server1;
     private String  server2;
-    private String  type;
 }

@@ -73,8 +73,8 @@
                 DOC_STATUS = #{docStatus},
             </if>
             TRANS_DT = NOW()
-            <if test="mergedHtml != null and mergedHtml != ''">
-                , TRANS_HTML = #{mergedHtml}
+            <if test="transHtml != null and transHtml != ''">
+                , TRANS_HTML = #{transHtml}
             </if>
         </set>
         WHERE DOC_ID = #{docId}
