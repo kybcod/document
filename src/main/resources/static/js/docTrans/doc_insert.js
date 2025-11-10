@@ -153,45 +153,31 @@ function transfer(data){
     });
 }
 
-function readFile(data) {
-    // 팝업이 이미 있다면 초기화
-    if ($("#previewPopup").data("dxPopup")) {
-        $("#previewPopup").dxPopup("dispose");
-        $("#previewPopup").empty();
+function readFile(htmlString) {
+    const popupId = "previewPopup";
+    let $popupContainer = $("#" + popupId);
+
+    if ($popupContainer.length === 0) {
+        $popupContainer = $("<div>").attr("id", popupId).appendTo("body");
     }
 
-    // iframe 요소를 생성
-    const iframe = document.createElement('iframe');
-    iframe.style.width = "100%";
-    iframe.style.height = "100%";
-    iframe.style.border = "none";
-
-    // 팝업 생성
-    $("#previewPopup").dxPopup({
-        title: "문서 미리보기",
+    $popupContainer.dxPopup({
+        title: "미리보기",
         width: "100%",
         height: "100%",
         showCloseButton: true,
-        hideOnOutsideClick: true,
         dragEnabled: true,
         resizeEnabled: true,
-        showTitle: true,
-        contentTemplate: function() {
-            // contentTemplate 안에 iframe 삽입
-            const container = $("<div>").css({
-                width: "100%",
-                height: "100%",
-                overflow: "hidden"
+        contentTemplate: function(contentElement) {
+            const $content = $(contentElement);
+            $content.css('overflow-y', 'auto');
+            $content.append(htmlString);
+            $content.on('dxmousewheel', function(e) {
+                e.stopPropagation();
             });
-            container.append(iframe);
-            return container;
         },
-        onShown: function() {
-            // 팝업이 열린 후 HTML 내용 삽입
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            iframeDoc.open();
-            iframeDoc.write(data);
-            iframeDoc.close();
+        onHidden: function(e) {
+            e.component.dispose();
         }
     }).dxPopup("instance").show();
 }
