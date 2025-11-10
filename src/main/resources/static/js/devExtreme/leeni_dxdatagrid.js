@@ -226,7 +226,7 @@ dxdatagrid.prototype.setEditingForm = function (dataField, colCount, colSpan, ca
 					selectButtonText: "파일 선택",
 					labelText: "",
 					multiple: false,
-					accept: "*",
+					accept:".doc,.docx,.txt,.xlx,.xlsx,.ppt,.pptx,.hwp,.gif,.jpeg,.jpg,.png,.bmp",
 					uploadMode: "useForm",
 					// 💡 아이콘 추가를 위한 onContentReady 핸들러
 					onContentReady: function(e) {

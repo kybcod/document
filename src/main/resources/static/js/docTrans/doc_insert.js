@@ -64,17 +64,35 @@ function docTransGridSetting() {
 
     // 등록
     dataGrid.setOnRowInserting(function(data, deferred) {
+
         const formData = new FormData();
         formData.append('docName', data.docName);
         formData.append('ocryn', data.ocryn ? 1 : 0);
 
-        // 파일 필드
+        const allowedExtensions = [
+            '.doc', '.docx', '.txt', '.xlx', '.xlxs',
+            '.ppt', '.pptx', '.hwp', '.gif', '.jpeg', '.jpg', '.png', '.bmp'
+        ];
+
         const fileUploader = $(".dx-fileuploader input[type='file']")[0];
 
-        // 파일 선택 여부 체크
         if (!fileUploader || fileUploader.files.length === 0) {
             basicAlert({ icon: 'error', text: '파일을 선택해주세요.' });
-            deferred.reject(); // 업로드 취소
+            deferred.reject();
+            return;
+        }
+
+        // 파일 확장자 체크
+        const fileName = fileUploader.files[0].name.toLowerCase();
+        const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
+
+        if (!isValid) {
+            basicAlert({
+                icon: 'error',
+                text: `지원하지 않는 파일 형식입니다.\n\n허용된 형식: ${allowedExtensions.join(', ')}`
+            });
+            fileUploader.value = ''; // 파일 선택 초기화
+            deferred.reject();
             return;
         }
 

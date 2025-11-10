@@ -143,8 +143,8 @@ public class DocService {
             log.info("텍스트 파일입니다.");
         }else if (save_filename.toLowerCase().endsWith(".xlx")) {
             log.info("엑셀xlx 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".xlxs")) {
-            log.info("엑셀xlxs 파일입니다.");
+        }else if (save_filename.toLowerCase().endsWith(".xlsx")) {
+            log.info("엑셀xlsx 파일입니다.");
         }else if (save_filename.toLowerCase().endsWith(".ppt")) {
             log.info("파워포인트ppt 파일입니다.");
         }else if (save_filename.toLowerCase().endsWith(".pptx")) {
