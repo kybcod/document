@@ -14,4 +14,6 @@ public interface DocMapper {
     DocDto getDocrByDocId(String docId);
 
     int insertDoc(DocDto docDto);
+
+    void updateTrans(DocDto docDto);
 }

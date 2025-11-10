@@ -66,4 +66,19 @@
                )
     </insert>
 
+    <update id="updateTrans">
+        UPDATE tb_document
+        <set>
+            <if test="docStatus != null and docStatus != ''">
+                DOC_STATUS = #{docStatus},
+            </if>
+            TRANS_DT = NOW()
+            <if test="mergedHtml != null and mergedHtml != ''">
+                , TRANS_HTML = #{mergedHtml}
+            </if>
+        </set>
+        WHERE DOC_ID = #{docId}
+    </update>
+
+
 </mapper>
