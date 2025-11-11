@@ -2,7 +2,7 @@ spring:
   application:
     name: document
   profiles:
-    active: local
+    active: dev
   config:
     import:
       - 'classpath:/yml/logging/application-logging.yml'
