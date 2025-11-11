@@ -1,7 +1,5 @@
 package document.doc.dto;
 
-public class ApiHwpResponse {
-    public String status;
+public class ApiHwpResponse extends ApiResponseBase {
     public String filename;
-    public String html_content;
 }

@@ -4,6 +4,7 @@ import document.config.TransDocApiProperties;
 import document.config.TransServerProperties;
 import document.doc.dto.ApiDocxResponse;
 import document.doc.dto.ApiHwpResponse;
+import document.doc.dto.ApiResponseBase;
 import document.doc.dto.DocDto;
 import document.doc.mapper.DocMapper;
 import document.user.dto.UserDto;
@@ -161,137 +162,100 @@ public class DocService {
         }
     }
 
+    /*
+    * HWP API 변환 요청
+    * */
+    public void transHwp(String apiUrlHwp, DocDto docDto) throws Exception {
+        String hwpHost = apiProps.getHwpHost();
+        String hwpPort = apiProps.getHwpPort();
+
+        apiUrlHwp = buildApiUrl(hwpHost, hwpPort, apiUrlHwp);
+        WebClient webClient = createWebClient(apiUrlHwp);
+
+        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
+        if (!file.exists()) throw new Exception("변환할 파일이 존재하지 않습니다: " + file.getPath());
+
+        ApiHwpResponse response = webClient.post()
+                .uri("/convert")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file))
+                .retrieve()
+                .bodyToMono(ApiHwpResponse.class)
+                .doOnError(Throwable::printStackTrace)
+                .block();
+
+        processConversionResponse(response, docDto);
+    }
 
 
-    // DOCX 문서변환 요청
+    /*
+     * DOC/DOCX API 변환 요청
+     * */
     public void transDocx(String apiUrlDocx, DocDto docDto) throws Exception {
         String docxHost = apiProps.getDocxHost();
         String docxPort = apiProps.getDocxPort();
-        String ocrHost = apiProps.getOcrHost();
-        String ocrPort = apiProps.getOcrPort();
-        String ip = null;
 
-        if (!serverType.equals("local")) {
-            try {
-                log.info("{} ip: {}", docxHost, InetAddress.getByName(docxHost).getHostAddress());
-                ip = InetAddress.getByName(docxHost).getHostAddress();
-                apiUrlDocx = "http://" + ip + ":" + docxPort;
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-                throw new RuntimeException("DOCX 변환 서버 IP 확인 중 오류가 발생했습니다: " + e.getMessage());
-            }
-        }
+        apiUrlDocx = buildApiUrl(docxHost, docxPort, apiUrlDocx);
+        WebClient webClient = createWebClient(apiUrlDocx);
 
-        // 버퍼 크기 늘리기 (기본: 256KB)
-        ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024)) // 50MB
-                .build();
+        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
+        if (!file.exists()) throw new Exception("변환할 파일이 존재하지 않습니다: " + file.getPath());
 
-        HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMinutes(2))  // 서버 응답 대기 시간
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000); // 연결 타임아웃
-
-        WebClient webClient = WebClient.builder()
-                .baseUrl(apiUrlDocx.trim())
-                .exchangeStrategies(strategies)
-                .clientConnector(new ReactorClientHttpConnector(httpClient))
-                .build();
-
-        FileSystemResource file2 = new FileSystemResource(docDto.getDocFilepath());
-
-
-        // 파일 존재 여부 체크
-        if (!file2.exists()) {
-            throw new Exception("변환할 파일이 존재하지 않습니다: " + file2.getPath());
-        }
-
-        // API 호출
         ApiDocxResponse response = webClient.post()
                 .uri("/convert/")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("file", file2))
+                .body(BodyInserters.fromMultipartData("file", file))
                 .retrieve()
                 .bodyToMono(ApiDocxResponse.class)
                 .doOnError(Throwable::printStackTrace)
                 .block();
 
-        // 응답 확인 및 DB 저장
-        if (response != null && "success".equalsIgnoreCase(response.status)) {
-            log.info("변환 성공 → DB 저장 중...");
-
-            String mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
-
-            docMapper.updateTrans(docDto.toBuilder()
-                            .docStatus("2")
-                            .transHtml(mergedHtml)
-                            .build());
-
-
-            log.info("DB 저장 완료!");
-        } else {
-            log.info("변환 실패");
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus("9")
-                    .build());
-
-            // 상세 메시지 출력
-            String errMsg = "문서 변환 중 오류가 발생했습니다: ";
-            if (response != null && response.messages != null) {
-                errMsg += ": " + String.join(", ", response.messages);
-            }
-
-            throw new Exception(errMsg);
-        }
-
+        processConversionResponse(response, docDto);
     }
 
 
 
-    //HWP 문서변환 요청
-    public void transHwp(String apiUrlHwp, DocDto docDto) throws Exception {
-        String hwpHost = apiProps.getHwpHost();
-        String hwpPort = apiProps.getHwpPort();
 
-        String ip = null;
-        if(!serverType.equals("local")) {
+    /*
+     * 서버 접속 URL 생성
+     * */
+    private String buildApiUrl(String host, String port, String originalUrl) throws Exception {
+        if (!serverType.equals("local")) {
             try {
-                ip = InetAddress.getByName(hwpHost).getHostAddress();
-                apiUrlHwp = "http://" + ip + ":" + hwpPort;
+                String ip = InetAddress.getByName(host).getHostAddress();
+                return "http://" + ip + ":" + port;
             } catch (UnknownHostException e) {
-                e.printStackTrace();
-                throw new RuntimeException("HWP 변환 서버 IP 확인 중 오류가 발생했습니다: " + e.getMessage());
+                throw new RuntimeException("서버 IP 확인 중 오류 발생: " + e.getMessage());
             }
         }
+        return originalUrl;
+    }
 
-        // 버퍼 크기 늘리기 (기본: 256KB)
+
+    /*
+     * WebClient 인스턴스를 생성
+     * */
+    private WebClient createWebClient(String apiUrl) {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
-                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024)) // 50MB
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024))
                 .build();
 
         HttpClient httpClient = HttpClient.create()
-                .responseTimeout(Duration.ofMinutes(2))  // 서버 응답 대기 시간
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000); // 연결 타임아웃
+                .responseTimeout(Duration.ofMinutes(2))
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 60000);
 
-        WebClient webClient = WebClient.builder()
-                .baseUrl(apiUrlHwp.trim())
+        return WebClient.builder()
+                .baseUrl(apiUrl.trim())
                 .exchangeStrategies(strategies)
                 .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
+    }
 
-        FileSystemResource file2 = new FileSystemResource(docDto.getDocFilepath());
-        // API 호출
-        ApiHwpResponse response = webClient.post()
-                .uri("/convert")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("file", file2))
-                .retrieve()
-                .bodyToMono(ApiHwpResponse.class)
-                .doOnError(e -> e.printStackTrace())
-//                    .bodyToMono(String.class) //그냥  String 으로 받을때
-                .block();
 
-        // 응답 확인 및 DB 저장
+    /*
+     * 문서 변환 API의 응답 결과를 처리
+     * */
+    private <T extends ApiResponseBase> void processConversionResponse(T response, DocDto docDto) throws Exception {
         if (response != null && "success".equalsIgnoreCase(response.status)) {
             log.info("변환 성공 → DB 저장 중...");
 
@@ -308,11 +272,18 @@ public class DocService {
 
             docMapper.updateTrans(docDto.toBuilder()
                     .docStatus("9")
+                    .transHtml("")
                     .build());
 
-            throw new Exception("문서 변환 중 오류가 발생했습니다.");
-        }
+            String errMsg = "문서 변환 중 오류가 발생했습니다.";
+            if (response != null && response.messages != null) {
+                errMsg += " " + String.join(", ", response.messages);
+            }
 
+            throw new Exception(errMsg);
+        }
     }
+
+
 
 }
