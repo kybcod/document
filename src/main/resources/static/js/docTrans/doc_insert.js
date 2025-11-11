@@ -71,7 +71,7 @@ function docTransGridSetting() {
 
         const allowedExtensions = [
             '.doc', '.docx', '.txt', '.xlx', '.xlxs',
-            '.ppt', '.pptx', '.hwp', '.gif', '.jpeg', '.jpg', '.png', '.bmp'
+            '.ppt', '.pptx', '.hwp', '.gif', '.jpeg', '.jpg', '.png', '.bmp', '.pdf'
         ];
 
         const fileUploader = $(".dx-fileuploader input[type='file']")[0];
