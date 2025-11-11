@@ -133,6 +133,12 @@ public class DocService {
     }
 
     public void apiTransfer(DocDto docDto) throws Exception {
+
+        // 변환 실패 상태가 맞는지 확인
+        if(!docDto.getDocStatus().equals("9")){
+            throw new Exception("변환상태가 실패가 아닙니다.");
+        }
+
         String save_filename = docDto.getSaveFilename();
 
         if (save_filename.toLowerCase().endsWith(".doc") || save_filename.toLowerCase().endsWith(".docx")) {
