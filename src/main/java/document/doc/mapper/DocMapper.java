@@ -11,7 +11,7 @@ public interface DocMapper {
 
     void deleteDoc(DocDto docDto);
 
-    DocDto getDocrByDocId(String docId);
+    DocDto getDocrByDocId(DocDto docDto);
 
     int insertDoc(DocDto docDto);
 

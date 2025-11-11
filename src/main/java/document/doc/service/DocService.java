@@ -57,6 +57,13 @@ public class DocService {
         return docMapper.getDocList(docDto);
     }
 
+    /**
+     * 변환된 HTML 문서
+     */
+    public DocDto getTransHtml(DocDto docDto) {
+        return docMapper.getDocrByDocId(docDto);
+    }
+
 
     /**
      * 사용자 정보 삭제

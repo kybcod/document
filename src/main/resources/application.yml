@@ -2,7 +2,7 @@ spring:
   application:
     name: document
   profiles:
-    active: dev
+    active: local
   config:
     import:
       - 'classpath:/yml/logging/application-logging.yml'
@@ -42,6 +42,7 @@ server:
     connection-timeout: 10000
 
 
+# TODO : 추후에 api 관련 dev, local로 나누어야함
 api:
   url:
     docx: http://210.113.0.140:8123
@@ -50,6 +51,9 @@ api:
     ocr: http://210.113.0.140:8080
     ocrHost: test
     ocrPort: 8080
+    hwp: http://210.113.0.140:8129
+    hwpHost: docuverse_hwp
+    hwpPort: 8129
 
 servers:
   server1: 172.20.10.5

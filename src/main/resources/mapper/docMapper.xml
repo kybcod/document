@@ -7,7 +7,20 @@
 
     <!-- 문서 목록 조회 -->
     <select id="getDocList" resultType="document.doc.dto.DocDto">
-        SELECT *
+        SELECT
+            DOC_ID,
+            DOC_DT,
+            DOC_NAME,
+            ORG_FILENAME,
+            SAVE_FILENAME,
+            DOC_FILEPATH,
+            DOC_STATUS,
+            SERVER_NUM,
+            CRT_ID,
+            OCRYN,
+            CRT_DT,
+            TRANS_FILE,
+            TRANS_DT
         FROM tb_document
         WHERE 1=1
         <if test="docName != null and docName != ''">

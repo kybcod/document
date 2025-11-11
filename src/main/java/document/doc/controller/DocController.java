@@ -63,4 +63,10 @@ public class DocController {
 
     }
 
+    @Description("문선 변환 후 html 가지고오기")
+    @PostMapping("/transHtml")
+    public ResponseEntity<?> transHtml(@RequestBody DocDto docDto) {
+        return ResponseEntity.ok(docService.getTransHtml(docDto));
+    }
+
 }

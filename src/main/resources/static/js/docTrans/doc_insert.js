@@ -131,7 +131,7 @@ function docTransGridSetting() {
                     .css('cursor', 'pointer')
                     .attr('title', '보기')
                     .on('click', function() {
-                        readFile(e.data.transHtml);
+                        readFile(e.data.docId);
                     })
                     .appendTo(e.cellElement);
             }
@@ -179,25 +179,38 @@ function transfer(data, callback){
     });
 }
 
-function readFile(htmlString) {
-    $("#previewPopup").dxPopup({
-        visible: true,
-        title: "미리보기",
-        width: "90%",
-        height: "90%",
-        showCloseButton: true,
-        dragEnabled: true,
-        resizeEnabled: true,
-        contentTemplate: function(contentElement) {
-            const $content = $(contentElement);
-            $content.css('overflow-y', 'auto');
-            $content.append(htmlString);
-            $content.on('dxmousewheel', function(e) {
-                e.stopPropagation();
+function readFile(docId) {
+
+    $.ajax({
+        url: "doc/transHtml",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({docId}),
+        success(res) {
+            let htmlString = res.transHtml;
+
+            $("#previewPopup").dxPopup({
+                visible: true,
+                title: "미리보기",
+                width: "90%",
+                height: "90%",
+                showCloseButton: true,
+                dragEnabled: true,
+                resizeEnabled: true,
+                contentTemplate: function(contentElement) {
+                    const $content = $(contentElement);
+                    $content.css('overflow-y', 'auto');
+                    $content.append(htmlString);
+                    $content.on('dxmousewheel', function(e) {
+                        e.stopPropagation();
+                    });
+                },
+                onHidden: function(e) {
+                    e.component.dispose();
+                }
             });
         },
-        onHidden: function(e) {
-            e.component.dispose();
-        }
+
     });
+
 }
