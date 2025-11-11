@@ -27,7 +27,7 @@ textarea {
 }
 
 table tr {
-	border-bottom: 0.5px solid #ced4da;
+	border-bottom: 0.5px solid #ced4da !important;
 }
 
 
@@ -758,7 +758,7 @@ ul.checktree span.count {
 }
 
 .cont_Sform table {
-	width: 100%;
+	width: 100% !important;
 }
 
 .cont_Mform {
@@ -820,7 +820,7 @@ ul.checktree span.count {
 }
 
 .search_form table {
-	border: 0.5px solid #ced4da;
+	border: 0.5px solid #ced4da !important;
 }
 
 .cont_Lform .search_form {
@@ -876,7 +876,7 @@ ul.checktree span.count {
 }
 
 .search_inner_form table {
-	border: 0.5px solid #ced4da;
+	border: 0.5px solid #ced4da !important;
 }
 
 .search_inner_wid {
