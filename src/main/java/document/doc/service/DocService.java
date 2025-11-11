@@ -283,8 +283,9 @@ public class DocService {
                     .build());
 
             String errMsg = "문서 변환 중 오류가 발생했습니다.";
-            if (response != null && response.messages != null) {
-                errMsg += " " + String.join(", ", response.messages);
+            String detailedMsg = response != null ? response.getErrorMessage() : null;
+            if (detailedMsg != null) {
+                errMsg += " " + detailedMsg;
             }
 
             throw new Exception(errMsg);
