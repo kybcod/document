@@ -147,7 +147,10 @@ function docTransGridSetting() {
             if ($buttons.length) {
                 const $resetBtn = $('<div class="dx-link dx-icon-refresh" title="변환"></div>');
                 $resetBtn.on("click", function() {
-                    transfer(e.data);
+                    $resetBtn.addClass("disabled").css("pointer-events", "none").css("opacity", "0.5");
+                    transfer(e.data, function() {
+                        $resetBtn.removeClass("disabled").css("pointer-events", "").css("opacity", "");
+                    });
                 });
                 $buttons.append($resetBtn);
             }
@@ -155,7 +158,7 @@ function docTransGridSetting() {
     });
 }
 
-function transfer(data){
+function transfer(data, callback){
 
     $.ajax({
         url: "doc/transfer",
@@ -168,6 +171,9 @@ function transfer(data){
         },
         error: function(xhr, status, err) {
             basicAlert({ icon: 'error', text: xhr.responseJSON?.msg || xhr.responseText || err });
+        },
+        complete: function() {
+            if (typeof callback === "function") callback();
         }
 
     });
