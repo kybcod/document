@@ -259,7 +259,7 @@ public class DocService {
      * 서버 접속 URL 생성
      */
     private String buildApiUrl(String host, String port, String originalUrl) throws Exception {
-        if (!serverType.equals("local")) {
+        if (!"local".equals(serverType)) {
             try {
                 String ip = InetAddress.getByName(host).getHostAddress();
                 return "http://" + ip + ":" + port;
