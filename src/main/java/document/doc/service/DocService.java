@@ -140,6 +140,10 @@ public class DocService {
         }
     }
 
+
+    /**
+     * 각각의 확장자 마다 API 호출
+     */
     public void apiTransfer(DocDto docDto) throws Exception {
 
         // 변환 실패 상태가 맞는지 확인
@@ -147,31 +151,59 @@ public class DocService {
             throw new Exception("변환상태가 실패가 아닙니다.");
         }
 
-        String save_filename = docDto.getSaveFilename();
+        // 확장자 다른 api
+        String ext = "";
+        String saveFilename = docDto.getSaveFilename().toLowerCase();
+        int dotIndex = saveFilename.lastIndexOf('.');
+        ext = saveFilename.substring(dotIndex + 1);
 
-        if (save_filename.toLowerCase().endsWith(".doc") || save_filename.toLowerCase().endsWith(".docx")) {
-            log.info("doc , docx 파일입니다.");
-            transDocx( apiProps.getDocx(),  docDto);
-        }else if (save_filename.toLowerCase().endsWith(".hwp")) {
-            log.info("hwp 파일입니다.");
-            transHwp( apiProps.getHwp(), docDto);
-        }else if (save_filename.toLowerCase().endsWith(".xlx") || save_filename.toLowerCase().endsWith(".")) {
-            log.info("엑셀 xlx,xlsx 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".ppt") || save_filename.toLowerCase().endsWith(".pptx")) {
-            log.info("파워포인트 ppt, pptx 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".txt")) {
-            log.info("텍스트 파일입니다.");
-        }else if (save_filename.toLowerCase().endsWith(".gif") || save_filename.toLowerCase().endsWith(".jpeg") || save_filename.toLowerCase().endsWith(".jpg")
-                || save_filename.toLowerCase().endsWith(".png") || save_filename.toLowerCase().endsWith("bmp")) {
-            log.info("이미지 파일입니다.");
-        }else {
-            throw new Exception("지원하지 않는 파일 형식입니다.");
+        switch (ext) {
+            case "doc":
+            case "docx":
+                log.info("doc, docx 파일입니다.");
+                transDocx(apiProps.getDocx(), docDto);
+                break;
+
+            case "hwp":
+                log.info("hwp 파일입니다.");
+                transHwp(apiProps.getHwp(), docDto);
+                break;
+
+            case "xls":
+            case "xlsx":
+                log.info("엑셀 xls, xlsx 파일입니다.");
+                break;
+
+            case "ppt":
+            case "pptx":
+                log.info("파워포인트 ppt, pptx 파일입니다.");
+                break;
+
+            case "txt":
+                log.info("텍스트 파일입니다.");
+                break;
+
+            case "gif":
+            case "jpeg":
+            case "jpg":
+            case "png":
+            case "bmp":
+                log.info("이미지 파일입니다.");
+                break;
+
+            case "pdf":
+                log.info("pdf 파일입니다.");
+                break;
+
+            default:
+                throw new Exception("지원하지 않는 파일 형식입니다.");
         }
+
     }
 
-    /*
+    /**
     * HWP API 변환 요청
-    * */
+    */
     public void transHwp(String apiUrlHwp, DocDto docDto) throws Exception {
         String hwpHost = apiProps.getHwpHost();
         String hwpPort = apiProps.getHwpPort();
@@ -195,9 +227,9 @@ public class DocService {
     }
 
 
-    /*
+    /**
      * DOC/DOCX API 변환 요청
-     * */
+     */
     public void transDocx(String apiUrlDocx, DocDto docDto) throws Exception {
         String docxHost = apiProps.getDocxHost();
         String docxPort = apiProps.getDocxPort();
@@ -209,7 +241,7 @@ public class DocService {
         if (!file.exists()) throw new Exception("변환할 파일이 존재하지 않습니다: " + file.getPath());
 
         ApiDocxResponse response = webClient.post()
-                .uri("/convert/")
+                .uri("/convert")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData("file", file))
                 .retrieve()
@@ -223,9 +255,9 @@ public class DocService {
 
 
 
-    /*
+    /**
      * 서버 접속 URL 생성
-     * */
+     */
     private String buildApiUrl(String host, String port, String originalUrl) throws Exception {
         if (!serverType.equals("local")) {
             try {
@@ -239,9 +271,9 @@ public class DocService {
     }
 
 
-    /*
+    /**
      * WebClient 인스턴스를 생성
-     * */
+     */
     private WebClient createWebClient(String apiUrl) {
         ExchangeStrategies strategies = ExchangeStrategies.builder()
                 .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(50 * 1024 * 1024))
@@ -259,9 +291,9 @@ public class DocService {
     }
 
 
-    /*
+    /**
      * 문서 변환 API의 응답 결과를 처리
-     * */
+     */
     private <T extends ApiResponseBase> void processConversionResponse(T response, DocDto docDto) throws Exception {
         if (response != null && "success".equalsIgnoreCase(response.status)) {
             log.info("변환 성공 → DB 저장 중...");
