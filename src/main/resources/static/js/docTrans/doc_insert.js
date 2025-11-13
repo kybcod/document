@@ -41,6 +41,8 @@ function docTransGridSetting() {
             0: '등록',
             1: '변환신청',
             2: '변환완료',
+            3: '변환보류',
+            8: '파일없음',
             9: '실패'
         };
         docStatusCol.customizeText = function(cellInfo) {
