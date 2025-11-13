@@ -89,6 +89,9 @@
             <if test="transHtml != null and transHtml != ''">
                 , TRANS_HTML = #{transHtml}
             </if>
+            <if test="transTaskid != null and transTaskid != ''">
+                , TRANS_TASKID = #{transTaskid}
+            </if>
         </set>
         WHERE DOC_ID = #{docId}
     </update>

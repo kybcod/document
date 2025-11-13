@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class TransDocApiProperties {
-	private String  docx;
-	private String  ocr;
+	private String docx;
 	private String docxHost;
 	private String docxPort;
+	private String ocr;
 	private String ocrHost;
 	private String ocrPort;
 	private String hwp;

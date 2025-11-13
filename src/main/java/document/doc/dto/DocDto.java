@@ -24,6 +24,7 @@ public class DocDto {
     private String transFile; //변환파일
     private String transDt; //변환파일작업일시
     private String transHtml; //변환파일html
+    private String transTaskid; //ocr task id (pdf, img 변한 시 필요)
 
     private String startDate; //시작날짜
     private String endDate; //종료날짜

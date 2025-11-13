@@ -48,9 +48,9 @@ api:
     docx: http://210.113.0.140:8123
     docxHost: docuverse_docx
     docxPort: 8123
-    ocr: http://210.113.0.140:8080
-    ocrHost: test
-    ocrPort: 8080
+    ocr: http://210.113.0.140:8124
+    ocrHost: docuverseocr_app
+    ocrPort: 8001
     hwp: http://210.113.0.140:8129
     hwpHost: docuverse_hwp
     hwpPort: 8129

@@ -1,11 +1,10 @@
 package document.doc.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import document.config.TransDocApiProperties;
 import document.config.TransServerProperties;
-import document.doc.dto.ApiDocxResponse;
-import document.doc.dto.ApiHwpResponse;
-import document.doc.dto.ApiResponseBase;
-import document.doc.dto.DocDto;
+import document.doc.dto.*;
 import document.doc.mapper.DocMapper;
 import document.user.dto.UserDto;
 import io.netty.channel.ChannelOption;
@@ -20,6 +19,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -189,10 +189,12 @@ public class DocService {
             case "png":
             case "bmp":
                 log.info("이미지 파일입니다.");
+                transPdf( apiProps.getOcr(),  docDto, "img");
                 break;
 
             case "pdf":
                 log.info("pdf 파일입니다.");
+                transPdf( apiProps.getOcr(),  docDto, "pdf");
                 break;
 
             default:
@@ -250,6 +252,85 @@ public class DocService {
                 .block();
 
         processConversionResponse(response, docDto);
+    }
+
+    /**
+     * PDF/IMG API 변환 요청
+     */
+    public void transPdf(String apiUrlOcr, DocDto docDto, String fileType) throws Exception {
+        String ocrHost = apiProps.getOcrHost();
+        String ocrPort = apiProps.getOcrPort();
+
+        apiUrlOcr = buildApiUrl(ocrHost, ocrPort, apiUrlOcr);
+        WebClient webClient = createWebClient(apiUrlOcr);
+
+        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
+        if (!file.exists()) throw new Exception("변환할 파일이 존재하지 않습니다: " + file.getPath());
+
+        String uriSet = "";
+        if("pdf".equals(fileType)) {
+            uriSet = "/extract/pdf";
+        } else if("img".equals(fileType)) {
+            uriSet = "/extract/image";
+        }
+
+        // ApiPdfResponse
+        ApiPdfResponse response = webClient.post()
+                .uri(uriSet)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file))
+                .retrieve()
+                .bodyToMono(ApiPdfResponse.class)
+                .doOnError(e -> e.printStackTrace())
+                .block();
+
+        // 파싱된 task_id로 상태 조회
+        ApiTaskResponse taskResponse = null;
+        if (response.task_id != null) {
+            taskResponse = webClient.get()
+                    .uri("/task/{id}", response.task_id)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(ApiTaskResponse.class)
+                    .block();
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .transTaskid(response.task_id)
+                    .build());
+
+            if (taskResponse.getStatus() != null && "SUCCESS".equalsIgnoreCase(taskResponse.getStatus())){
+                String toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
+                log.info("변환 성공 → DB 저장 중...");
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus("2")
+                        .transHtml(toHtml)
+                        .build());
+
+            } else if(taskResponse.getStatus() != null && "PENDING".equalsIgnoreCase(taskResponse.getStatus())) {
+                log.info("변환 대기중 입니다."+ taskResponse.getStatus());
+
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus("3")
+                        .build());
+            } else {
+
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus("9")
+                        .transHtml("")
+                        .build());
+
+                throw new Exception(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(taskResponse));
+            }
+        } else {
+            log.info("task_id가 응답에 없습니다!");
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus("9")
+                    .transHtml("")
+                    .build());
+        }
+
     }
 
 
