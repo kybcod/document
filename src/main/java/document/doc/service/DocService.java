@@ -1,6 +1,5 @@
 package document.doc.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import document.config.TransDocApiProperties;
 import document.config.TransServerProperties;
@@ -19,7 +18,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -144,7 +142,7 @@ public class DocService {
     /**
      * 각각의 확장자 마다 API 호출
      */
-    public void apiTransfer(DocDto docDto) throws Exception {
+    public String apiTransfer(DocDto docDto) throws Exception {
 
         // 변환 실패 상태가 맞는지 확인
         if(!docDto.getDocStatus().equals("9")){
@@ -161,27 +159,26 @@ public class DocService {
             case "doc":
             case "docx":
                 log.info("doc, docx 파일입니다.");
-                transDocx(apiProps.getDocx(), docDto);
-                break;
+                return transDocx(apiProps.getDocx(), docDto);
 
             case "hwp":
                 log.info("hwp 파일입니다.");
-                transHwp(apiProps.getHwp(), docDto);
-                break;
+                return transHwp(apiProps.getHwp(), docDto);
+
 
             case "xls":
             case "xlsx":
                 log.info("엑셀 xls, xlsx 파일입니다.");
-                break;
+                return "";
 
             case "ppt":
             case "pptx":
                 log.info("파워포인트 ppt, pptx 파일입니다.");
-                break;
+                return "";
 
             case "txt":
                 log.info("텍스트 파일입니다.");
-                break;
+                return "";
 
             case "gif":
             case "jpeg":
@@ -189,13 +186,11 @@ public class DocService {
             case "png":
             case "bmp":
                 log.info("이미지 파일입니다.");
-                transPdf( apiProps.getOcr(),  docDto, "img");
-                break;
+                return transPdf( apiProps.getOcr(),  docDto, "img");
 
             case "pdf":
                 log.info("pdf 파일입니다.");
-                transPdf( apiProps.getOcr(),  docDto, "pdf");
-                break;
+                return transPdf( apiProps.getOcr(),  docDto, "pdf");
 
             default:
                 throw new Exception("지원하지 않는 파일 형식입니다.");
@@ -206,7 +201,7 @@ public class DocService {
     /**
     * HWP API 변환 요청
     */
-    public void transHwp(String apiUrlHwp, DocDto docDto) throws Exception {
+    public String transHwp(String apiUrlHwp, DocDto docDto) throws Exception {
         String hwpHost = apiProps.getHwpHost();
         String hwpPort = apiProps.getHwpPort();
 
@@ -225,14 +220,14 @@ public class DocService {
                 .doOnError(Throwable::printStackTrace)
                 .block();
 
-        processConversionResponse(response, docDto);
+        return processConversionResponse(response, docDto);
     }
 
 
     /**
      * DOC/DOCX API 변환 요청
      */
-    public void transDocx(String apiUrlDocx, DocDto docDto) throws Exception {
+    public String transDocx(String apiUrlDocx, DocDto docDto) throws Exception {
         String docxHost = apiProps.getDocxHost();
         String docxPort = apiProps.getDocxPort();
 
@@ -251,13 +246,13 @@ public class DocService {
                 .doOnError(Throwable::printStackTrace)
                 .block();
 
-        processConversionResponse(response, docDto);
+        return processConversionResponse(response, docDto);
     }
 
     /**
      * PDF/IMG API 변환 요청
      */
-    public void transPdf(String apiUrlOcr, DocDto docDto, String fileType) throws Exception {
+    public String transPdf(String apiUrlOcr, DocDto docDto, String fileType) throws Exception {
         String ocrHost = apiProps.getOcrHost();
         String ocrPort = apiProps.getOcrPort();
 
@@ -274,7 +269,6 @@ public class DocService {
             uriSet = "/extract/image";
         }
 
-        // ApiPdfResponse
         ApiPdfResponse response = webClient.post()
                 .uri(uriSet)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
@@ -284,56 +278,75 @@ public class DocService {
                 .doOnError(e -> e.printStackTrace())
                 .block();
 
-        // 파싱된 task_id로 상태 조회
-        ApiTaskResponse taskResponse = null;
-        if (response.task_id != null) {
-            taskResponse = webClient.get()
-                    .uri("/task/{id}", response.task_id)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .retrieve()
-                    .bodyToMono(ApiTaskResponse.class)
-                    .block();
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .transTaskid(response.task_id)
-                    .build());
-
-            if (taskResponse.getStatus() != null && "SUCCESS".equalsIgnoreCase(taskResponse.getStatus())){
-                String toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
-                log.info("변환 성공 → DB 저장 중...");
-                docMapper.updateTrans(docDto.toBuilder()
-                        .docStatus("2")
-                        .transHtml(toHtml)
-                        .build());
-
-            } else if(taskResponse.getStatus() != null && "PENDING".equalsIgnoreCase(taskResponse.getStatus())) {
-                log.info("변환 대기중 입니다."+ taskResponse.getStatus());
-
-                docMapper.updateTrans(docDto.toBuilder()
-                        .docStatus("3")
-                        .build());
-            } else {
-
-                docMapper.updateTrans(docDto.toBuilder()
-                        .docStatus("9")
-                        .transHtml("")
-                        .build());
-
-                throw new Exception(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(taskResponse));
-            }
-        } else {
-            log.info("task_id가 응답에 없습니다!");
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus("9")
-                    .transHtml("")
-                    .build());
-        }
-
+        return processConversionPdfResponse(docDto, response.task_id, webClient);
     }
 
+    /**
+     * PDF/IMG 변환 요청에서 Task 상태 확인 및 DB 업데이트 로직 분리
+     */
+    private String processConversionPdfResponse(DocDto docDto, String task_id, WebClient webClient) throws Exception {
+        String toHtml = "";
 
+        if (task_id == null) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.FAILURE.getDbCode())
+                    .transHtml(toHtml)
+                    .build());
+
+            throw new Exception(TransStatus.FAILURE.getMessage() + " (Task ID 없음)");
+
+        }
+
+
+        ApiTaskResponse taskResponse = webClient.get()
+                .uri("/task/{id}", task_id)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(ApiTaskResponse.class)
+                .block();
+
+
+        docMapper.updateTrans(docDto.toBuilder()
+                .transTaskid(task_id)
+                .build());
+
+        String status = taskResponse != null && taskResponse.getStatus() != null ? taskResponse.getStatus().toUpperCase() : null;
+        ObjectMapper mapper = new ObjectMapper();
+
+        if (TransStatus.SUCCESS.getApiStatus().equalsIgnoreCase(status)){
+
+            toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.SUCCESS.getDbCode())
+                    .transHtml(toHtml)
+                    .build());
+            return TransStatus.SUCCESS.getMessage();
+
+        } else if(TransStatus.PENDING.getApiStatus().equalsIgnoreCase(status)) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.PENDING.getDbCode())
+                    .transHtml(toHtml)
+                    .build());
+            return TransStatus.PENDING.getMessage();
+        } else {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.FAILURE.getDbCode())
+                    .transHtml(toHtml)
+                    .build());
+
+            String errMsg = TransStatus.FAILURE.getMessage();
+            String detailedMsg = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(taskResponse);
+            if (detailedMsg != null) {
+                errMsg += " " + detailedMsg;
+            }
+
+            throw new Exception(errMsg);
+
+        }
+    }
 
 
     /**
@@ -375,27 +388,30 @@ public class DocService {
     /**
      * 문서 변환 API의 응답 결과를 처리
      */
-    private <T extends ApiResponseBase> void processConversionResponse(T response, DocDto docDto) throws Exception {
-        if (response != null && "success".equalsIgnoreCase(response.status)) {
-            log.info("변환 성공 → DB 저장 중...");
+    private <T extends ApiResponseBase> String processConversionResponse(T response, DocDto docDto) throws Exception {
 
-            String mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
+        TransStatus resultStatus;
+        String mergedHtml= "";
+
+        if (response != null && TransStatus.SUCCESS.getApiStatus().equalsIgnoreCase(response.status)) {
+
+            mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
 
             docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus("2")
+                    .docStatus(TransStatus.SUCCESS.getDbCode())
                     .transHtml(mergedHtml)
                     .build());
 
-            log.info("DB 저장 완료!");
+            return TransStatus.SUCCESS.getMessage();
+
         } else {
-            log.info("변환 실패");
 
             docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus("9")
-                    .transHtml("")
+                    .docStatus(TransStatus.FAILURE.getDbCode())
+                    .transHtml(mergedHtml)
                     .build());
 
-            String errMsg = "문서 변환 중 오류가 발생했습니다.";
+            String errMsg = TransStatus.FAILURE.getMessage();
             String detailedMsg = response != null ? response.getErrorMessage() : null;
             if (detailedMsg != null) {
                 errMsg += " " + detailedMsg;
@@ -403,6 +419,7 @@ public class DocService {
 
             throw new Exception(errMsg);
         }
+
     }
 
 
