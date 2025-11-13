@@ -281,73 +281,6 @@ public class DocService {
         return processConversionPdfResponse(docDto, response.task_id, webClient);
     }
 
-    /**
-     * PDF/IMG 변환 요청에서 Task 상태 확인 및 DB 업데이트 로직 분리
-     */
-    private String processConversionPdfResponse(DocDto docDto, String task_id, WebClient webClient) throws Exception {
-        String toHtml = "";
-
-        if (task_id == null) {
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.FAILURE.getDbCode())
-                    .transHtml(toHtml)
-                    .build());
-
-            throw new Exception(TransStatus.FAILURE.getMessage() + " (Task ID 없음)");
-
-        }
-
-
-        ApiTaskResponse taskResponse = webClient.get()
-                .uri("/task/{id}", task_id)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(ApiTaskResponse.class)
-                .block();
-
-
-        docMapper.updateTrans(docDto.toBuilder()
-                .transTaskid(task_id)
-                .build());
-
-        String status = taskResponse != null && taskResponse.getStatus() != null ? taskResponse.getStatus().toUpperCase() : null;
-        ObjectMapper mapper = new ObjectMapper();
-
-        if (TransStatus.SUCCESS.getApiStatus().equalsIgnoreCase(status)){
-
-            toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.SUCCESS.getDbCode())
-                    .transHtml(toHtml)
-                    .build());
-            return TransStatus.SUCCESS.getMessage();
-
-        } else if(TransStatus.PENDING.getApiStatus().equalsIgnoreCase(status)) {
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.PENDING.getDbCode())
-                    .transHtml(toHtml)
-                    .build());
-            return TransStatus.PENDING.getMessage();
-        } else {
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.FAILURE.getDbCode())
-                    .transHtml(toHtml)
-                    .build());
-
-            String errMsg = TransStatus.FAILURE.getMessage();
-            String detailedMsg = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(taskResponse);
-            if (detailedMsg != null) {
-                errMsg += " " + detailedMsg;
-            }
-
-            throw new Exception(errMsg);
-
-        }
-    }
-
 
     /**
      * 서버 접속 URL 생성
@@ -390,37 +323,106 @@ public class DocService {
      */
     private <T extends ApiResponseBase> String processConversionResponse(T response, DocDto docDto) throws Exception {
 
-        TransStatus resultStatus;
-        String mergedHtml= "";
+        TransStatus resultStatus = TransStatus.fromApiStatus(response.status);
+        String mergedHtml = "";
 
-        if (response != null && TransStatus.SUCCESS.getApiStatus().equalsIgnoreCase(response.status)) {
+        // 상태에 따라 분기 처리
+        switch (resultStatus) {
+            case SUCCESS:
+                mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
 
-            mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus(resultStatus.getDbCode())
+                        .transHtml(mergedHtml)
+                        .build());
 
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.SUCCESS.getDbCode())
-                    .transHtml(mergedHtml)
-                    .build());
+                return resultStatus.getMessage();
 
-            return TransStatus.SUCCESS.getMessage();
+            default:
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus(TransStatus.FAILURE.getDbCode())
+                        .transHtml(mergedHtml)
+                        .build());
 
-        } else {
+                String errMsg = TransStatus.FAILURE.getMessage();
+                String detailedMsg = response != null ? response.getErrorMessage() : null;
+                if (detailedMsg != null) {
+                    errMsg += " " + detailedMsg;
+                }
+
+                throw new Exception(errMsg);
+        }
+    }
+
+
+    /**
+     * PDF/IMG 변환 요청에서 Task 상태 확인 및 DB 업데이트 로직 분리
+     */
+    private String processConversionPdfResponse(DocDto docDto, String task_id, WebClient webClient) throws Exception {
+        String toHtml = "";
+
+        if (task_id == null) {
 
             docMapper.updateTrans(docDto.toBuilder()
                     .docStatus(TransStatus.FAILURE.getDbCode())
-                    .transHtml(mergedHtml)
+                    .transHtml(toHtml)
                     .build());
 
-            String errMsg = TransStatus.FAILURE.getMessage();
-            String detailedMsg = response != null ? response.getErrorMessage() : null;
-            if (detailedMsg != null) {
-                errMsg += " " + detailedMsg;
-            }
+            throw new Exception(TransStatus.FAILURE.getMessage() + " (Task ID 없음)");
 
-            throw new Exception(errMsg);
         }
 
+
+        ApiTaskResponse taskResponse = webClient.get()
+                .uri("/task/{id}", task_id)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .bodyToMono(ApiTaskResponse.class)
+                .block();
+
+
+        docMapper.updateTrans(docDto.toBuilder()
+                .transTaskid(task_id)
+                .build());
+
+        // 상태를 TransStatus Enum으로 변환
+        TransStatus transStatus = TransStatus.fromApiStatus(taskResponse.getStatus());
+
+        // 상태별 처리
+        switch (transStatus) {
+            case SUCCESS:
+                toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus(transStatus.getDbCode())
+                        .transHtml(toHtml)
+                        .build());
+                return transStatus.getMessage();
+
+            case PENDING:
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus(transStatus.getDbCode())
+                        .transHtml(toHtml)
+                        .build());
+                return transStatus.getMessage();
+
+            case FAILURE:
+            default:
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus(TransStatus.FAILURE.getDbCode())
+                        .transHtml(toHtml)
+                        .build());
+
+                ObjectMapper mapper = new ObjectMapper();
+                String errMsg = transStatus.getMessage();
+                String detailedMsg = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(taskResponse);
+                if (detailedMsg != null) {
+                    errMsg += " " + detailedMsg;
+                }
+
+                throw new Exception(errMsg);
+        }
     }
+
 
 
 
