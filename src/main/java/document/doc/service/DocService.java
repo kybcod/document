@@ -209,7 +209,16 @@ public class DocService {
         WebClient webClient = createWebClient(apiUrlHwp);
 
         FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
-        if (!file.exists()) throw new Exception("변환할 파일이 존재하지 않습니다: " + file.getPath());
+        if (!file.exists()) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.NOFILE.getDbCode())
+                    .build());
+
+            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
+
+
+        }
 
         ApiHwpResponse response = webClient.post()
                 .uri("/convert")
@@ -235,7 +244,16 @@ public class DocService {
         WebClient webClient = createWebClient(apiUrlDocx);
 
         FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
-        if (!file.exists()) throw new Exception("변환할 파일이 존재하지 않습니다: " + file.getPath());
+        if (!file.exists()) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.NOFILE.getDbCode())
+                    .build());
+
+            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
+
+
+        }
 
         ApiDocxResponse response = webClient.post()
                 .uri("/convert")
@@ -260,7 +278,16 @@ public class DocService {
         WebClient webClient = createWebClient(apiUrlOcr);
 
         FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
-        if (!file.exists()) throw new Exception("변환할 파일이 존재하지 않습니다: " + file.getPath());
+        if (!file.exists()) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.NOFILE.getDbCode())
+                    .build());
+
+            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
+
+
+        }
 
         String uriSet = "";
         if("pdf".equals(fileType)) {
