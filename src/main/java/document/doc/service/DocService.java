@@ -256,7 +256,7 @@ public class DocService {
         }
 
         ApiDocxResponse response = webClient.post()
-                .uri("/convert")
+                .uri("/convert/")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData("file", file))
                 .retrieve()
