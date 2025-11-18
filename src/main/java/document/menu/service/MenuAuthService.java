@@ -42,13 +42,8 @@ public class MenuAuthService {
             throw new Exception("메뉴 권한 업데이트에 실패했습니다.");
         }
 
-        MenuAuthDto result = menuAuthMapper.getMenuMgmtByPermitId(updateMenuAuthDto);
 
-        if (result == null) {
-            throw new Exception("업데이트된 메뉴 권한 정보를 조회할 수 없습니다.");
-        }
-
-        return result;
+        return menuAuthMapper.getMenuMgmtByPermitId(updateMenuAuthDto);
     }
 
 

@@ -12,8 +12,8 @@ public interface UserMapper {
     UserDto getUserByUserId(String userId);
     int updateUserInfo(UserDto userDto);
     int insertUserInfo(UserDto userDto);
-    void deleteUserInfo(UserDto userDto);
+    int deleteUserInfo(UserDto userDto);
     int updatePassword(String userId, String userPass);
     UserDto login(UserDto userDto);
-    void updatePwdFcnt(String pwdFcnt, String userId);
+    int updatePwdFcnt(String pwdFcnt, String userId);
 }

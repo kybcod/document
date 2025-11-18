@@ -50,10 +50,11 @@ public class UserService {
 
         int updateUserInfo = userMapper.updateUserInfo(userDto);
 
-        if (updateUserInfo > 0) {
-            return userMapper.getUserByUserId(userDto.getUserId());
+        if (updateUserInfo <= 0) {
+            throw new Exception("사용자 정보 수정 실패했습니다 : " + userDto.getUserId());
+
         }
-        return null;
+        return userMapper.getUserByUserId(userDto.getUserId());
     }
 
     /**
@@ -70,10 +71,16 @@ public class UserService {
         int insertUserInfo = userMapper.insertUserInfo(userDto.toBuilder()
                 .userPass(sha512(userDto.getUserPass())).build());
 
-        if (insertUserInfo > 0) {
-            return userMapper.getUserByUserId(userDto.getUserId());
+        if (insertUserInfo <= 0) {
+            throw new Exception("사용자 등록 실패했습니다 : " + userDto.getUserId());
         }
-        return null;
+
+        UserDto userByUserId = userMapper.getUserByUserId(userDto.getUserId());
+        if (userByUserId == null) {
+            throw new Exception("해당 사용자 정보가 없습니다.");
+        }
+
+        return userByUserId;
     }
 
 
@@ -86,7 +93,10 @@ public class UserService {
             throw new Exception("관리자 계정은 삭제할 수 없습니다.");
         }
 
-        userMapper.deleteUserInfo(userDto);
+        int deleted = userMapper.deleteUserInfo(userDto);
+        if (deleted <= 0) {
+            throw new Exception("사용자 삭제 실패했습니다 : " + userDto.getUserId());
+        }
     }
 
 
@@ -186,6 +196,9 @@ public class UserService {
      *  비밀번호 실패 횟수 리셋
      */
     public void updatePwdFcntZero(UserDto userDto) throws Exception {
-        userMapper.updatePwdFcnt("0", userDto.getUserId());
+        int updated = userMapper.updatePwdFcnt("0", userDto.getUserId());
+        if (updated <= 0) {
+            throw new Exception("비밀번호 실패 횟수 초기화 실패했습니다.");
+        }
     }
 }
