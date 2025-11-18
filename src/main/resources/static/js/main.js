@@ -35,7 +35,7 @@ function updateInfo() {
                 <div class="userInfo-content">
                     <p>
                         <label>아이디</label>
-                        <input type="text" id="userId">
+                        <input type="text" id="userId" readonly>
                     </p>
                     <p>
                         <label>이름</label>
