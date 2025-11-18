@@ -36,40 +36,27 @@ public class MenuController {
     
     @Description("메뉴 관리 수정")
     @PutMapping
-    public ResponseEntity<?> updateMenuInfo(@RequestBody MenuDto menuDto, HttpSession session) {
-        try {
-            UserDto userDto = (UserDto) session.getAttribute("loginUser");
+    public ResponseEntity<?> updateMenuInfo(@RequestBody MenuDto menuDto, HttpSession session) throws Exception {
+        UserDto userDto = (UserDto) session.getAttribute("loginUser");
 
-            MenuDto updatedUserInfo = menuService.updateMenuInfo(menuDto, userDto);
-            return ResponseEntity.ok(updatedUserInfo);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+        MenuDto updatedUserInfo = menuService.updateMenuInfo(menuDto, userDto);
+        return ResponseEntity.ok(updatedUserInfo);
 
     }
 
     @Description("메뉴 관리 등록")
     @PostMapping
-    public ResponseEntity<?> insertMenuInfo(@RequestBody MenuDto menuDto, HttpSession session) {
-        try {
+    public ResponseEntity<?> insertMenuInfo(@RequestBody MenuDto menuDto, HttpSession session) throws Exception {
             UserDto userDto = (UserDto) session.getAttribute("loginUser");
             MenuDto insertMenuDto = menuService.insertMenuInfo(menuDto, userDto);
             return ResponseEntity.ok(insertMenuDto);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
     }
 
     @Description("메뉴 관리 삭제")
     @DeleteMapping
-    public ResponseEntity<?> deleteMenuInfo(@RequestBody MenuDto menuDto) {
-        try {
+    public ResponseEntity<?> deleteMenuInfo(@RequestBody MenuDto menuDto) throws Exception {
             menuService.deleteMenuInfo(menuDto);
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
-
     }
 
 

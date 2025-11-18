@@ -7,6 +7,8 @@ import document.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +30,7 @@ public class MenuAuthService {
     /**
      * 메뉴 권한 수정
      * */
-    public MenuAuthDto updateMenuAuthInfo(MenuAuthDto menuAuthDto, UserDto userDto) {
+    public MenuAuthDto updateMenuAuthInfo(MenuAuthDto menuAuthDto, UserDto userDto) throws Exception {
 
         MenuAuthDto updateMenuAuthDto = menuAuthDto.toBuilder()
                 .uptId(userDto.getUserId())
@@ -36,11 +38,17 @@ public class MenuAuthService {
 
         int updated = menuAuthMapper.updateMenuAuthInfo(updateMenuAuthDto);
 
-        if (updated > 0) {
-            return menuAuthMapper.getMenuMgmtByPermitId(updateMenuAuthDto);
+        if (updated <= 0) {
+            throw new Exception("메뉴 권한 업데이트에 실패했습니다.");
         }
 
-        return null;
+        MenuAuthDto result = menuAuthMapper.getMenuMgmtByPermitId(updateMenuAuthDto);
+
+        if (result == null) {
+            throw new Exception("업데이트된 메뉴 권한 정보를 조회할 수 없습니다.");
+        }
+
+        return result;
     }
 
 
@@ -63,19 +71,29 @@ public class MenuAuthService {
 
         int inserted = menuAuthMapper.insertMenuAuthInfo(insertMenuAuthDto);
 
-        if (inserted > 0) {
-            return menuAuthMapper.getMenuMgmtByPermitId(insertMenuAuthDto);
+        if (inserted <= 0) {
+            throw new Exception("메뉴 권한 등록에 실패했습니다.");
         }
 
-        return null;
+        MenuAuthDto result = menuAuthMapper.getMenuMgmtByPermitId(insertMenuAuthDto);
+
+        if (result == null) {
+            throw new Exception("등록된 메뉴 권한 정보를 조회할 수 없습니다.");
+        }
+
+        return result;
     }
 
 
     /**
      * 메뉴 권한 삭제
      * */
-    public void deleteMenuAuthInfo(MenuAuthDto menuAuthDto) {
-        menuAuthMapper.deleteMenuAuthInfo(menuAuthDto);
+    public void deleteMenuAuthInfo(MenuAuthDto menuAuthDto) throws Exception {
+        int deleted = menuAuthMapper.deleteMenuAuthInfo(menuAuthDto);
+
+        if (deleted <= 0) {
+            throw new Exception("메뉴 권한 삭제에 실패했습니다.");
+        }
     }
 
 
@@ -90,15 +108,20 @@ public class MenuAuthService {
     /**
      * 메뉴 권한 등록 리스트 삭제
      * */
-    public void deletePermitDetail(MenuAuthDto menuAuthDto) {
-        menuAuthMapper.deletePermitDetail(menuAuthDto);
+    public void deletePermitDetail(MenuAuthDto menuAuthDto) throws Exception {
+        int deleted = menuAuthMapper.deletePermitDetail(menuAuthDto);
+
+        if (deleted <= 0) {
+            throw new Exception("메뉴 권한 상세 삭제에 실패했습니다.");
+        }
     }
 
 
     /**
      * 메뉴 사용 여부 결정
      * */
-    public void insertMenuAuthUse(List<UseMenuDto> menuList, UserDto userDto) {
+    @Transactional(rollbackFor = Exception.class)
+    public void insertMenuAuthUse(List<UseMenuDto> menuList, UserDto userDto) throws Exception {
 
         String permitId = menuList.get(0).getPermitId();
 
@@ -125,12 +148,18 @@ public class MenuAuthService {
 
             // menuId가 DB에 존재하고 realUse=0 → 삭제
             if (exist && "0".equals(menu.getRealUse())) {
-                menuAuthMapper.deletePermitDetail(menuAuthDto);
+                int deleted = menuAuthMapper.deletePermitDetail(menuAuthDto);
+                if (deleted <= 0) {
+                    throw new Exception("메뉴 권한 삭제에 실패했습니다.");
+                }
             }
 
             // menuId가 DB에 없고고 realUse=1 → 추가
             if (!exist && "1".equals(menu.getRealUse())) {
-                menuAuthMapper.insertTbPermitDetail(menuAuthDto);
+                int inserted = menuAuthMapper.insertTbPermitDetail(menuAuthDto);
+                if (inserted <= 0) {
+                    throw new Exception("메뉴 권한 추가에 실패했습니다.");
+                }
             }
         }
     }

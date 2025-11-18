@@ -29,38 +29,26 @@ public class MenuAuthController {
 
     @Description("메뉴 권한 관리 수정")
     @PutMapping
-    public ResponseEntity<?> updateMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto, HttpSession session) {
-        try {
-            UserDto userDto = (UserDto) session.getAttribute("loginUser");
-            MenuAuthDto updateMenuAuthDto = menuAuthService.updateMenuAuthInfo(menuAuthDto, userDto);
-            return ResponseEntity.ok(updateMenuAuthDto);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> updateMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto, HttpSession session) throws Exception {
+        UserDto userDto = (UserDto) session.getAttribute("loginUser");
+        MenuAuthDto updateMenuAuthDto = menuAuthService.updateMenuAuthInfo(menuAuthDto, userDto);
+        return ResponseEntity.ok(updateMenuAuthDto);
 
     }
 
     @Description("메뉴 권한 관리 등록")
     @PostMapping
-    public ResponseEntity<?> insertMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto, HttpSession session) {
-        try {
-            UserDto userDto = (UserDto) session.getAttribute("loginUser");
-            MenuAuthDto insertMenuAuthDto = menuAuthService.insertMenuAuthInfo(menuAuthDto,userDto);
-            return ResponseEntity.ok(insertMenuAuthDto);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> insertMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto, HttpSession session) throws Exception {
+        UserDto userDto = (UserDto) session.getAttribute("loginUser");
+        MenuAuthDto insertMenuAuthDto = menuAuthService.insertMenuAuthInfo(menuAuthDto,userDto);
+        return ResponseEntity.ok(insertMenuAuthDto);
     }
 
     @Description("메뉴 권한 관리 삭제")
     @DeleteMapping
-    public ResponseEntity<?> deleteMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto) {
-        try {
-            menuAuthService.deleteMenuAuthInfo(menuAuthDto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> deleteMenuAuthInfo(@RequestBody MenuAuthDto menuAuthDto) throws Exception {
+        menuAuthService.deleteMenuAuthInfo(menuAuthDto);
+        return ResponseEntity.ok().build();
 
     }
 
@@ -73,26 +61,18 @@ public class MenuAuthController {
 
     @Description("메뉴 권한 관리 삭제")
     @PostMapping("/permitDetailDelete")
-    public ResponseEntity<?> deletePermitDetail(@RequestBody MenuAuthDto menuAuthDto) {
-        try {
-            menuAuthService.deletePermitDetail(menuAuthDto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> deletePermitDetail(@RequestBody MenuAuthDto menuAuthDto) throws Exception {
+        menuAuthService.deletePermitDetail(menuAuthDto);
+        return ResponseEntity.ok().build();
 
     }
 
     @Description("권한 아이디 마다 메뉴 사용 여부 결정")
     @PostMapping("/menuUseinsert")
-    public ResponseEntity<?> insertMenuAuthUse(@RequestBody List<UseMenuDto> menuList, HttpSession session) {
-        try {
-            UserDto userDto = (UserDto) session.getAttribute("loginUser");
-            menuAuthService.insertMenuAuthUse(menuList, userDto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> insertMenuAuthUse(@RequestBody List<UseMenuDto> menuList, HttpSession session) throws Exception {
+        UserDto userDto = (UserDto) session.getAttribute("loginUser");
+        menuAuthService.insertMenuAuthUse(menuList, userDto);
+        return ResponseEntity.ok().build();
     }
 
 }

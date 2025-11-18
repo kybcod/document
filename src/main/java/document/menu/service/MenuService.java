@@ -51,10 +51,14 @@ public class MenuService {
 
         int updateMenuInfo = menuMapper.updateMenuInfo(updateMenuDto);
 
-        if (updateMenuInfo > 0 ) {
-            return menuMapper.getMenuByMenuId(updateMenuDto.getMenuId()).get(0);
+        if (updateMenuInfo <= 0 ) {
+            throw new Exception("메뉴 업데이트에 실패했습니다.");
         }
-        return null;
+
+        return menuMapper.getMenuByMenuId(updateMenuDto.getMenuId())
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new Exception("메뉴 정보를 가져올 수 없습니다."));
     }
 
     /**
@@ -89,11 +93,14 @@ public class MenuService {
 
         menuAuthMapper.insertTbPermitDetail(menuAuthDto);
 
-        if (insertUserInfo > 0) {
-            return menuMapper.getMenuByMenuId(menuDto.getMenuId()).get(0);
+        if (insertUserInfo <= 0) {
+            throw new Exception("메뉴 추가에 실패했습니다.");
         }
 
-        return null;
+        return menuMapper.getMenuByMenuId(menuDto.getMenuId())
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new Exception("메뉴 조회에 실패했습니다."));
     }
 
 
@@ -101,13 +108,13 @@ public class MenuService {
      * 메뉴 삭제
      * */
     @Transactional(rollbackFor = Exception.class)
-    public void deleteMenuInfo(MenuDto menuDto) {
+    public void deleteMenuInfo(MenuDto menuDto) throws Exception {
 
-        // 무조건 자기 자신 삭제
-        menuMapper.deleteMenuById(menuDto.getMenuId());
+        int deleted = menuMapper.deleteMenuById(menuDto.getMenuId());
+        if (deleted == 0) {
+            throw new Exception("삭제할 메뉴가 존재하지 않습니다.");
+        }
 
-
-        // 상위 메뉴가 삭제 시 하위 메뉴들도 삭제
         if ("0000".equals(menuDto.getMenuGroup())) {
             List<MenuDto> childIds = menuMapper.findChildren(menuDto.getMenuId());
             for (MenuDto childId : childIds) {
@@ -115,13 +122,16 @@ public class MenuService {
             }
         }
 
-        // TB_PREMITDETAIL에서도 삭제
         MenuAuthDto menuAuthDto = MenuAuthDto.builder()
                 .menuId(menuDto.getMenuId())
                 .build();
-        menuAuthMapper.deleteTbPermitDByMenuId(menuAuthDto);
 
+        int authDeleted = menuAuthMapper.deleteTbPermitDByMenuId(menuAuthDto);
+        if (authDeleted == 0) {
+            throw new Exception("권한 삭제에 실패했습니다.");
+        }
     }
+
 
     /**
      * 사용 중인 메뉴 리스트

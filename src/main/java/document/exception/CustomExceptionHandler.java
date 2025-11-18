@@ -1,19 +1,21 @@
 package document.exception;
 
 import document.exception.dto.ExceptionResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-
+@Slf4j
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
     @ExceptionHandler(Exception.class) // Exception 터지면 작동
     public ResponseEntity<?> apiException(Exception e) {
         e.printStackTrace();
+        log.info("exception: {}", e);
         return new ResponseEntity<>(new ExceptionResponseDTO<>(-1,e.getMessage(),null), HttpStatus.BAD_REQUEST);
     }
 

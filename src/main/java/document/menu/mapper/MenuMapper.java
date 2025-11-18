@@ -13,7 +13,7 @@ public interface MenuMapper {
     List<MenuDto> getMenuByMenuId(String menuId);
     int updateMenuInfo(MenuDto menuDto);
     int insertMenuInfo(MenuDto menuDto);
-    void deleteMenuById(String menuId);
+    int deleteMenuById(String menuId);
     List<MenuDto> findChildren(String menuId);
     List<MenuDto> getMenuByMenuGroup(String menuGroup);
     List<UseMenuDto> getMenuWithPermitFlag(UseMenuDto menuDto);

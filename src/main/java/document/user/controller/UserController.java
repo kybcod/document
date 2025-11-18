@@ -38,36 +38,24 @@ public class UserController {
 
     @Description("사용자 관리 User 수정")
     @PutMapping
-    public ResponseEntity<?> updateUserList(@RequestBody UserDto userDto) {
-        try {
-            UserDto updatedUserInfo = userService.updateUserInfo(userDto);
-            return ResponseEntity.ok(updatedUserInfo);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> updateUserList(@RequestBody UserDto userDto) throws Exception {
+        UserDto updatedUserInfo = userService.updateUserInfo(userDto);
+        return ResponseEntity.ok(updatedUserInfo);
 
     }
 
     @Description("사용자 관리 User 등록")
     @PostMapping
-    public ResponseEntity<?> insertUserInfo(@RequestBody UserDto userDto) {
-        try {
-            UserDto insertUserDto = userService.insertUserInfo(userDto);
-            return ResponseEntity.ok(insertUserDto);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> insertUserInfo(@RequestBody UserDto userDto) throws Exception {
+        UserDto insertUserDto = userService.insertUserInfo(userDto);
+        return ResponseEntity.ok(insertUserDto);
     }
 
     @Description("사용자 관리 User 삭제")
     @DeleteMapping
-    public ResponseEntity<?> deleteUserInfo(@RequestBody UserDto userDto) {
-        try {
-            userService.deleteUserInfo(userDto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> deleteUserInfo(@RequestBody UserDto userDto) throws Exception {
+        userService.deleteUserInfo(userDto);
+        return ResponseEntity.ok().build();
 
     }
 
@@ -82,27 +70,18 @@ public class UserController {
 
     @Description("암호 변경")
     @PostMapping("/changePassword")
-    public ResponseEntity<?> changePassword(@RequestBody UserDto userDto){
-
-        try {
-            UserDto changeUser = userService.changePassword(userDto);
-            return ResponseEntity.ok(changeUser);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> changePassword(@RequestBody UserDto userDto) throws Exception {
+        UserDto changeUser = userService.changePassword(userDto);
+        return ResponseEntity.ok(changeUser);
     }
 
 
 
     @Description("실패 횟수 리셋")
     @PutMapping("/updatePwdFcntZero")
-    public ResponseEntity<?> updatePwdFcntZero(@RequestBody UserDto userDto) {
-        try {
-             userService.updatePwdFcntZero(userDto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> updatePwdFcntZero(@RequestBody UserDto userDto) throws Exception {
+         userService.updatePwdFcntZero(userDto);
+        return ResponseEntity.ok().build();
 
     }
 

@@ -9,11 +9,11 @@ import java.util.List;
 public interface DocMapper {
     List<DocDto> getDocList(DocDto docDto);
 
-    void deleteDoc(DocDto docDto);
+    int deleteDoc(DocDto docDto);
 
     DocDto getDocrByDocId(DocDto docDto);
 
     int insertDoc(DocDto docDto);
 
-    void updateTrans(DocDto docDto);
+    int updateTrans(DocDto docDto);
 }

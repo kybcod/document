@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -28,38 +30,25 @@ public class DocController {
     @Description("문서 등록")
     @PostMapping
     public ResponseEntity<?> uploadDoc(@ModelAttribute DocDto docDto,
-                                       HttpSession session) {
-        try {
-            UserDto userDto = (UserDto) session.getAttribute("loginUser");
-            docService.saveDocument(docDto,userDto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+                                       HttpSession session) throws Exception {
+        UserDto userDto = (UserDto) session.getAttribute("loginUser");
+        docService.saveDocument(docDto,userDto);
+        return ResponseEntity.ok().build();
     }
 
     @Description("문서 삭제")
     @DeleteMapping
-    public ResponseEntity<?> deleteDoc(@RequestBody DocDto docDto) {
-        try {
-            docService.deleteDoc(docDto);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
-
+    public ResponseEntity<?> deleteDoc(@RequestBody DocDto docDto) throws Exception {
+        docService.deleteDoc(docDto);
+        return ResponseEntity.ok().build();
     }
 
 
     @Description("문서 변환")
     @PostMapping("/transfer")
-    public ResponseEntity<?> transferDoc(@RequestBody DocDto docDto) {
-        try {
-            String message = docService.apiTransfer(docDto);
-            return ResponseEntity.ok(message);
-        } catch (Exception e) {
-            return ResponseEntity.status(404).body(e.getMessage());
-        }
+    public ResponseEntity<?> transferDoc(@RequestBody DocDto docDto) throws Exception {
+        String message = docService.apiTransfer(docDto);
+        return ResponseEntity.ok(message);
 
     }
 

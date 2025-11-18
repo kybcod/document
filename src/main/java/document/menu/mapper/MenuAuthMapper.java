@@ -12,9 +12,9 @@ public interface MenuAuthMapper {
     int updateMenuAuthInfo(MenuAuthDto menuAuthDto);
     int insertMenuAuthInfo(MenuAuthDto menuAuthDto);
     MenuAuthDto getMenuMgmtByPermitId(MenuAuthDto updateMenuAuthDto);
-    void deleteMenuAuthInfo(MenuAuthDto menuAuthDto);
-    void deletePermitDetail(MenuAuthDto menuAuthDto);
-    void insertTbPermitDetail(MenuAuthDto menuAuthDto);
+    int deleteMenuAuthInfo(MenuAuthDto menuAuthDto);
+    int deletePermitDetail(MenuAuthDto menuAuthDto);
+    int insertTbPermitDetail(MenuAuthDto menuAuthDto);
 
-    void deleteTbPermitDByMenuId(MenuAuthDto menuAuthDto);
+    int deleteTbPermitDByMenuId(MenuAuthDto menuAuthDto);
 }

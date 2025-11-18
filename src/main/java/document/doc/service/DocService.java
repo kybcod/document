@@ -64,16 +64,24 @@ public class DocService {
 
 
     /**
-     * 사용자 정보 삭제
+     * 문서 삭제
      */
-    public void deleteDoc(DocDto docDto) throws IOException {
+    public void deleteDoc(DocDto docDto) throws Exception {
+
 
         Path filePath = Paths.get(docDto.getDocFilepath());
         if (Files.exists(filePath)) {
-            Files.delete(filePath);
+            try {
+                Files.delete(filePath);
+            } catch (IOException e) {
+                throw new Exception("파일 삭제 실패: " + filePath.toString(), e);
+            }
         }
 
-        docMapper.deleteDoc(docDto);
+        int deleted = docMapper.deleteDoc(docDto);
+        if (deleted <= 0) {
+            throw new Exception("문서 DB 삭제 실패. docId: " + docDto.getDocId());
+        }
     }
 
 
@@ -117,7 +125,10 @@ public class DocService {
                 .build();
 
 
-        docMapper.insertDoc(insertDocDto);
+        int inserted = docMapper.insertDoc(insertDocDto);
+        if (inserted <= 0) {
+            throw new Exception("문서 등록에 실패했습니다. docName: " + docDto.getDocName());
+        }
     }
 
 
@@ -358,18 +369,26 @@ public class DocService {
             case SUCCESS:
                 mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
 
-                docMapper.updateTrans(docDto.toBuilder()
+                int updated = docMapper.updateTrans(docDto.toBuilder()
                         .docStatus(resultStatus.getDbCode())
                         .transHtml(mergedHtml)
                         .build());
 
+                if (updated <= 0) {
+                    throw new Exception("문서 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
+                }
+
                 return resultStatus.getMessage();
 
             default:
-                docMapper.updateTrans(docDto.toBuilder()
+                updated = docMapper.updateTrans(docDto.toBuilder()
                         .docStatus(TransStatus.FAILURE.getDbCode())
                         .transHtml(mergedHtml)
                         .build());
+
+                if (updated <= 0) {
+                    throw new Exception("문서 변환 실패 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
+                }
 
                 String errMsg = TransStatus.FAILURE.getMessage();
                 String detailedMsg = response != null ? response.getErrorMessage() : null;
@@ -408,9 +427,13 @@ public class DocService {
                 .block();
 
 
-        docMapper.updateTrans(docDto.toBuilder()
+        int updated = docMapper.updateTrans(docDto.toBuilder()
                 .transTaskid(task_id)
                 .build());
+
+        if (updated <= 0) {
+            throw new Exception("Task ID DB 업데이트 실패. docId: " + docDto.getDocId());
+        }
 
         // 상태를 TransStatus Enum으로 변환
         TransStatus transStatus = TransStatus.fromApiStatus(taskResponse.getStatus());
@@ -419,25 +442,36 @@ public class DocService {
         switch (transStatus) {
             case SUCCESS:
                 toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
-                docMapper.updateTrans(docDto.toBuilder()
+                updated = docMapper.updateTrans(docDto.toBuilder()
                         .docStatus(transStatus.getDbCode())
                         .transHtml(toHtml)
                         .build());
+                if (updated <= 0) {
+                    throw new Exception("PDF/IMG 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
+                }
                 return transStatus.getMessage();
 
             case PENDING:
-                docMapper.updateTrans(docDto.toBuilder()
+                updated  = docMapper.updateTrans(docDto.toBuilder()
                         .docStatus(transStatus.getDbCode())
                         .transHtml(toHtml)
                         .build());
+                if (updated <= 0) {
+                    throw new Exception("PDF/IMG PENDING 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
+                }
                 return transStatus.getMessage();
 
             case FAILURE:
             default:
-                docMapper.updateTrans(docDto.toBuilder()
+                updated = docMapper.updateTrans(docDto.toBuilder()
                         .docStatus(TransStatus.FAILURE.getDbCode())
                         .transHtml(toHtml)
                         .build());
+
+                if (updated <= 0) {
+                    throw new Exception("PDF/IMG 변환 실패 DB 업데이트 실패. docId: " + docDto.getDocId());
+                }
+
 
                 ObjectMapper mapper = new ObjectMapper();
                 String errMsg = transStatus.getMessage();

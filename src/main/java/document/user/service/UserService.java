@@ -177,7 +177,6 @@ public class UserService {
      * 전화번호 숫자로만 비교
      */
     private String integerPhone(String phone) {
-        log.info("phone {}", phone);
         return phone.replaceAll("[^0-9]", "");
     }
 
