@@ -881,10 +881,14 @@ ul.checktree span.count {
 	padding: 0 !important;
 }
 
-.search_inner_form th, td {
+.search_inner_form th,
+.search_inner_form td {
 	border: 0px solid white !important;
 	padding: 0 !important;
 }
+
+
+
 
 .search_inner_wid {
 	overflow: hidden;

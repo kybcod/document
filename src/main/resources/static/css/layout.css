@@ -1080,6 +1080,7 @@ button .text-primary {
 .submenu-item.depth-1 {
     font-size: 14px;
     padding-left: 40px;
+	color: black;
 }
 
 /* 중메뉴 토글 화살표 크기 조정 */
