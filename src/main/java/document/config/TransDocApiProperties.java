@@ -19,4 +19,7 @@ public class TransDocApiProperties {
 	private String hwp;
 	private String hwpHost;
 	private String hwpPort;
+	private String pptx;
+	private String pptxHost;
+	private String pptxPort;
 }

@@ -36,4 +36,24 @@ public enum TransStatus {
 
         return FAILURE;
     }
+
+    /**
+     * API 응답 객체 받아와 ENUM 찾기
+     * - ApiPptxResponse: full_html 필드 존재 여부로 SUCCESS/FAILURE 판단.
+     * - 그 외: status 필드를 기준으로 판단.
+     */
+    public static TransStatus fromApiResponse(ApiResponseBase response) {
+        if (response instanceof ApiPptxResponse) {
+            ApiPptxResponse pptxResponse = (ApiPptxResponse) response;
+            // PPTX 응답 객체의 경우: full_html 값이 유효하면 SUCCESS
+            if (pptxResponse.getFull_html() != null && !pptxResponse.getFull_html().trim().isEmpty()) {
+                return SUCCESS;
+            } else {
+                return FAILURE;
+            }
+        }
+
+        // PPTX 외 다른 응답 객체의 경우: status 필드를 사용하여 판단 (기존 API 방식)
+        return fromApiStatus(response.status);
+    }
 }

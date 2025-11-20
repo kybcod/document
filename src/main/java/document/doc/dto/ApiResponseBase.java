@@ -5,11 +5,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ApiResponseBase {
+public abstract class ApiResponseBase {
     public String status;
     public String html_content;
 
     public String getErrorMessage() {
         return null;
     }
+
+    public String getHtmlContent() {
+        return html_content;
+    }
+
 }

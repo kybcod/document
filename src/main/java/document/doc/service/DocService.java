@@ -185,7 +185,7 @@ public class DocService {
             case "ppt":
             case "pptx":
                 log.info("파워포인트 ppt, pptx 파일입니다.");
-                return "";
+                return transPptx( apiProps.getPptx(), docDto);
 
             case "txt":
                 log.info("텍스트 파일입니다.");
@@ -320,6 +320,35 @@ public class DocService {
     }
 
 
+
+    private String transPptx(String apiUrlPptx, DocDto docDto) throws Exception {
+
+        String pptxHost = apiProps.getPptxHost();
+        String pptxPort = apiProps.getPptxPort();
+
+        apiUrlPptx = buildApiUrl(pptxHost, pptxPort, apiUrlPptx);
+        WebClient webClient = createWebClient(apiUrlPptx);
+
+
+        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
+
+        // API 호출
+        ApiPptxResponse response = webClient.post()
+                .uri("/convert/")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file))
+                .retrieve()
+                .bodyToMono(ApiPptxResponse.class)
+                .doOnError(e -> e.printStackTrace())
+//                    .bodyToMono(String.class) //그냥  String 으로 받을때
+                .block();
+
+
+        return processConversionResponse(response, docDto);
+
+    }
+
+
     /**
      * 서버 접속 URL 생성
      */
@@ -361,13 +390,13 @@ public class DocService {
      */
     private <T extends ApiResponseBase> String processConversionResponse(T response, DocDto docDto) throws Exception {
 
-        TransStatus resultStatus = TransStatus.fromApiStatus(response.status);
+        TransStatus resultStatus = TransStatus.fromApiResponse(response);
         String mergedHtml = "";
 
         // 상태에 따라 분기 처리
         switch (resultStatus) {
             case SUCCESS:
-                mergedHtml = String.join("<!--PAGE_BREAK-->", response.html_content);
+                mergedHtml = String.join("<!--PAGE_BREAK-->", response.getHtmlContent());
 
                 int updated = docMapper.updateTrans(docDto.toBuilder()
                         .docStatus(resultStatus.getDbCode())

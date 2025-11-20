@@ -54,6 +54,10 @@ api:
     hwp: http://210.113.0.140:8129
     hwpHost: docuverse_hwp
     hwpPort: 8129
+    pptx: http://210.113.0.140:8120
+    pptxHost: docuverse_pptx
+    pptxPort: 8120
+
 
 servers:
   server1: 172.20.10.5
