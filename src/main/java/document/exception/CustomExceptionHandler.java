@@ -1,12 +1,23 @@
 package document.exception;
 
+import document.exception.Error.Error;
 import document.exception.dto.ExceptionResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static document.exception.Error.Error.ErrorMessage.getGroupedErrorMessage;
 
 @Slf4j
 @RestControllerAdvice
@@ -15,7 +26,6 @@ public class CustomExceptionHandler {
     @ExceptionHandler(Exception.class) // Exception 터지면 작동
     public ResponseEntity<?> apiException(Exception e) {
         e.printStackTrace();
-        log.info("exception: {}", e);
         return new ResponseEntity<>(new ExceptionResponseDTO<>(-1,e.getMessage(),null), HttpStatus.BAD_REQUEST);
     }
 
@@ -49,5 +59,14 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body("업로드 가능한 파일 크기를 초과했습니다. (최대 20MB)");
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> validationApiException(MethodArgumentNotValidException e) {
+
+        String msg = Error.ErrorMessage.getGroupedErrorMessage(e.getBindingResult().getFieldErrors());
+
+        return new ResponseEntity<>(new ExceptionResponseDTO<>(-1, msg, null), HttpStatus.BAD_REQUEST);
+    }
+
 
 }

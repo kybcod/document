@@ -9,12 +9,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("menu")
+@Validated
 public class MenuController {
 
     private final MenuService menuService;
@@ -36,7 +39,7 @@ public class MenuController {
     
     @Description("메뉴 관리 수정")
     @PutMapping
-    public ResponseEntity<?> updateMenuInfo(@RequestBody MenuDto menuDto, HttpSession session) throws Exception {
+    public ResponseEntity<?> updateMenuInfo(@Valid @RequestBody MenuDto menuDto, HttpSession session) throws Exception {
         UserDto userDto = (UserDto) session.getAttribute("loginUser");
 
         MenuDto updatedUserInfo = menuService.updateMenuInfo(menuDto, userDto);
@@ -46,7 +49,7 @@ public class MenuController {
 
     @Description("메뉴 관리 등록")
     @PostMapping
-    public ResponseEntity<?> insertMenuInfo(@RequestBody MenuDto menuDto, HttpSession session) throws Exception {
+    public ResponseEntity<?> insertMenuInfo(@Valid @RequestBody MenuDto menuDto, HttpSession session) throws Exception {
             UserDto userDto = (UserDto) session.getAttribute("loginUser");
             MenuDto insertMenuDto = menuService.insertMenuInfo(menuDto, userDto);
             return ResponseEntity.ok(insertMenuDto);
