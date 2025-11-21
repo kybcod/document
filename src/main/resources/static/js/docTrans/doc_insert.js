@@ -68,7 +68,7 @@ function docTransGridSetting() {
     dataGrid.setOnRowInserting(function(data, deferred) {
 
         const formData = new FormData();
-        formData.append('docName', data.docName);
+        formData.append('docName', data.docName ?? "");
         formData.append('ocryn', data.ocryn ? 1 : 0);
 
         const allowedExtensions = [
