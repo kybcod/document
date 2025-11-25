@@ -386,7 +386,7 @@ public class DocService {
                             .transHtml(mergedHtml)
                             .build());
 
-            throw new Exception("문서 변환 실패 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
+            throw new Exception("서버에서 시트 데이터를 받지 못했습니다.");
         }
 
         mergedHtml = response.stream()
@@ -399,7 +399,7 @@ public class DocService {
                 .build());
 
         if (updated <= 0) {
-            throw new Exception("문서 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
+            throw new Exception(TransStatus.FAILURE.getMessage());
         }
 
         return TransStatus.SUCCESS.getMessage();
