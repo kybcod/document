@@ -52,6 +52,15 @@ public enum TransStatus {
                 return FAILURE;
             }
         }
+        if (response instanceof ApiXlsxResponse) {
+            ApiXlsxResponse xlsxResponse = (ApiXlsxResponse) response;
+            // PPTX 응답 객체의 경우: full_html 값이 유효하면 SUCCESS
+            if (xlsxResponse.getSheet_html() != null && !xlsxResponse.getSheet_html().trim().isEmpty()) {
+                return SUCCESS;
+            } else {
+                return FAILURE;
+            }
+        }
 
         // PPTX 외 다른 응답 객체의 경우: status 필드를 사용하여 판단 (기존 API 방식)
         return fromApiStatus(response.status);

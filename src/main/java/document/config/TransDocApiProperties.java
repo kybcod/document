@@ -22,4 +22,7 @@ public class TransDocApiProperties {
 	private String pptx;
 	private String pptxHost;
 	private String pptxPort;
+    private String xlsx;
+    private String xlsxHost;
+    private String xlsxPort;
 }

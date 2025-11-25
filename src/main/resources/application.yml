@@ -57,6 +57,9 @@ api:
     pptx: http://210.113.0.140:8120
     pptxHost: docuverse_pptx
     pptxPort: 8120
+    xlsx: http://210.113.0.140:8230
+    xlsxHost: docuverse_xlsx
+    xlsxPort: 8230
 
 
 servers:

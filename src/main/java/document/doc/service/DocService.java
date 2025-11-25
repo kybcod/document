@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
 import reactor.netty.http.client.HttpClient;
 
 import java.nio.file.Files;
@@ -30,6 +31,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -180,7 +182,7 @@ public class DocService {
             case "xls":
             case "xlsx":
                 log.info("엑셀 xls, xlsx 파일입니다.");
-                return "";
+                return transXlsx(apiProps.getXlsx(),docDto);
 
             case "ppt":
             case "pptx":
@@ -348,6 +350,36 @@ public class DocService {
 
     }
 
+    public String transXlsx(String apiUrlXlsx, DocDto docDto) throws Exception {
+
+        String XlsxHost = apiProps.getXlsxHost();
+        String XlsxPort = apiProps.getXlsxPort();
+
+        apiUrlXlsx = buildApiUrl(XlsxHost, XlsxPort, apiUrlXlsx);
+        WebClient webClient = createWebClient(apiUrlXlsx);
+
+        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
+
+        // API 호출
+        List<ApiXlsxResponse> response = webClient.post()
+                .uri("/convert")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file))
+                .retrieve()
+                .bodyToFlux(ApiXlsxResponse.class) // 배열을 Flux로
+                .collectList()                     // Flux -> List
+                .doOnError(e -> e.printStackTrace())
+//                    .bodyToMono(String.class) //그냥  String 으로 받을때
+                .block();
+
+        if (response == null) {
+            // 여기서 바로 로그 찍고 예외 던지기
+            throw new IllegalStateException("변환 API 응답이 null 입니다. (본문이 비어있음 또는 오류 처리 중 Mono.empty() 반환)");
+        }
+
+        return processConversionResponse(response, docDto);
+    }
+
 
     /**
      * 서버 접속 URL 생성
@@ -428,6 +460,27 @@ public class DocService {
                 throw new Exception(errMsg);
         }
     }
+
+    /**
+     * 엑셀 변환용
+     */
+    private <T extends ApiResponseBase> String processConversionResponse(List<T> responses, DocDto docDto) throws Exception {
+
+        if (responses == null || responses.isEmpty()) {
+            throw new Exception("API 응답 리스트가 비어있습니다.");
+        }
+
+        if (responses.size() > 1) {
+            // 2건 이상이면 무조건 예외
+            throw new Exception("API 응답이 2건 이상입니다. 현재 로직은 1건만 지원합니다. size=" + responses.size());
+        }
+
+        // 딱 1건만 들어온 경우 → 기존 단일 버전 그대로 사용
+        T response = responses.get(0);
+        return processConversionResponse(response, docDto);
+    }
+
+
 
 
     /**

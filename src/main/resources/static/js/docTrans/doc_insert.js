@@ -72,7 +72,7 @@ function docTransGridSetting() {
         formData.append('ocryn', data.ocryn ? 1 : 0);
 
         const allowedExtensions = [
-            '.doc', '.docx', '.txt', '.xlx', '.xlxs',
+            '.doc', '.docx', '.txt', '.xls', '.xlsx',
             '.ppt', '.pptx', '.hwp', '.gif', '.jpeg', '.jpg', '.png', '.bmp', '.pdf'
         ];
 
