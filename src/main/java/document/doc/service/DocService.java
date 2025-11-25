@@ -34,6 +34,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -372,12 +373,36 @@ public class DocService {
 //                    .bodyToMono(String.class) //그냥  String 으로 받을때
                 .block();
 
-        if (response == null) {
-            // 여기서 바로 로그 찍고 예외 던지기
-            throw new IllegalStateException("변환 API 응답이 null 입니다. (본문이 비어있음 또는 오류 처리 중 Mono.empty() 반환)");
+        return processConversionXlsxResponse(response, docDto);
+    }
+
+    private String processConversionXlsxResponse(List<ApiXlsxResponse> response, DocDto docDto) throws Exception {
+        String mergedHtml = "";
+
+        if (response == null || response.isEmpty()) {
+            // fail 업데이트 로직
+            docMapper.updateTrans(docDto.toBuilder()
+                            .docStatus(TransStatus.FAILURE.getDbCode())
+                            .transHtml(mergedHtml)
+                            .build());
+
+            throw new Exception("문서 변환 실패 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
         }
 
-        return processConversionResponse(response, docDto);
+        mergedHtml = response.stream()
+                .map(r -> "<h1>" + r.getSheet_name() + "</h1>" + r.getSheet_html())
+                .collect(Collectors.joining("<!--PAGE_BREAK-->"));
+
+        int updated = docMapper.updateTrans(docDto.toBuilder()
+                .docStatus(TransStatus.SUCCESS.getDbCode())
+                .transHtml(mergedHtml)
+                .build());
+
+        if (updated <= 0) {
+            throw new Exception("문서 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
+        }
+
+        return TransStatus.SUCCESS.getMessage();
     }
 
 
