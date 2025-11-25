@@ -299,8 +299,7 @@ public class DocService {
                     .build());
 
             throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
-
-
+            
         }
 
         String uriSet = "";
@@ -322,8 +321,9 @@ public class DocService {
         return processConversionPdfResponse(docDto, response.task_id, webClient);
     }
 
-
-
+    /**
+     * Pptx API 변환 요청
+     */
     private String transPptx(String apiUrlPptx, DocDto docDto) throws Exception {
 
         String pptxHost = apiProps.getPptxHost();
@@ -351,6 +351,9 @@ public class DocService {
 
     }
 
+    /**
+     * Xlsx API 변환 요청
+     */
     public String transXlsx(String apiUrlXlsx, DocDto docDto) throws Exception {
 
         String XlsxHost = apiProps.getXlsxHost();
@@ -386,36 +389,12 @@ public class DocService {
         return processConversionXlsxResponse(response, docDto);
     }
 
-    private String processConversionXlsxResponse(List<ApiXlsxResponse> response, DocDto docDto) throws Exception {
-        String mergedHtml = "";
 
-        if (response == null || response.isEmpty()) {
-            // fail 업데이트 로직
-            docMapper.updateTrans(docDto.toBuilder()
-                            .docStatus(TransStatus.FAILURE.getDbCode())
-                            .transHtml(mergedHtml)
-                            .build());
-
-            throw new Exception("서버에서 시트 데이터를 받지 못했습니다.");
-        }
-
-        mergedHtml = response.stream()
-                .map(r -> "<h1>" + r.getSheet_name() + "</h1>" + r.getSheet_html())
-                .collect(Collectors.joining("<!--PAGE_BREAK-->"));
-
-        int updated = docMapper.updateTrans(docDto.toBuilder()
-                .docStatus(TransStatus.SUCCESS.getDbCode())
-                .transHtml(mergedHtml)
-                .build());
-
-        if (updated <= 0) {
-            throw new Exception(TransStatus.FAILURE.getMessage());
-        }
-
-        return TransStatus.SUCCESS.getMessage();
-    }
-
-
+    
+    
+    
+    
+    
     /**
      * 서버 접속 URL 생성
      */
@@ -499,23 +478,34 @@ public class DocService {
     /**
      * 엑셀 변환용
      */
-    private <T extends ApiResponseBase> String processConversionResponse(List<T> responses, DocDto docDto) throws Exception {
+    private String processConversionXlsxResponse(List<ApiXlsxResponse> response, DocDto docDto) throws Exception {
+        String mergedHtml = "";
 
-        if (responses == null || responses.isEmpty()) {
-            throw new Exception("API 응답 리스트가 비어있습니다.");
+        if (response == null || response.isEmpty()) {
+            // fail 업데이트 로직
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.FAILURE.getDbCode())
+                    .transHtml(mergedHtml)
+                    .build());
+
+            throw new Exception("서버에서 시트 데이터를 받지 못했습니다.");
         }
 
-        if (responses.size() > 1) {
-            // 2건 이상이면 무조건 예외
-            throw new Exception("API 응답이 2건 이상입니다. 현재 로직은 1건만 지원합니다. size=" + responses.size());
+        mergedHtml = response.stream()
+                .map(r -> "<h1>" + r.getSheet_name() + "</h1>" + r.getSheet_html())
+                .collect(Collectors.joining("<!--PAGE_BREAK-->"));
+
+        int updated = docMapper.updateTrans(docDto.toBuilder()
+                .docStatus(TransStatus.SUCCESS.getDbCode())
+                .transHtml(mergedHtml)
+                .build());
+
+        if (updated <= 0) {
+            throw new Exception(TransStatus.FAILURE.getMessage());
         }
 
-        // 딱 1건만 들어온 경우 → 기존 단일 버전 그대로 사용
-        T response = responses.get(0);
-        return processConversionResponse(response, docDto);
+        return TransStatus.SUCCESS.getMessage();
     }
-
-
 
 
     /**
