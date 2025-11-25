@@ -361,6 +361,16 @@ public class DocService {
 
         FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
 
+
+        if (!file.exists()) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.NOFILE.getDbCode())
+                    .build());
+
+            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
+        }
+
         // API 호출
         List<ApiXlsxResponse> response = webClient.post()
                 .uri("/convert")
