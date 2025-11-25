@@ -422,7 +422,7 @@ public class DocService {
      */
     private <T extends ApiResponseBase> String processConversionResponse(T response, DocDto docDto) throws Exception {
 
-        TransStatus resultStatus = TransStatus.fromApiResponse(response);
+        TransStatus resultStatus = TransStatus.fromApiStatus(response);
         String mergedHtml = "";
 
         // 상태에 따라 분기 처리
@@ -518,7 +518,7 @@ public class DocService {
         }
 
         // 상태를 TransStatus Enum으로 변환
-        TransStatus transStatus = TransStatus.fromApiStatus(taskResponse.getStatus());
+        TransStatus transStatus = TransStatus.fromApiStatus(taskResponse);
 
         // 상태별 처리
         switch (transStatus) {
