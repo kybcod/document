@@ -376,35 +376,6 @@ public class DocService {
         return processConversionXlsxResponse(response, docDto);
     }
 
-    private String processConversionXlsxResponse(List<ApiXlsxResponse> response, DocDto docDto) throws Exception {
-        String mergedHtml = "";
-
-        if (response == null || response.isEmpty()) {
-            // fail 업데이트 로직
-            docMapper.updateTrans(docDto.toBuilder()
-                            .docStatus(TransStatus.FAILURE.getDbCode())
-                            .transHtml(mergedHtml)
-                            .build());
-
-            throw new Exception("문서 변환 실패 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
-        }
-
-        mergedHtml = response.stream()
-                .map(r -> "<h1>" + r.getSheet_name() + "</h1>" + r.getSheet_html())
-                .collect(Collectors.joining("<!--PAGE_BREAK-->"));
-
-        int updated = docMapper.updateTrans(docDto.toBuilder()
-                .docStatus(TransStatus.SUCCESS.getDbCode())
-                .transHtml(mergedHtml)
-                .build());
-
-        if (updated <= 0) {
-            throw new Exception("문서 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
-        }
-
-        return TransStatus.SUCCESS.getMessage();
-    }
-
 
     /**
      * 서버 접속 URL 생성
@@ -489,20 +460,33 @@ public class DocService {
     /**
      * 엑셀 변환용
      */
-    private <T extends ApiResponseBase> String processConversionResponse(List<T> responses, DocDto docDto) throws Exception {
+    private String processConversionXlsxResponse(List<ApiXlsxResponse> response, DocDto docDto) throws Exception {
+        String mergedHtml = "";
 
-        if (responses == null || responses.isEmpty()) {
-            throw new Exception("API 응답 리스트가 비어있습니다.");
+        if (response == null || response.isEmpty()) {
+            // fail 업데이트 로직
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.FAILURE.getDbCode())
+                    .transHtml(mergedHtml)
+                    .build());
+
+            throw new Exception("문서 변환 실패 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
         }
 
-        if (responses.size() > 1) {
-            // 2건 이상이면 무조건 예외
-            throw new Exception("API 응답이 2건 이상입니다. 현재 로직은 1건만 지원합니다. size=" + responses.size());
+        mergedHtml = response.stream()
+                .map(r -> "<h1>" + r.getSheet_name() + "</h1>" + r.getSheet_html())
+                .collect(Collectors.joining("<!--PAGE_BREAK-->"));
+
+        int updated = docMapper.updateTrans(docDto.toBuilder()
+                .docStatus(TransStatus.SUCCESS.getDbCode())
+                .transHtml(mergedHtml)
+                .build());
+
+        if (updated <= 0) {
+            throw new Exception("문서 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
         }
 
-        // 딱 1건만 들어온 경우 → 기존 단일 버전 그대로 사용
-        T response = responses.get(0);
-        return processConversionResponse(response, docDto);
+        return TransStatus.SUCCESS.getMessage();
     }
 
 

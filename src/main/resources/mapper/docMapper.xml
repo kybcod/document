@@ -96,5 +96,24 @@
         WHERE DOC_ID = #{docId}
     </update>
 
+    <select id="getDocCountByStatus">
+        SELECT count(*)
+        FROM tb_document
+        WHERE DOC_STATUS = #{docStatus} AND TRANS_DT >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+    </select>
 
+    <select id="getDocListByServer">
+        SELECT DOC_ID,SAVE_FILENAME,DOC_FILEPATH,OCRYN
+        FROM tb_document
+        WHERE DOC_STATUS = 0 AND SERVER_NUM = #{serverNum}
+        ORDER BY CRT_DT ASC
+    </select>
+
+
+    <select id="getTaskList">
+        SELECT DOC_ID,TRANS_TASKID
+        FROM tb_document
+        WHERE DOC_STATUS = "3"
+        ORDER BY CRT_DT ASC
+    </select>
 </mapper>

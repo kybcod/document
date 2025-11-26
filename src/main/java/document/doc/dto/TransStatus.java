@@ -7,6 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TransStatus {
 
+
+    REGISTRY("0", "등록", null),
     SUCCESS("2", "변환 성공했습니다.", "SUCCESS"),
     PENDING("3", "변환 대기중입니다.", "PENDING"),
     FAILURE("9", "변환 중 문제가 발생했습니다.", null),
