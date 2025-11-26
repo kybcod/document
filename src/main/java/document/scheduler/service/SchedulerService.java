@@ -508,8 +508,6 @@ public class SchedulerService {
         }
     }
 
-
-
     /**
      * 서버 접속 URL 생성
      */
