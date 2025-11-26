@@ -300,7 +300,6 @@ public class DocService {
 
             throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
 
-
         }
 
         String uriSet = "";
@@ -322,8 +321,9 @@ public class DocService {
         return processConversionPdfResponse(docDto, response.task_id, webClient);
     }
 
-
-
+    /**
+     * Pptx API 변환 요청
+     */
     private String transPptx(String apiUrlPptx, DocDto docDto) throws Exception {
 
         String pptxHost = apiProps.getPptxHost();
@@ -351,6 +351,9 @@ public class DocService {
 
     }
 
+    /**
+     * Xlsx API 변환 요청
+     */
     public String transXlsx(String apiUrlXlsx, DocDto docDto) throws Exception {
 
         String XlsxHost = apiProps.getXlsxHost();
@@ -360,6 +363,16 @@ public class DocService {
         WebClient webClient = createWebClient(apiUrlXlsx);
 
         FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
+
+
+        if (!file.exists()) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.NOFILE.getDbCode())
+                    .build());
+
+            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
+        }
 
         // API 호출
         List<ApiXlsxResponse> response = webClient.post()
@@ -375,6 +388,11 @@ public class DocService {
 
         return processConversionXlsxResponse(response, docDto);
     }
+
+
+
+
+
 
 
     /**
@@ -470,7 +488,7 @@ public class DocService {
                     .transHtml(mergedHtml)
                     .build());
 
-            throw new Exception("문서 변환 실패 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
+            throw new Exception("서버에서 시트 데이터를 받지 못했습니다.");
         }
 
         mergedHtml = response.stream()
@@ -483,7 +501,7 @@ public class DocService {
                 .build());
 
         if (updated <= 0) {
-            throw new Exception("문서 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
+            throw new Exception(TransStatus.FAILURE.getMessage());
         }
 
         return TransStatus.SUCCESS.getMessage();
