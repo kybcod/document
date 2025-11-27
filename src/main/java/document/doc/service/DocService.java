@@ -303,10 +303,10 @@ public class DocService {
      * PDF API 변환 요청
      */
     public String transPdf(String apiUrlPdf, DocDto docDto) throws Exception {
-        String hwpHost = apiProps.getHwpHost();
-        String hwpPort = apiProps.getHwpPort();
+        String pdfHost = apiProps.getPdfHost();
+        String pdfPort = apiProps.getPdfPort();
 
-        apiUrlPdf = buildApiUrl(hwpHost, hwpPort, apiUrlPdf);
+        apiUrlPdf = buildApiUrl(pdfHost, pdfPort, apiUrlPdf);
         WebClient webClient = createWebClient(apiUrlPdf);
 
         FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
