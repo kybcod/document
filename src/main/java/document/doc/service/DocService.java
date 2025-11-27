@@ -169,47 +169,65 @@ public class DocService {
         int dotIndex = saveFilename.lastIndexOf('.');
         ext = saveFilename.substring(dotIndex + 1);
 
-        switch (ext) {
-            case "doc":
-            case "docx":
-                log.info("doc, docx 파일입니다.");
-                return transDocx(apiProps.getDocx(), docDto);
+        if(docDto.getOcryn().equals("1")){
+            switch (ext) {
+                case "gif":
+                case "jpeg":
+                case "jpg":
+                case "png":
+                case "bmp":
+                    log.info("이미지 파일입니다.");
+                    return transOcr( apiProps.getOcr(),  docDto, "img");
 
-            case "hwp":
-                log.info("hwp 파일입니다.");
-                return transHwp(apiProps.getHwp(), docDto);
+                case "pdf":
+                    log.info("pdf 파일입니다.");
+                    return transOcr( apiProps.getOcr(),  docDto, "pdf");
+
+                default:
+                    throw new Exception("지원하지 않는 파일 형식입니다.");
+            }
+        } else {
+            switch (ext) {
+                case "doc":
+                case "docx":
+                    log.info("doc, docx 파일입니다.");
+                    return transDocx(apiProps.getDocx(), docDto);
+
+                case "hwp":
+                    log.info("hwp 파일입니다.");
+                    return transHwp(apiProps.getHwp(), docDto);
 
 
-            case "xls":
-            case "xlsx":
-                log.info("엑셀 xls, xlsx 파일입니다.");
-                return transXlsx(apiProps.getXlsx(),docDto);
+                case "xls":
+                case "xlsx":
+                    log.info("엑셀 xls, xlsx 파일입니다.");
+                    return transXlsx(apiProps.getXlsx(),docDto);
 
-            case "ppt":
-            case "pptx":
-                log.info("파워포인트 ppt, pptx 파일입니다.");
-                return transPptx( apiProps.getPptx(), docDto);
+                case "ppt":
+                case "pptx":
+                    log.info("파워포인트 ppt, pptx 파일입니다.");
+                    return transPptx( apiProps.getPptx(), docDto);
 
-            case "txt":
-                log.info("텍스트 파일입니다.");
-                return "";
+                case "txt":
+                    log.info("텍스트 파일입니다.");
+                    return "";
 
-            case "gif":
-            case "jpeg":
-            case "jpg":
-            case "png":
-            case "bmp":
-                log.info("이미지 파일입니다.");
-                return transPdf( apiProps.getOcr(),  docDto, "img");
+                case "gif":
+                case "jpeg":
+                case "jpg":
+                case "png":
+                case "bmp":
+                    log.info("이미지 파일입니다.");
+                    return transOcr( apiProps.getOcr(),  docDto, "img");
 
-            case "pdf":
-                log.info("pdf 파일입니다.");
-                return transPdf( apiProps.getOcr(),  docDto, "pdf");
+                case "pdf":
+                    log.info("pdf 파일입니다.");
+                    return transPdf( apiProps.getPdf(),  docDto);
 
-            default:
-                throw new Exception("지원하지 않는 파일 형식입니다.");
+                default:
+                    throw new Exception("지원하지 않는 파일 형식입니다.");
+            }
         }
-
     }
 
     /**
@@ -282,9 +300,44 @@ public class DocService {
     }
 
     /**
-     * PDF/IMG API 변환 요청
+     * PDF API 변환 요청
      */
-    public String transPdf(String apiUrlOcr, DocDto docDto, String fileType) throws Exception {
+    public String transPdf(String apiUrlPdf, DocDto docDto) throws Exception {
+        String hwpHost = apiProps.getHwpHost();
+        String hwpPort = apiProps.getHwpPort();
+
+        apiUrlPdf = buildApiUrl(hwpHost, hwpPort, apiUrlPdf);
+        WebClient webClient = createWebClient(apiUrlPdf);
+
+        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
+        if (!file.exists()) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.NOFILE.getDbCode())
+                    .build());
+
+            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
+
+
+        }
+
+        ApiPdfResponse response = webClient.post()
+                .uri("/api/convert")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file))
+                .retrieve()
+                .bodyToMono(ApiPdfResponse.class)
+                .doOnError(Throwable::printStackTrace)
+                .block();
+
+        return processConversionResponse(response, docDto);
+    }
+
+
+    /**
+     * PDF/IMG OCR API 변환 요청
+     */
+    public String transOcr(String apiUrlOcr, DocDto docDto, String fileType) throws Exception {
         String ocrHost = apiProps.getOcrHost();
         String ocrPort = apiProps.getOcrPort();
 
@@ -309,16 +362,16 @@ public class DocService {
             uriSet = "/extract/image";
         }
 
-        ApiPdfResponse response = webClient.post()
+        ApiOcrResponse response = webClient.post()
                 .uri(uriSet)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData("file", file))
                 .retrieve()
-                .bodyToMono(ApiPdfResponse.class)
+                .bodyToMono(ApiOcrResponse.class)
                 .doOnError(e -> e.printStackTrace())
                 .block();
 
-        return processConversionPdfResponse(docDto, response.task_id, webClient);
+        return processConversionOcrResponse(docDto, response.task_id, webClient);
     }
 
     /**
@@ -513,7 +566,7 @@ public class DocService {
     /**
      * PDF/IMG 변환 요청에서 Task 상태 확인 및 DB 업데이트 로직 분리
      */
-    private String processConversionPdfResponse(DocDto docDto, String task_id, WebClient webClient) throws Exception {
+    private String processConversionOcrResponse(DocDto docDto, String task_id, WebClient webClient) throws Exception {
         String toHtml = "";
 
         if (task_id == null) {

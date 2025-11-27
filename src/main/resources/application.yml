@@ -60,6 +60,9 @@ api:
     xlsx: http://210.113.0.140:8230
     xlsxHost: docuverse_xlsx
     xlsxPort: 8230
+    pdf: http://210.113.0.140:8127
+    pdfHost: docuverse_pdf
+    pdfPort: 8127
 
 
 servers:

@@ -25,4 +25,7 @@ public class TransDocApiProperties {
     private String xlsx;
     private String xlsxHost;
     private String xlsxPort;
+    private String pdf;
+    private String pdfHost;
+    private String pdfPort;
 }

@@ -1,5 +1,7 @@
 package document.doc.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 public class ApiPdfResponse extends ApiResponseBase{
-    public String task_id;
+    public JsonNode json_data;
 }
