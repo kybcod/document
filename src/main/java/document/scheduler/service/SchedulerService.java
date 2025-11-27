@@ -1,20 +1,17 @@
 package document.scheduler.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import document.config.TransDocApiProperties;
 import document.config.TransServerProperties;
 import document.doc.dto.*;
 import document.doc.mapper.DocMapper;
+import document.doc.service.DocService;
 import io.netty.channel.ChannelOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
@@ -25,8 +22,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,6 +31,7 @@ public class SchedulerService {
     private final DocMapper docMapper;
     private final TransServerProperties servProp;
     private final TransDocApiProperties apiProps;
+    private final DocService docService;
 
     @Value("${spring.profiles.active}")
     private String serverType;
@@ -53,12 +49,6 @@ public class SchedulerService {
 
     //파일변환 API
     public void docuTansApi() {
-
-        String apiUrlDocx = apiProps.getDocx();
-        String apiUrlHwp = apiProps.getHwp();
-        String apiUrlOcr = apiProps.getOcr();
-        String apiUrlPptx = apiProps.getPptx();
-        String apiUrlXlsx = apiProps.getXlsx();
 
         String serverNum = resolveCurrentServerNumber();
 
@@ -122,18 +112,9 @@ public class SchedulerService {
                 continue;
             }
 
-            String filename = save_filename.toLowerCase();
-
             try {
 
-                if ("1".equals(ocryn)) {
-                    log.info("OCR 변환 시작 - DOC_ID={}", doc_id);
-                    handleOcrConvert(filename, docDto, apiUrlOcr);
-                } else {
-                    log.info("일반 변환 시작 - DOC_ID={}", doc_id);
-                    handleNormalConvert(filename, docDto, apiUrlDocx, apiUrlHwp, apiUrlXlsx, apiUrlPptx);
-                }
-
+                docService.apiTransfer(docDto);
             } catch (Exception e) {
                 log.error("문서 변환 실패 - DOC_ID={}", doc_id, e);
                 docMapper.updateTrans(docDto.toBuilder()
@@ -159,352 +140,6 @@ public class SchedulerService {
             }
         } catch (UnknownHostException e) {
             return "1"; // 오류 시 기본값
-        }
-    }
-
-    private void handleOcrConvert(String filename, DocDto docDto, String apiUrlOcr) throws Exception {
-
-        if (filename.endsWith(".pdf")) {
-            transPdf(apiUrlOcr, docDto, "pdf");
-        } else if (filename.endsWith(".gif") || filename.endsWith(".jpg") ||
-                filename.endsWith(".jpeg") || filename.endsWith(".png") ||
-                filename.endsWith(".bmp")) {
-            transPdf(apiUrlOcr, docDto, "img");
-        } else {
-            throw new UnsupportedOperationException("지원하지 않는 파일입니다: " + filename);
-        }
-    }
-
-    private void handleNormalConvert( String filename, DocDto docDto,
-                                      String apiUrlDocx, String apiUrlHwp, String apiUrlXlsx, String apiUrlPptx) throws Exception {
-
-        if (filename.endsWith(".doc") || filename.endsWith(".docx")) {
-            transDocx(apiUrlDocx, docDto);
-
-        } else if (filename.endsWith(".xls") || filename.endsWith(".xlsx")) {
-            transXlsx(apiUrlXlsx, docDto);
-
-        } else if (filename.endsWith(".pptx")  || filename.endsWith(".ppt")) {
-            transPptx(apiUrlPptx, docDto);
-
-        } else if (filename.endsWith(".hwp")) {
-            transHwp(apiUrlHwp, docDto);
-        } else {
-            throw new UnsupportedOperationException("지원하지 않는 파일입니다: " + filename);
-        }
-    }
-
-    public String transPdf(String apiUrlOcr, DocDto docDto, String fileType) throws Exception {
-        String ocrHost = apiProps.getOcrHost();
-        String ocrPort = apiProps.getOcrPort();
-
-        apiUrlOcr = buildApiUrl(ocrHost, ocrPort, apiUrlOcr);
-        WebClient webClient = createWebClient(apiUrlOcr);
-
-        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
-        if (!file.exists()) {
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.NOFILE.getDbCode())
-                    .build());
-
-            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
-
-
-        }
-
-        String uriSet = "";
-        if("pdf".equals(fileType)) {
-            uriSet = "/extract/pdf";
-        } else if("img".equals(fileType)) {
-            uriSet = "/extract/image";
-        }
-
-        ApiPdfResponse response = webClient.post()
-                .uri(uriSet)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("file", file))
-                .retrieve()
-                .bodyToMono(ApiPdfResponse.class)
-                .doOnError(e -> e.printStackTrace())
-                .block();
-
-        return processConversionPdfResponse(docDto, response.task_id, webClient);
-    }
-
-    public String transDocx(String apiUrlDocx, DocDto docDto) throws Exception {
-        String docxHost = apiProps.getDocxHost();
-        String docxPort = apiProps.getDocxPort();
-
-        apiUrlDocx = buildApiUrl(docxHost, docxPort, apiUrlDocx);
-        WebClient webClient = createWebClient(apiUrlDocx);
-
-        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
-        if (!file.exists()) {
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.NOFILE.getDbCode())
-                    .build());
-
-            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
-
-
-        }
-
-        ApiDocxResponse response = webClient.post()
-                .uri("/convert/")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("file", file))
-                .retrieve()
-                .bodyToMono(ApiDocxResponse.class)
-                .doOnError(Throwable::printStackTrace)
-                .block();
-
-        return processConversionResponse(response, docDto);
-    }
-
-    public String transHwp(String apiUrlHwp, DocDto docDto) throws Exception {
-        String hwpHost = apiProps.getHwpHost();
-        String hwpPort = apiProps.getHwpPort();
-
-        apiUrlHwp = buildApiUrl(hwpHost, hwpPort, apiUrlHwp);
-        WebClient webClient = createWebClient(apiUrlHwp);
-
-        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
-        if (!file.exists()) {
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.NOFILE.getDbCode())
-                    .build());
-
-            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
-
-
-        }
-
-        ApiHwpResponse response = webClient.post()
-                .uri("/convert")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("file", file))
-                .retrieve()
-                .bodyToMono(ApiHwpResponse.class)
-                .doOnError(Throwable::printStackTrace)
-                .block();
-
-        return processConversionResponse(response, docDto);
-    }
-
-    private String transPptx(String apiUrlPptx, DocDto docDto) throws Exception {
-
-        String pptxHost = apiProps.getPptxHost();
-        String pptxPort = apiProps.getPptxPort();
-
-        apiUrlPptx = buildApiUrl(pptxHost, pptxPort, apiUrlPptx);
-        WebClient webClient = createWebClient(apiUrlPptx);
-
-
-        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
-
-        // API 호출
-        ApiPptxResponse response = webClient.post()
-                .uri("/convert/")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("file", file))
-                .retrieve()
-                .bodyToMono(ApiPptxResponse.class)
-                .doOnError(e -> e.printStackTrace())
-//                    .bodyToMono(String.class) //그냥  String 으로 받을때
-                .block();
-
-
-        return processConversionResponse(response, docDto);
-
-    }
-
-    public String transXlsx(String apiUrlXlsx, DocDto docDto) throws Exception {
-
-        String XlsxHost = apiProps.getXlsxHost();
-        String XlsxPort = apiProps.getXlsxPort();
-
-        apiUrlXlsx = buildApiUrl(XlsxHost, XlsxPort, apiUrlXlsx);
-        WebClient webClient = createWebClient(apiUrlXlsx);
-
-        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
-
-        // API 호출
-        List<ApiXlsxResponse> response = webClient.post()
-                .uri("/convert")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData("file", file))
-                .retrieve()
-                .bodyToFlux(ApiXlsxResponse.class) // 배열을 Flux로
-                .collectList()                     // Flux -> List
-                .doOnError(e -> e.printStackTrace())
-//                    .bodyToMono(String.class) //그냥  String 으로 받을때
-                .block();
-
-        return processConversionXlsxResponse(response, docDto);
-    }
-
-    /**
-     * 문서 변환 API의 응답 결과를 처리
-     */
-    private <T extends ApiResponseBase> String processConversionResponse(T response, DocDto docDto) throws Exception {
-
-        TransStatus resultStatus = TransStatus.fromApiStatus(response);
-        String mergedHtml = "";
-
-        // 상태에 따라 분기 처리
-        switch (resultStatus) {
-            case SUCCESS:
-                mergedHtml = String.join("<!--PAGE_BREAK-->", response.getHtmlContent());
-
-                int updated = docMapper.updateTrans(docDto.toBuilder()
-                        .docStatus(resultStatus.getDbCode())
-                        .transHtml(mergedHtml)
-                        .build());
-
-                if (updated <= 0) {
-                    throw new Exception("문서 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
-                }
-
-                return resultStatus.getMessage();
-
-            default:
-                updated = docMapper.updateTrans(docDto.toBuilder()
-                        .docStatus(TransStatus.FAILURE.getDbCode())
-                        .transHtml(mergedHtml)
-                        .build());
-
-                if (updated <= 0) {
-                    throw new Exception("문서 변환 실패 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
-                }
-
-                String errMsg = TransStatus.FAILURE.getMessage();
-                String detailedMsg = response != null ? response.getErrorMessage() : null;
-                if (detailedMsg != null) {
-                    errMsg += " " + detailedMsg;
-                }
-
-                throw new Exception(errMsg);
-        }
-    }
-
-    /**
-     * 엑셀 변환용
-     */
-    private String processConversionXlsxResponse(List<ApiXlsxResponse> response, DocDto docDto) throws Exception {
-        String mergedHtml = "";
-
-        if (response == null || response.isEmpty()) {
-            // fail 업데이트 로직
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.FAILURE.getDbCode())
-                    .transHtml(mergedHtml)
-                    .build());
-
-            throw new Exception("문서 변환 실패 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
-        }
-
-        mergedHtml = response.stream()
-                .map(r -> "<h1>" + r.getSheet_name() + "</h1>" + r.getSheet_html())
-                .collect(Collectors.joining("<!--PAGE_BREAK-->"));
-
-        int updated = docMapper.updateTrans(docDto.toBuilder()
-                .docStatus(TransStatus.SUCCESS.getDbCode())
-                .transHtml(mergedHtml)
-                .build());
-
-        if (updated <= 0) {
-            throw new Exception("문서 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
-        }
-
-        return TransStatus.SUCCESS.getMessage();
-    }
-
-
-
-
-    /**
-     * PDF/IMG 변환 요청에서 Task 상태 확인 및 DB 업데이트 로직 분리
-     */
-    private String processConversionPdfResponse(DocDto docDto, String task_id, WebClient webClient) throws Exception {
-        String toHtml = "";
-
-        if (task_id == null) {
-
-            docMapper.updateTrans(docDto.toBuilder()
-                    .docStatus(TransStatus.FAILURE.getDbCode())
-                    .transHtml(toHtml)
-                    .build());
-
-            throw new Exception(TransStatus.FAILURE.getMessage() + " (Task ID 없음)");
-
-        }
-
-
-        ApiTaskResponse taskResponse = webClient.get()
-                .uri("/task/{id}", task_id)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(ApiTaskResponse.class)
-                .block();
-
-
-        int updated = docMapper.updateTrans(docDto.toBuilder()
-                .transTaskid(task_id)
-                .build());
-
-        if (updated <= 0) {
-            throw new Exception("Task ID DB 업데이트 실패. docId: " + docDto.getDocId());
-        }
-
-        // 상태를 TransStatus Enum으로 변환
-        TransStatus transStatus = TransStatus.fromApiStatus(taskResponse);
-
-        // 상태별 처리
-        switch (transStatus) {
-            case SUCCESS:
-                toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
-                updated = docMapper.updateTrans(docDto.toBuilder()
-                        .docStatus(transStatus.getDbCode())
-                        .transHtml(toHtml)
-                        .build());
-                if (updated <= 0) {
-                    throw new Exception("PDF/IMG 변환 결과 DB 업데이트 실패. docId: " + docDto.getDocId());
-                }
-                return transStatus.getMessage();
-
-            case PENDING:
-                updated  = docMapper.updateTrans(docDto.toBuilder()
-                        .docStatus(transStatus.getDbCode())
-                        .transHtml(toHtml)
-                        .build());
-                if (updated <= 0) {
-                    throw new Exception("PDF/IMG PENDING 상태 DB 업데이트 실패. docId: " + docDto.getDocId());
-                }
-                return transStatus.getMessage();
-
-            case FAILURE:
-            default:
-                updated = docMapper.updateTrans(docDto.toBuilder()
-                        .docStatus(TransStatus.FAILURE.getDbCode())
-                        .transHtml(toHtml)
-                        .build());
-
-                if (updated <= 0) {
-                    throw new Exception("PDF/IMG 변환 실패 DB 업데이트 실패. docId: " + docDto.getDocId());
-                }
-
-
-                ObjectMapper mapper = new ObjectMapper();
-                String errMsg = transStatus.getMessage();
-                String detailedMsg = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(taskResponse);
-                if (detailedMsg != null) {
-                    errMsg += " " + detailedMsg;
-                }
-
-                throw new Exception(errMsg);
         }
     }
 
@@ -542,10 +177,6 @@ public class SchedulerService {
                 .build();
     }
 
-
-
-
-
     //전환 보류 상태 확인
     public void taskCheck(String apiUrlOcr) {
 
@@ -564,6 +195,7 @@ public class SchedulerService {
                 WebClient webClient = createWebClient(apiUrlOcr);
 
                 ApiTaskResponse taskResponse = getTaskStatus(webClient ,taskId);
+                log.info("taskResponse:"+taskResponse);
 
                 if (taskResponse.getStatus() != null && "SUCCESS".equalsIgnoreCase(taskResponse.getStatus())){
                     String toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
@@ -589,6 +221,8 @@ public class SchedulerService {
                 docMapper.updateTrans(docDto.toBuilder()
                         .docStatus(TransStatus.FAILURE.getDbCode())
                         .build());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
         log.info("taskCheck end");
@@ -596,6 +230,7 @@ public class SchedulerService {
 
     public ApiTaskResponse getTaskStatus(WebClient webClient, String task_id) {
         log.info("getTaskStatus 시작");
+        log.info("task_id:"+task_id);
         return webClient.get()
                 .uri("/task/{id}", task_id)
                 .accept(MediaType.APPLICATION_JSON)

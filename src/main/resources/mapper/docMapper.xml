@@ -103,7 +103,19 @@
     </select>
 
     <select id="getDocListByServer">
-        SELECT DOC_ID,SAVE_FILENAME,DOC_FILEPATH,OCRYN
+        SELECT DOC_ID,
+               DOC_DT,
+               DOC_NAME,
+               ORG_FILENAME,
+               SAVE_FILENAME,
+               DOC_FILEPATH,
+               DOC_STATUS,
+               SERVER_NUM,
+               CRT_ID,
+               OCRYN,
+               CRT_DT,
+               TRANS_FILE,
+               TRANS_DT
         FROM tb_document
         WHERE DOC_STATUS = 0 AND SERVER_NUM = #{serverNum}
         ORDER BY CRT_DT ASC

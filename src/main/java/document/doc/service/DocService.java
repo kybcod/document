@@ -158,10 +158,10 @@ public class DocService {
      */
     public String apiTransfer(DocDto docDto) throws Exception {
 
-        // 변환 실패 상태가 맞는지 확인
-        if(!docDto.getDocStatus().equals("9")){
-            throw new Exception("변환상태가 실패가 아닙니다.");
-        }
+//        // 변환 실패 상태가 맞는지 확인
+//        if(!docDto.getDocStatus().equals("9")){
+//            throw new Exception("변환상태가 실패가 아닙니다.");
+//        }
 
         // 확장자 다른 api
         String ext = "";
