@@ -100,6 +100,14 @@ public class DocService {
 
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
+        // 이미지 외의 ocr체크 예외처리
+        if(docDto.getOcryn().equals("1") && !extension.equals(".jpg") &&
+                !extension.equals(".png") && !extension.equals(".jpeg") &&
+                !extension.equals(".gif") && !extension.equals(".bmp") &&
+                !extension.equals(".tiff")) {
+            throw new Exception("OCR 문서가 아닙니다 docStatus: " + docDto.getDocStatus());
+        }
+
         // uploadPath 디렉토리가 없으면 생성
         Path baseDir = Paths.get(uploadPath);
         if (!Files.exists(baseDir)) {
@@ -176,13 +184,9 @@ public class DocService {
                 case "jpg":
                 case "png":
                 case "bmp":
+                case "tiff":
                     log.info("이미지 파일입니다.");
                     return transOcr( apiProps.getOcr(),  docDto, "img");
-
-                case "pdf":
-                    log.info("pdf 파일입니다.");
-                    return transOcr( apiProps.getOcr(),  docDto, "pdf");
-
                 default:
                     throw new Exception("지원하지 않는 파일 형식입니다.");
             }

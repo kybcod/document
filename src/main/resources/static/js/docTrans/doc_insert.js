@@ -72,11 +72,16 @@ function docTransGridSetting() {
         formData.append('ocryn', data.ocryn ? 1 : 0);
 
         const allowedExtensions = [
-            '.doc', '.docx', '.txt', '.xls', '.xlsx',
+            '.doc', '.docx', '.txt', '.xls', '.xlsx', '.tiff',
             '.ppt', '.pptx', '.hwp', '.gif', '.jpeg', '.jpg', '.png', '.bmp', '.pdf'
         ];
 
+        const allowedOcrExtensions = [
+            '.gif', '.jpeg', '.jpg', '.png', '.bmp', '.tiff'
+        ];
+
         const fileUploader = $(".dx-fileuploader input[type='file']")[0];
+
 
         if (!fileUploader || fileUploader.files.length === 0) {
             basicAlert({ icon: 'error', text: '파일을 선택해주세요.' });
@@ -87,6 +92,7 @@ function docTransGridSetting() {
         // 파일 확장자 체크
         const fileName = fileUploader.files[0].name.toLowerCase();
         const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
+        const isOcrValid = allowedOcrExtensions.some(ext => fileName.endsWith(ext));
 
         if (!isValid) {
             basicAlert({
@@ -94,6 +100,23 @@ function docTransGridSetting() {
                 text: `지원하지 않는 파일 형식입니다.\n\n허용된 형식: ${allowedExtensions.join(', ')}`
             });
             fileUploader.value = ''; // 파일 선택 초기화
+            deferred.reject();
+            return;
+        } else if (!isOcrValid && data.ocryn) {
+            basicAlert({
+                icon: 'error',
+                text: `지원하지 않는 OCR 형식입니다.\n\n허용된 형식: ${allowedOcrExtensions.join(', ')}`
+            });
+            data.ocryn = 0;
+            const ocrCheckBox = $(".dx-overlay-content .dx-checkbox")
+                .filter(function () {
+                    return $(this).find(".dx-checkbox-text").text() === "OCR";
+                })
+                .dxCheckBox("instance");
+            if (ocrCheckBox) {
+                ocrCheckBox.option("value", false);
+            }
+
             deferred.reject();
             return;
         }
