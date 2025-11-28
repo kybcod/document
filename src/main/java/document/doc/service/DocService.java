@@ -105,7 +105,7 @@ public class DocService {
                 !extension.equals(".png") && !extension.equals(".jpeg") &&
                 !extension.equals(".gif") && !extension.equals(".bmp") &&
                 !extension.equals(".tiff")) {
-            throw new Exception("OCR 문서가 아닙니다 docStatus: " + docDto.getDocStatus());
+            throw new Exception("OCR 문서가 아닙니다 확장자 : " + extension);
         }
 
         // uploadPath 디렉토리가 없으면 생성
@@ -188,7 +188,7 @@ public class DocService {
                     log.info("이미지 파일입니다.");
                     return transOcr( apiProps.getOcr(),  docDto, "img");
                 default:
-                    throw new Exception("지원하지 않는 파일 형식입니다.");
+                    throw new Exception("OCR파일 형식이 아닙니다.");
             }
         } else {
             switch (ext) {
