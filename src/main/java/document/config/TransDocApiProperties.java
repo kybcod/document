@@ -28,4 +28,7 @@ public class TransDocApiProperties {
     private String pdf;
     private String pdfHost;
     private String pdfPort;
+    private String jpg;
+    private String jpgHost;
+    private String jpgPort;
 }

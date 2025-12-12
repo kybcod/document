@@ -51,8 +51,8 @@ function docTransGridSetting() {
     const ocrynCol = dataGrid.columns.find(c => c.dataField === 'ocryn');
     if (ocrynCol) {
         const ocrynMap = {
-            0: '✓',
-            1: ' ',
+            0: ' ',
+            1: '✓',
         };
         ocrynCol.width = 80;
         ocrynCol.customizeText = function(cellInfo) {
@@ -222,6 +222,11 @@ function readFile(docId) {
         contentType: "application/json",
         data: JSON.stringify({docId}),
         success(res) {
+            console.log("==== transHtml ====");
+            console.log(res);
+            console.log(res.transHtml);
+
+
             let htmlString = res.transHtml;
 
             $("#previewPopup").dxPopup({

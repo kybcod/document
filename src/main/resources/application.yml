@@ -63,6 +63,9 @@ api:
     pdf: http://210.113.0.140:8127
     pdfHost: docuverse_pdf
     pdfPort: 8127
+    jpg: http://210.113.0.140:8390
+    jpgHost: docuverselaytect
+    jpgPort: 8390
 
 
 servers:

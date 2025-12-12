@@ -222,7 +222,7 @@ public class DocService {
                 case "png":
                 case "bmp":
                     log.info("이미지 파일입니다.");
-                    return transOcr( apiProps.getOcr(),  docDto, "img");
+                    return transJpg( apiProps.getJpg(),  docDto);
 
                 case "pdf":
                     log.info("pdf 파일입니다.");
@@ -335,6 +335,40 @@ public class DocService {
                 .block();
 
         return processConversionResponse(response, docDto);
+    }
+
+    /**
+     * IMG API 변환 요청
+     */
+    public String transJpg(String apiJpgPdf, DocDto docDto) throws Exception {
+        String jpgHost = apiProps.getJpgHost();
+        String jpgPort = apiProps.getJpgPort();
+
+        apiJpgPdf = buildApiUrl(jpgHost, jpgPort, apiJpgPdf);
+        WebClient webClient = createWebClient(apiJpgPdf);
+
+        FileSystemResource file = new FileSystemResource(docDto.getDocFilepath());
+        if (!file.exists()) {
+
+            docMapper.updateTrans(docDto.toBuilder()
+                    .docStatus(TransStatus.NOFILE.getDbCode())
+                    .build());
+
+            throw new Exception(TransStatus.NOFILE.getMsgFilePath(file.getPath()));
+
+
+        }
+
+        ApiJpgResponse response = webClient.post()
+                .uri("/detect")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData("file", file))
+                .retrieve()
+                .bodyToMono(ApiJpgResponse.class)
+                //.doOnError(Throwable::printStackTrace)
+                .block();
+
+        return processConversionJpgResponse(response, docDto);
     }
 
 
@@ -649,6 +683,48 @@ public class DocService {
                 throw new Exception(errMsg);
         }
     }
+
+    /**
+     * 이미지 API 응답 결과를 처리
+     */
+    private String processConversionJpgResponse(ApiJpgResponse response, DocDto docDto) throws Exception {
+
+        TransStatus resultStatus = TransStatus.fromApiStatus(response);
+        String base64 = response.getImage_base64();
+        String html = "<img src=\"data:image/jpeg;base64," + base64 + "\" style=\"max-width:100%;height:auto;\" />";
+
+        switch (resultStatus) {
+            case SUCCESS:
+
+                int updated = docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus(resultStatus.getDbCode())
+                        .transHtml(html)   // HTML 대신 base64 저장
+                        .build());
+
+                if (updated <= 0) {
+                    throw new Exception("JPG 변환 결과 DB 업데이트 실패. docId: "
+                            + docDto.getDocId());
+                }
+
+                return "이미지 변환 성공";
+
+            default:
+
+                updated = docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus(TransStatus.FAILURE.getDbCode())
+                        .transHtml("")
+                        .build());
+
+                if (updated <= 0) {
+                    throw new Exception("JPG 변환 실패 상태 DB 업데이트 실패. docId: "
+                            + docDto.getDocId());
+                }
+
+                String detailed = response.getErrorMessage();
+                throw new Exception("이미지 변환 실패. " + (detailed != null ? detailed : ""));
+        }
+    }
+
 
 
 
