@@ -222,11 +222,6 @@ function readFile(docId) {
         contentType: "application/json",
         data: JSON.stringify({docId}),
         success(res) {
-            console.log("==== transHtml ====");
-            console.log(res);
-            console.log(res.transHtml);
-
-
             let htmlString = res.transHtml;
 
             $("#previewPopup").dxPopup({
