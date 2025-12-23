@@ -33,7 +33,11 @@ function docTransGridSetting() {
     let captions = ['등록날짜','문서명', '변환상태', '보기', '변환작업일시', '등록자ID', '원본파일명', '저장파일명', '저장경로','OCR여부','변환HTML'];
     dataGrid.setColumns(columns);
     dataGrid.setCaptions(captions);
-    dataGrid.columns.find(c => c.dataField === 'transHtml').visible = false;
+    const transHtmlCol = dataGrid.columns.find(c => c.dataField === 'transHtml');
+    if (transHtmlCol) {
+        transHtmlCol.visible = false;
+        transHtmlCol.calculateCellValue = () => '';
+    }
     const docStatusCol = dataGrid.columns.find(c => c.dataField === 'docStatus');
     if (docStatusCol) {
         const docStatusMap = {
@@ -45,7 +49,7 @@ function docTransGridSetting() {
             9: '실패'
         };
         docStatusCol.customizeText = function(cellInfo) {
-            return docStatusMap[cellInfo.value] || cellInfo.value;
+            return String(docStatusMap[cellInfo.value] ?? '');
         };
     }
     const ocrynCol = dataGrid.columns.find(c => c.dataField === 'ocryn');
@@ -56,7 +60,7 @@ function docTransGridSetting() {
         };
         ocrynCol.width = 80;
         ocrynCol.customizeText = function(cellInfo) {
-            return ocrynMap[cellInfo.value] || cellInfo.value;
+            return String(ocrynMap[cellInfo.value] ?? '');
         };
     }
     dataGrid.setPaging(15);
