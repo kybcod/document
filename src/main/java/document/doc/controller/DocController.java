@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -32,7 +33,7 @@ public class DocController {
     public ResponseEntity<?> uploadDoc(@ModelAttribute DocDto docDto,
                                        HttpSession session) throws Exception {
         UserDto userDto = (UserDto) session.getAttribute("loginUser");
-        docService.saveDocument(docDto,userDto);
+        docService.saveDocuments(docDto,userDto);
         return ResponseEntity.ok().build();
     }
 
@@ -57,5 +58,18 @@ public class DocController {
     public ResponseEntity<?> transHtml(@RequestBody DocDto docDto) {
         return ResponseEntity.ok(docService.getTransHtml(docDto));
     }
+
+    @Description("문서 리스트 삭제")
+    @DeleteMapping("/bulk")
+    public ResponseEntity<?> deleteDocList(@RequestBody List<DocDto> docDto) {
+        return ResponseEntity.ok(docService.deleteDocList(docDto));
+    }
+
+    @Description("문서 리스트 변환")
+    @PostMapping("/bulkTransfer")
+    public ResponseEntity<?> transferDocList(@RequestBody List<DocDto> docList) {
+        return ResponseEntity.ok(docService.transferDocList(docList));
+    }
+
 
 }

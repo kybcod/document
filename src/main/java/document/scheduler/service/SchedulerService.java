@@ -197,23 +197,32 @@ public class SchedulerService {
                 ApiTaskResponse taskResponse = getTaskStatus(webClient ,taskId);
                 log.info("taskResponse:"+taskResponse);
 
-                if (taskResponse.getStatus() != null && "SUCCESS".equalsIgnoreCase(taskResponse.getStatus())){
-                    String toHtml = taskResponse.getResult().getOcr_gen().getHtml().get(0);
-                    log.info("변환 성공 → DB 저장 중...");
+                if ("SUCCESS".equalsIgnoreCase(taskResponse.getStatus())) {
+
+                    String toHtml = taskResponse.getResult()
+                            .getOcr_gen()
+                            .getHtml()
+                            .get(0);
+
                     docMapper.updateTrans(docDto.toBuilder()
                             .docStatus(TransStatus.SUCCESS.getDbCode())
                             .transHtml(toHtml)
                             .build());
-                    log.info("DB 저장 완료!");
-                } else if(taskResponse.getStatus() != null && "PENDING".equalsIgnoreCase(taskResponse.getStatus())) {
-                    log.info("변환 대기중 입니다."+ taskResponse.getStatus());
-//                String sql = "UPDATE tb_document SET DOC_STATUS = '3' ,TRANS_DT = NOW() WHERE DOC_ID = ?";
-//                jdbcTemplate.update(sql, doc_id);
-                } else {
+
+                } else if ("PENDING".equalsIgnoreCase(taskResponse.getStatus())) {
+
+                    log.info("변환 대기중 taskId={}", taskId);
+                    // 상태 유지
+
+                } else { // ERROR, FAILED, UNKNOWN
+
+                    log.warn("OCR task 실패 처리 taskId={}", taskId);
+
                     docMapper.updateTrans(docDto.toBuilder()
                             .docStatus(TransStatus.FAILURE.getDbCode())
                             .build());
                 }
+
             } catch (WebClientRequestException e) {
                 log.error("taskId={} 상태 조회 중 통신 오류: {}", taskId, e.getMessage(), e);
 
@@ -222,20 +231,43 @@ public class SchedulerService {
                         .docStatus(TransStatus.FAILURE.getDbCode())
                         .build());
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                log.error("taskId={} 처리 중 예외 발생", taskId, e);
+
+                docMapper.updateTrans(docDto.toBuilder()
+                        .docStatus(TransStatus.FAILURE.getDbCode())
+                        .build());
             }
         }
         log.info("taskCheck end");
     }
 
-    public ApiTaskResponse getTaskStatus(WebClient webClient, String task_id) {
-        log.info("getTaskStatus 시작");
-        log.info("task_id:"+task_id);
-        return webClient.get()
-                .uri("/task/{id}", task_id)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .bodyToMono(ApiTaskResponse.class)
-                .block();
+    public ApiTaskResponse getTaskStatus(WebClient webClient, String taskId) {
+
+        try {
+            return webClient.get()
+                    .uri("/task/{id}", taskId)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(ApiTaskResponse.class)
+                    .block();
+
+        } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
+
+            log.error("OCR task 조회 실패 taskId={}, status={}, body={}",
+                    taskId, e.getStatusCode(), e.getResponseBodyAsString());
+
+            // 👉 task 유실 / OCR 서버 오류
+            ApiTaskResponse fail = new ApiTaskResponse();
+            fail.setStatus("ERROR");
+            return fail;
+
+        } catch (Exception e) {
+            log.error("OCR task 조회 중 예외 taskId={}", taskId, e);
+
+            ApiTaskResponse fail = new ApiTaskResponse();
+            fail.setStatus("ERROR");
+            return fail;
+        }
     }
+
 }

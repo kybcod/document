@@ -29,7 +29,7 @@ public class DocDto {
     private String startDate; //시작날짜
     private String endDate; //종료날짜
 
-    private MultipartFile file; //파일
+    private MultipartFile[] files; //파일
 
 
 }

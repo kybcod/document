@@ -17,7 +17,7 @@ spring:
       validation-timeout: 5000    # 5초 내에 커넥션 확인 안 되면 실패
   servlet:
     multipart:
-      max-file-size: 50MB       # 단일 파일 최대 크기
+      max-file-size: 100MB       # 단일 파일 최대 크기
       max-request-size: 100MB   # 요청 전체 크기 (여러 파일 포함 시)
 
 # MyBatis 설정
@@ -48,9 +48,9 @@ api:
     docx: http://210.113.0.140:8123
     docxHost: docuverse_docx
     docxPort: 8123
-    ocr: http://210.113.0.140:8124
+    ocr: http://210.113.0.140:8003
     ocrHost: docuverseocr_app
-    ocrPort: 8124
+    ocrPort: 8003
     hwp: http://210.113.0.140:8129
     hwpHost: docuverse_hwp
     hwpPort: 8129

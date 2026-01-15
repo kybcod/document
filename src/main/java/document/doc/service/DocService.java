@@ -14,16 +14,15 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
-import reactor.netty.http.client.HttpClient;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,9 +30,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -91,56 +88,82 @@ public class DocService {
     /**
      * 문서 등록
      */
-    public void saveDocument(DocDto docDto, UserDto userDto) throws Exception {
+    public void saveDocuments(DocDto docDto, UserDto userDto) throws Exception {
+
         String serverNum = resolveCurrentServerNumber();
-
-        String orgFilename = docDto.getFile().getOriginalFilename(); // 예: "myDocument.pdf"
-        String extension = orgFilename.substring(orgFilename.lastIndexOf(".")); // 확장자 추출
-        String saveFilename = UUID.randomUUID().toString() +extension;
-
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        // 이미지 외의 ocr체크 예외처리
-        if(docDto.getOcryn().equals("1") && !extension.equals(".jpg") &&
-                !extension.equals(".png") && !extension.equals(".jpeg") &&
-                !extension.equals(".gif") && !extension.equals(".bmp") &&
-                !extension.equals(".tiff")) {
-            throw new Exception("OCR 문서가 아닙니다 확장자 : " + extension);
+        MultipartFile[] files = docDto.getFiles();
+        if (files == null || files.length == 0) {
+            throw new Exception("업로드된 파일이 없습니다.");
         }
 
-        // uploadPath 디렉토리가 없으면 생성
+        Map<String, Integer> docNameCountMap = new HashMap<>();
+
         Path baseDir = Paths.get(uploadPath);
         if (!Files.exists(baseDir)) {
             Files.createDirectories(baseDir);
         }
 
-        // 2날짜별 디렉토리 생성
         Path uploadDir = baseDir.resolve(today);
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
 
-        // 실제 파일 저장 경로 (uploadPath + 파일명)
-        Path filePath = uploadDir.resolve(saveFilename);
-        Files.copy(docDto.getFile().getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        for (MultipartFile file : files) {
 
-        // DTO 구성
-        DocDto insertDocDto = DocDto.builder()
-                .docName(docDto.getDocName())
-                .orgFilename(orgFilename)
-                .saveFilename(saveFilename)
-                .docFilepath(filePath.toString())
-                .serverNum(serverNum)
-                .ocryn(docDto.getOcryn())
-                .crtId(userDto.getUserId())
-                .build();
+            String orgFilename = file.getOriginalFilename();
+            String extension = orgFilename.substring(orgFilename.lastIndexOf("."));
 
+            String baseDocName = docDto.getDocName();
+            int count = docNameCountMap.getOrDefault(baseDocName, 0);
+            docNameCountMap.put(baseDocName, count + 1);
 
-        int inserted = docMapper.insertDoc(insertDocDto);
-        if (inserted <= 0) {
-            throw new Exception("문서 등록에 실패했습니다. docName: " + docDto.getDocName());
+            String docName;
+            if (count == 0) {
+                docName = baseDocName;           // 첫 번째
+            } else {
+                docName = baseDocName + "_" + (count + 1); // _2, _3 ...
+            }
+
+            // saveFilename은 기존 UUID 유지
+            String saveFilename = UUID.randomUUID().toString() + extension;
+
+            // OCR 예외 처리 (기존 그대로)
+            if ("1".equals(docDto.getOcryn()) &&
+                    !extension.equalsIgnoreCase(".jpg") &&
+                    !extension.equalsIgnoreCase(".png") &&
+                    !extension.equalsIgnoreCase(".jpeg") &&
+                    !extension.equalsIgnoreCase(".gif") &&
+                    !extension.equalsIgnoreCase(".bmp") &&
+                    !extension.equalsIgnoreCase(".tiff") &&
+                    !extension.equalsIgnoreCase(".pdf")) {
+                throw new Exception("OCR 문서가 아닙니다 확장자 : " + extension);
+            }
+
+            // 파일 저장
+            Path filePath = uploadDir.resolve(saveFilename);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // DB INSERT DTO
+            DocDto insertDocDto = DocDto.builder()
+                    .docName(docName)
+                    .orgFilename(orgFilename)
+                    .saveFilename(saveFilename)
+                    .docFilepath(filePath.toString())
+                    .serverNum(serverNum)
+                    .ocryn(docDto.getOcryn())
+                    .crtId(userDto.getUserId())
+                    .build();
+
+            int inserted = docMapper.insertDoc(insertDocDto);
+            if (inserted <= 0) {
+                throw new Exception("문서 등록에 실패했습니다. docName: " + docName);
+            }
         }
     }
+
+
 
 
     /**
@@ -187,6 +210,8 @@ public class DocService {
                 case "tiff":
                     log.info("이미지 파일입니다.");
                     return transOcr( apiProps.getOcr(),  docDto, "img");
+                case "pdf":
+                    return transOcr( apiProps.getOcr(),  docDto, "pdf");
                 default:
                     throw new Exception("OCR파일 형식이 아닙니다.");
             }
@@ -206,8 +231,6 @@ public class DocService {
                 case "xlsx":
                     log.info("엑셀 xls, xlsx 파일입니다.");
                     return transXlsx(apiProps.getXlsx(),docDto);
-
-                case "ppt":
                 case "pptx":
                     log.info("파워포인트 ppt, pptx 파일입니다.");
                     return transPptx( apiProps.getPptx(), docDto);
@@ -725,8 +748,55 @@ public class DocService {
         }
     }
 
+    /**
+     * 문서 리스트 삭제 (일괄)
+     */
+    public BulkResultDto deleteDocList(List<DocDto> docList) {
 
+        List<String> successIds = new ArrayList<>();
+        List<BulkErrorDto> failList = new ArrayList<>();
 
+        for (DocDto doc : docList) {
+            try {
+                deleteDoc(doc); // 기존 단건 삭제 로직 재사용
+                successIds.add(doc.getDocId());
+
+            } catch (Exception e) {
+                log.error("문서 삭제 실패 docId={}", doc.getDocId(), e);
+                failList.add(new BulkErrorDto(
+                        doc.getDocId(),
+                        e.getMessage()
+                ));
+            }
+        }
+
+        return new BulkResultDto(successIds, failList);
+    }
+
+    /**
+     * 문서 리스트 변환 (일괄)
+     */
+    public BulkResultDto transferDocList(List<DocDto> docList) {
+
+        List<String> successIds = new ArrayList<>();
+        List<BulkErrorDto> failList = new ArrayList<>();
+
+        for (DocDto doc : docList) {
+            try {
+                apiTransfer(doc);
+                successIds.add(doc.getDocId());
+
+            } catch (Exception e) {
+                log.error("문서 변환 실패 docId={}", doc.getDocId(), e);
+                failList.add(new BulkErrorDto(
+                        doc.getDocId(),
+                        e.getMessage()
+                ));
+            }
+        }
+
+        return new BulkResultDto(successIds, failList);
+    }
 
 
 }

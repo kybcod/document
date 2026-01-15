@@ -79,82 +79,97 @@ function docTransGridSetting() {
     });
 
     // 등록
-    dataGrid.setOnRowInserting(function(data, deferred) {
+    dataGrid.setOnRowInserting(function (data, deferred) {
 
         const formData = new FormData();
-        formData.append('docName', data.docName ?? "");
-        formData.append('ocryn', data.ocryn ? 1 : 0);
+        formData.append("docName", data.docName ?? "");
+        formData.append("ocryn", data.ocryn ? 1 : 0);
 
         const allowedExtensions = [
             '.doc', '.docx', '.txt', '.xls', '.xlsx', '.tiff',
-            '.ppt', '.pptx', '.hwp', '.gif', '.jpeg', '.jpg', '.png', '.bmp', '.pdf'
+            '.pptx', '.hwp', '.gif', '.jpeg', '.jpg', '.png', '.bmp', '.pdf'
         ];
 
         const allowedOcrExtensions = [
-            '.gif', '.jpeg', '.jpg', '.png', '.bmp', '.tiff'
+            '.gif', '.jpeg', '.jpg', '.png', '.bmp', '.tiff', '.pdf'
         ];
 
-        const fileUploader = $(".dx-fileuploader input[type='file']")[0];
+        const fileInput = $(".dx-fileuploader input[type='file']")[0];
 
-
-        if (!fileUploader || fileUploader.files.length === 0) {
+        if (!fileInput || fileInput.files.length === 0) {
             basicAlert({ icon: 'error', text: '파일을 선택해주세요.' });
             deferred.reject();
             return;
         }
 
-        // 파일 확장자 체크
-        const fileName = fileUploader.files[0].name.toLowerCase();
-        const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
-        const isOcrValid = allowedOcrExtensions.some(ext => fileName.endsWith(ext));
+        for (let i = 0; i < fileInput.files.length; i++) {
 
-        if (!isValid) {
-            basicAlert({
-                icon: 'error',
-                text: `지원하지 않는 파일 형식입니다.\n\n허용된 형식: ${allowedExtensions.join(', ')}`
-            });
-            fileUploader.value = ''; // 파일 선택 초기화
-            deferred.reject();
-            return;
-        } else if (!isOcrValid && data.ocryn) {
-            basicAlert({
-                icon: 'error',
-                text: `지원하지 않는 OCR 형식입니다.\n\n허용된 형식: ${allowedOcrExtensions.join(', ')}`
-            });
-            data.ocryn = 0;
-            const ocrCheckBox = $(".dx-overlay-content .dx-checkbox")
-                .filter(function () {
-                    return $(this).find(".dx-checkbox-text").text() === "OCR";
-                })
-                .dxCheckBox("instance");
-            if (ocrCheckBox) {
-                ocrCheckBox.option("value", false);
+            const file = fileInput.files[i];
+            const fileName = file.name.toLowerCase();
+
+            const isValid = allowedExtensions.some(ext => fileName.endsWith(ext));
+            const isOcrValid = allowedOcrExtensions.some(ext => fileName.endsWith(ext));
+
+            if (!isValid) {
+                basicAlert({
+                    icon: 'error',
+                    text: `지원하지 않는 파일 형식입니다.\n\n파일명: ${file.name}\n허용된 형식: ${allowedExtensions.join(', ')}`
+                });
+                deferred.reject();
+                return;
             }
 
-            deferred.reject();
-            return;
+            if (data.ocryn && !isOcrValid) {
+                basicAlert({
+                    icon: 'error',
+                    text: `OCR 불가능한 파일이 포함되어 있습니다.\n\n파일명: ${file.name}\n허용된 OCR 형식: ${allowedOcrExtensions.join(', ')}`
+                });
+
+                // OCR 체크 해제
+                data.ocryn = 0;
+                const ocrCheckBox = $(".dx-overlay-content .dx-checkbox")
+                    .filter(function () {
+                        return $(this).find(".dx-checkbox-text").text() === "OCR";
+                    })
+                    .dxCheckBox("instance");
+
+                if (ocrCheckBox) {
+                    ocrCheckBox.option("value", false);
+                }
+
+                deferred.reject();
+                return;
+            }
         }
 
-        formData.append("file", fileUploader.files[0]);
-
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append("files", fileInput.files[i]);
+        }
 
         // 전송
         $.ajax({
-            url: 'doc',
-            type: 'POST',
+            url: "doc",
+            type: "POST",
             data: formData,
             contentType: false,
             processData: false,
-            success: function(response) {
-                deferred.resolve();
+            success: function () {
+                deferred.resolve(true);
+                docTransferGrid.cancelEditData();
                 getDocList();
             },
-            error: function(err) {
+            error: function (err) {
                 deferred.reject();
-                basicAlert({ icon: 'error', text: err.responseJSON?.msg || err.responseText });
+                basicAlert({
+                    icon: 'error',
+                    text: err.responseJSON?.msg || err.responseText
+                });
             }
         });
     });
+
+
+
 
 
     // 삭제
@@ -176,6 +191,49 @@ function docTransGridSetting() {
             }
         }
     });
+    dataGrid.selection = {
+        mode: "multiple",      // 다중 선택
+        showCheckBoxesMode: "always", // 항상 체크박스 표시
+        selectAllMode: "page"  // 현재 페이지 전체 선택
+    };
+
+    dataGrid.toolbar = {
+        items: [
+            {
+                location: "before",
+                widget: "dxButton",
+                options: {
+                    icon: "trash",
+                    text: "일괄삭제",
+                    onClick: function () {
+                        bulkDelete();
+                    }
+                }
+            },
+            {
+                location: "before",
+                widget: "dxButton",
+                options: {
+                    icon: "refresh",
+                    text: "실패문서 일괄변환",
+                    onClick: function () {
+                        bulkTransfer();
+                    }
+                }
+            },
+            "addRowButton" // 기존 문서 추가 (+) 버튼 유지
+        ]
+    };
+
+    dataGrid.onSelectionChanging = function(e) {
+        e.addedItems.forEach(item => {
+            if (item.docStatus != 9) {
+                e.component.deselectRows([item.docId]);
+            }
+        });
+    };
+
+
     docTransferGrid = $('#docTransferGrid').dxDataGrid(dataGrid).dxDataGrid("instance");
 
     docTransferGrid.beginCustomLoading();
@@ -252,4 +310,125 @@ function readFile(docId) {
 
     });
 
+}
+
+function getSelectedRows() {
+    return docTransferGrid.getSelectedRowsData();
+}
+
+function bulkDelete() {
+    const selected = getSelectedRows();
+
+    if (!selected || selected.length === 0) {
+        basicAlert({ icon: 'warning', text: '선택된 문서가 없습니다.' });
+        return;
+    }
+
+    const ok = confirm(`선택한 ${selected.length}건을 삭제하시겠습니까?`);
+    if (!ok) return;
+
+    docTransferGrid.beginCustomLoading("삭제 중...");
+
+    $.ajax({
+        url: "doc/bulk",
+        type: "DELETE",
+        contentType: "application/json",
+        data: JSON.stringify(selected),
+        success(res) {
+            const successCnt = res?.successIds?.length || 0;
+            const failCnt = res?.failList?.length || 0;
+
+            if (failCnt === 0) {
+                basicAlert({
+                    icon: 'success',
+                    text: `${successCnt}건 삭제 완료`
+                });
+            } else {
+                basicAlert({
+                    icon: 'warning',
+                    text: `삭제 완료 ${successCnt}건 / 실패 ${failCnt}건`
+                });
+            }
+
+            getDocList();
+        },
+        error(err) {
+            basicAlert({
+                icon: 'error',
+                text: err.responseJSON?.msg || err.responseText
+            });
+        },
+        complete() {
+            docTransferGrid.endCustomLoading();
+        }
+    });
+}
+
+
+
+function bulkTransfer() {
+    const selected = getSelectedRows();
+
+    if (selected.length === 0) {
+        basicAlert({ icon: 'warning', text: '선택된 문서가 없습니다.' });
+        return;
+    }
+
+    const targets = selected.filter(d => d.docStatus == 9);
+
+    if (targets.length === 0) {
+        basicAlert({ icon: 'info', text: '변환 가능한 문서가 없습니다.' });
+        return;
+    }
+
+    if (targets.length !== selected.length) {
+        basicAlert({ icon: 'info', text: '변환 가능한 문서만 체크해주십시오.' });
+        return;
+    }
+
+    docTransferGrid.beginCustomLoading("변환 중...");
+
+    $.ajax({
+        url: "doc/bulkTransfer",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(selected),
+        success(res) {
+
+            const successCnt = res?.successIds?.length || 0;
+            const failList = res?.failList || [];
+            const failCnt = failList.length;
+
+            if (failCnt === 0) {
+                basicAlert({
+                    icon: 'success',
+                    text: `${successCnt}건 변환 완료`
+                });
+            } else {
+                let failText = `변환 완료: ${successCnt}건\n\n`;
+                failText += `실패 내역\n`;
+
+                failList.forEach((f, idx) => {
+                    failText += `${idx + 1}. 문서ID: ${f.docId}\n`;
+                    failText += `   사유: ${f.reason}\n\n`;
+                });
+
+                basicAlert({
+                    icon: 'warning',
+                    text: failText
+                });
+            }
+
+            getDocList();
+        },
+        error(err) {
+            basicAlert({
+                icon: 'error',
+                text: err.responseJSON?.msg || err.responseText
+            });
+        },
+        complete() {
+            docTransferGrid.endCustomLoading();
+        }
+    });
 }
